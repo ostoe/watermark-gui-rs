@@ -5,7 +5,6 @@ import HelloWorld from './components/HelloWorld.vue'
 import H222 from './components/H222.vue'
 import greet from './main'
 
-
 </script>
 
 <template>
