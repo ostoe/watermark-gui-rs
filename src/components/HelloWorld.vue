@@ -3,6 +3,8 @@ import { ref } from 'vue'
 
 defineProps<{ msg: string }>()
 
+const input = ref('')
+
 const count = ref(0)
 </script>
 
@@ -22,6 +24,7 @@ const count = ref(0)
       >create-vue</a
     >, the official Vue + Vite starter
   </p>
+   <el-input v-model="input" placeholder="Please input" />
 </template>
 
 <style scoped>

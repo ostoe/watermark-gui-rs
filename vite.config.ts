@@ -1,6 +1,12 @@
 import vue from '@vitejs/plugin-vue'
 import { defineConfig } from 'vite'
 
+// 引入自动导入式ui框架
+import AutoImport from 'unplugin-auto-import/vite'
+import Components from 'unplugin-vue-components/vite'
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
+
+
 export default defineConfig({
   // 防止 vite 输出复杂的 rust 错误
   clearScreen: false,
@@ -19,5 +25,13 @@ export default defineConfig({
     // 为调试构建生成源代码映射 (sourcemap)
     sourcemap: !!process.env.TAURI_DEBUG,
   },
-  plugins: [vue()],
+  plugins: [vue(),
+    // ui自动导入
+    AutoImport({
+      resolvers: [ElementPlusResolver()],
+    }),
+    Components({
+      resolvers: [ElementPlusResolver()],
+    }),
+  ],
 })

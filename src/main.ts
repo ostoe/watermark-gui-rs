@@ -1,15 +1,21 @@
 import {createApp} from 'vue'
 import './style.css'
 import App from './App.vue'
-import ElementPlus from 'element-plus'
-import 'element-plus/dist/index.css'
-import zhCn from 'element-plus/es/locale/lang/zh-cn'
+// 全局引入elementui
+// import ElementPlus from 'element-plus'
+// import 'element-plus/dist/index.css'
+// import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import {invoke} from '@tauri-apps/api'
 
 const app = createApp(App)
-app.use(ElementPlus, {
-  locale: zhCn,
-})
+
+
+// 全局引入elementui
+// app.use(ElementPlus, {
+//   locale: zhCn,
+// })
+
+
 app.mount('#app')
 
 // createApp(App).mount('#app')
