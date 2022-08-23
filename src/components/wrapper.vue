@@ -6,8 +6,11 @@ import { defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'index',
-  setup(){
-
+  methods: {
+    // 这是个异步函数
+    greetTest(){
+      greet("")
+    }
   }
 })
 </script>
@@ -16,14 +19,12 @@ export default defineComponent({
     <div>
         111111111212121
     </div>
-    <HelloWorld msg="Vite + Vue" class="hw"/>
-    <H222 class="h2"/>
-    <button @click="greet"> some button </button>
+    <HelloWorld msg="Vite + Vue"/>
+    <H222/>
+    <suspense>
+      <button @click="greetTest"> some button </button>
+    </suspense>
 </template>
 
 <style>
-.hw {
-    width: 50%;
-    height: 50%;
-}
 </style>

@@ -18,5 +18,3 @@ fn greet(name: &str) -> String {
     read_exif("ff");
     format!("Hello, {}!", name)
 }
-
-

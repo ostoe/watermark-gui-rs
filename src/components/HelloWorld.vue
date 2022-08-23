@@ -1,13 +1,15 @@
 <script lang="ts">
 import { ref, defineComponent } from 'vue'
 
-// defineProps<{ msg: string }>()
-
 export default defineComponent({
   name: 'HelloWorld',
-  setup(props,context){
+  props: {
+    msg: String
+  },
+  setup(props){
     const input = ref('')
     const count = ref(0)
+    console.log(props)
     return {
       input,
       count
@@ -17,7 +19,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <!-- <h1>{{ msg }}</h1> -->
+  <h1>{{ msg }}</h1>
 
   <div class="card">
     <button type="button" @click="count++">count is {{ count }}</button>
