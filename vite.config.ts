@@ -6,6 +6,10 @@ import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 
+import { resolve } from '@tauri-apps/api/path'
+
+// import { vueResolve } from  "path"
+// import styleImport, { VantResolve } from "vite-plugin-style-import"
 
 export default defineConfig({
   // 防止 vite 输出复杂的 rust 错误
@@ -25,6 +29,7 @@ export default defineConfig({
     // 为调试构建生成源代码映射 (sourcemap)
     sourcemap: !!process.env.TAURI_DEBUG,
   },
+  base: "/",
   plugins: [vue(),
     // ui自动导入
     AutoImport({
@@ -33,5 +38,15 @@ export default defineConfig({
     Components({
       resolvers: [ElementPlusResolver()],
     }),
+    // 快捷路径插件
+    // styleImport({
+    //   resolves: [VantResolve()],
+    // }),
   ],
+  // 快捷路径
+  // resolve: {
+  //   alias: {
+  //     "@": vueResolve("src"),
+  //   },
+  // },
 })

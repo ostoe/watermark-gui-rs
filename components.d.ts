@@ -11,6 +11,8 @@ declare module '@vue/runtime-core' {
     ElSlider: typeof import('element-plus/es')['ElSlider']
     H222: typeof import('./src/components/H222.vue')['default']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
-    Wrapper: typeof import('./src/components/wrapper.vue')['default']
+    RouterLink: typeof import('vue-router')['RouterLink']
+    RouterView: typeof import('vue-router')['RouterView']
+    Wrapper: typeof import('./src/components/Wrapper.vue')['default']
   }
 }

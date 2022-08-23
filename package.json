@@ -12,7 +12,10 @@
   "dependencies": {
     "@tauri-apps/api": "^1.0.2",
     "element-plus": "^2.2.14",
-    "vue": "^3.2.37"
+    "path": "^0.12.7",
+    "vite-plugin-style-import": "^2.0.0",
+    "vue": "^3.2.37",
+    "vue-router": "^4.1.4"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^1.0.5",

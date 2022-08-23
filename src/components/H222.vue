@@ -1,5 +1,5 @@
-<script setup lang="ts">
-import { ref, onMounted } from 'vue'
+<script lang="ts">
+import { ref, onMounted, defineComponent } from 'vue'
 const value = ref(0)
 // 响应式状态
 const count = ref(0)
@@ -12,6 +12,13 @@ function increment() {
 // 生命周期钩子
 onMounted(() => {
   console.log(`The initial count is ${count.value}.`)
+})
+
+export default defineComponent({
+  name: 'H222',
+  setup(){
+
+  }
 })
 </script>
 
