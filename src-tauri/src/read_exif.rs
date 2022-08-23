@@ -179,7 +179,7 @@ pub fn read_logos(banner: &str, src_img: DynamicImage) {
     println!("Text size: {}x{}", w, h);
 
     generator_draw_text("f 1.8 1/0 ", 40.0, (banner_w/2, banner_h/3),
-        1.0, &font, Rgba([179, 63u8, 60u8, 100]), &mut newimg_buf);
+        1.0, &font, Rgba([179, 63u8, 60u8, 0]), &mut newimg_buf);
 
     let img_path = "./tests/img/jpg/gps/DSCN0010-99.jpg";
     let mut fout = &mut File::create(&Path::new(&format!("{}.jpg", img_path))).unwrap();
