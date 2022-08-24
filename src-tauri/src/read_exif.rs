@@ -16,7 +16,7 @@ use image::{RgbImage, Rgba};
 use imageproc::drawing::{draw_text_mut, text_size, Canvas};
 use rusttype::{Font, Scale};
 
-pub fn read_exif(img_path: &str) -> Result<HashMap::<ExifTag, &str>, std::io::Error> {
+pub fn read_exif(img_path: &str) -> Result<HashMap::<ExifTag, String>, std::io::Error> {
     let img_path = "./tests/img/jpg/gps/DSCN0010.jpg";
     // let img_path = "./tests/img/jpg/Canon_40D_photoshop_import.jpg";
     // let img_path = "./tests/img/jpg/Canon_40D.jpg";
@@ -35,53 +35,54 @@ pub fn read_exif(img_path: &str) -> Result<HashMap::<ExifTag, &str>, std::io::Er
     let (w, h) = (metadata.width, metadata.height);
 
     println!("{}", exif_parsed.mime);
-    let mut exif_map = HashMap::<ExifTag, &str>::new();
-    // for entry in exif_parsed.entries.iter() {
-    //     match exif_map.entry(entry.tag) {
-    //         std::collections::hash_map::Entry::Vacant(vacant) => {
-    //             let value = entry.value_more_readable.trim();
-    //             vacant.insert(value);
-    //         }
-    //         _ => {}
-    //     }
-    //     // println!(
-    //     //     "[{:?}] {}: {} --{} ",
-    //     //     entry.kind, entry.tag, entry.value_more_readable, entry.ifd.tag
-    //     // );
-    // }
-    // println!("{:?}", exif_map);
-    // println!("read exif ok");
+    let mut exif_map = HashMap::<ExifTag, String>::new();
+    for entry in exif_parsed.entries.into_iter() {
+        let tag = entry.tag;
+        match exif_map.entry(tag) {
+            std::collections::hash_map::Entry::Vacant(vacant) => {
+                let value = entry.value_more_readable.trim();
+                vacant.insert(String::from(value));
+            }
+            _ => {}
+        }
+        // println!(
+        //     "[{:?}] {}: {} --{} ",
+        //     entry.kind, entry.tag, entry.value_more_readable, entry.ifd.tag
+        // );
+    }
+    println!("{:?}", exif_map);
+    println!("read exif ok");
     return Ok(exif_map);
 }
 
 
-fn process_single_image(img_path: &str, brand: &str, font: &Font, brand_image: DynamicImage, 
-    exif_map: HashMap::<ExifTag, &str>) {
+pub fn process_single_image(img_path: &str, brand: &str, font: &Font, brand_image: DynamicImage, 
+    exif_map: HashMap::<ExifTag, String>) {
     // convert to BannerStruct to draw..
     //
     let exposure_time = match exif_map.get(&ExifTag::ExposureTime) {
-        Some(v) => *v,
+        Some(v) => v,
         _ => "0",
     };
 
     let f_number = match exif_map.get(&ExifTag::FNumber) {
-        Some(v) => *v,
+        Some(v) => v,
         _ => "f/0",
     };
     let camera_device = match exif_map.get(&ExifTag::Model) {
-        Some(v) => *v,
+        Some(v) => v,
         _ => "",
     };
     let iso = match exif_map.get(&ExifTag::ISOSpeedRatings) {
-        Some(v) => *v,
+        Some(v) => v,
         _ => "ISO 0",
     };
     let focal_length = match exif_map.get(&ExifTag::FocalLength) {
-        Some(v) => *v,
+        Some(v) => v,
         _ => "0 mm",
     };
     let data_time = match exif_map.get(&ExifTag::DateTime) {
-        Some(v) => *v,
+        Some(v) => v,
         _ => "",
     };
     // read images to vec

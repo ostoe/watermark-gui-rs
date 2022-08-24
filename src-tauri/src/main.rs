@@ -5,12 +5,12 @@
 
 use std::io::{BufReader, Read};
 
-use app::read_exif::read_exif;
+use app::read_exif;
 use image::DynamicImage;
 use tauri::{CustomMenuItem, Menu, MenuItem, Submenu, State};
 use tauri::{Manager, Window};
-
-// the payload type must implement `Serialize` and `Clone`.
+use rusttype::{Font, Scale};
+// the payload type must implement `Se&rialize` and `Clone`.
 #[derive(Clone, serde::Serialize)]
 struct Payload {
     message: String,
@@ -19,7 +19,7 @@ struct Payload {
 
 
 fn main() {
-    let (font, (n_logo, c_logo, s_logl)) = _init();
+    let (font, (n_logo, c_logo, s_logo)) = _init();
     // here `"quit".to_string()` defines the menu item id, and the second parameter is the menu item label.
     let quit = CustomMenuItem::new("quit".to_string(), "Quit");
     let close = CustomMenuItem::new("close".to_string(), "Close");
@@ -31,7 +31,7 @@ fn main() {
 
     tauri::Builder::default()
         .menu(menu)
-        .manage((font, (n_logo, c_logo, s_logl)))
+        .manage((font, (n_logo, c_logo, s_logo)))
         .invoke_handler(tauri::generate_handler![close_splashscreen, greet, send_event])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -49,21 +49,25 @@ async fn close_splashscreen(window: tauri::Window) {
 
 #[tauri::command]
 fn greet(name: &str) -> String {
-    read_exif("ff");
+    read_exif::read_exif("ff");
     format!("Hello, {}!", name)
 }
 
 #[tauri::command]
-fn process_image(brand: &str, dir_path: &str, images_list: &[&str] ,state: State<(Vec<u8>, (DynamicImage, DynamicImage, DynamicImage))>) {
+fn process_image(brand: &str, dir_path: &str, images_list: &[&str] ,state: State<(Font<'static>, (DynamicImage, DynamicImage, DynamicImage))>) {
     if (dir_path != "") {
         // glob -> images_list
         // 
     } else if (images_list.len() == 0) {
          // send { error message }
     }
+
+    let image_list = ["ff", ""];
     
-    for x in images_list.iter() {
-        let exif_data = read_exif(x).unwrap(); // todo
+    for image_path in images_list.iter() {
+        let exif_data = read_exif::read_exif(image_path).unwrap(); // todo
+        
+        read_exif::process_single_image(image_path, brand, &state.0, state.1.0, exif_data)
         // todo use image data mark 非统一
         // send( message ) to front
     }
@@ -88,14 +92,14 @@ fn send_event(window: Window) {
 
 
 
-fn _init() -> (Vec<u8>, (DynamicImage, DynamicImage, DynamicImage)){
+fn _init() -> (Font<'static>, (DynamicImage, DynamicImage, DynamicImage)){
     // read font
     let font_path = "../src/assets/FiraCode-Medium.ttf";
     let font_file = std::fs::File::open(font_path).expect("failed to open file");
     let mut font_read = BufReader::new(font_file);
     let mut font: Vec<u8> = vec![];
     font_read.read_to_end(&mut font);
-    
+    let font = Font::try_from_vec(font).unwrap();
     //read logo * 3
     let nikon_banner_img = image::open("../src/assets/nikon.png").unwrap();
     let canon_banner_img = image::open("../src/assets/canon.png").unwrap();
