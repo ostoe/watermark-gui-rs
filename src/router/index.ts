@@ -1,6 +1,6 @@
 // hash history模式
 // https://router.vuejs.org/guide/essentials/history-mode.html#hash-mode
-import { createRouter,createWebHashHistory} from "vue-router"
+import { createRouter,createWebHashHistory } from "vue-router"
 
 const helloworld = () => import('../components/HelloWorld.vue') 
 const h222 = () => import('../components/H222.vue')

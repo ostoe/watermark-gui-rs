@@ -16,13 +16,13 @@ use image::{RgbImage, Rgba};
 use imageproc::drawing::{draw_text_mut, text_size, Canvas};
 use rusttype::{Font, Scale};
 
-pub fn read_exif(img_path: &str) -> Result<(), std::io::Error> {
+pub fn read_exif(img_path: &str) -> Result<HashMap::<ExifTag, &str>, std::io::Error> {
     let img_path = "./tests/img/jpg/gps/DSCN0010.jpg";
     // let img_path = "./tests/img/jpg/Canon_40D_photoshop_import.jpg";
     // let img_path = "./tests/img/jpg/Canon_40D.jpg";
-    let file = File::open(img_path).expect("failed to open file");
+    let file = File::open(img_path).expect("failed to open file"); // todo
     let mut decoder = jpeg::Decoder::new(BufReader::new(file));
-    let pixels = decoder.read_info().expect("failed to decode image");
+    let pixels = decoder.read_info().expect("failed to decode image"); // todo
     let metadata = decoder.info().unwrap();
     let exif_data = decoder.exif_data().unwrap();
     println!(
@@ -36,22 +36,27 @@ pub fn read_exif(img_path: &str) -> Result<(), std::io::Error> {
 
     println!("{}", exif_parsed.mime);
     let mut exif_map = HashMap::<ExifTag, &str>::new();
-    for entry in exif_parsed.entries.iter() {
-        match exif_map.entry(entry.tag) {
-            std::collections::hash_map::Entry::Vacant(vacant) => {
-                let value = entry.value_more_readable.trim();
-                vacant.insert(value);
-            }
-            _ => {}
-        }
-        println!(
-            "[{:?}] {}: {} --{} ",
-            entry.kind, entry.tag, entry.value_more_readable, entry.ifd.tag
-        );
-    }
+    // for entry in exif_parsed.entries.iter() {
+    //     match exif_map.entry(entry.tag) {
+    //         std::collections::hash_map::Entry::Vacant(vacant) => {
+    //             let value = entry.value_more_readable.trim();
+    //             vacant.insert(value);
+    //         }
+    //         _ => {}
+    //     }
+    //     // println!(
+    //     //     "[{:?}] {}: {} --{} ",
+    //     //     entry.kind, entry.tag, entry.value_more_readable, entry.ifd.tag
+    //     // );
+    // }
     // println!("{:?}", exif_map);
-    println!("read exif ok");
+    // println!("read exif ok");
+    return Ok(exif_map);
+}
 
+
+fn process_single_image(img_path: &str, brand: &str, font: &Font, brand_image: DynamicImage, 
+    exif_map: HashMap::<ExifTag, &str>) {
     // convert to BannerStruct to draw..
     //
     let exposure_time = match exif_map.get(&ExifTag::ExposureTime) {
@@ -80,46 +85,38 @@ pub fn read_exif(img_path: &str) -> Result<(), std::io::Error> {
         _ => "",
     };
     // read images to vec
-    let img = image::open(img_path).unwrap();
+    let src_img = image::open(img_path).unwrap();
     let img_path = "./tests/img/jpg/gps/DSCN0010-99.jpg";
     // let mut fout = &mut File::create(&Path::new(&format!("{}.jpg", img_path))).unwrap();
     // img.write_to(&mut fout, ImageOutputFormat::Jpeg(10))
     // // img.write_to(&mut Cursor::new(&mut small), ImageOutputFormat::Jpeg(99))
     // .unwrap();
-    read_logos("nikon", img);
+    // read_logos("nikon", img);
 
-    Ok(())
-}
 
-pub enum LogoSize {
-    Nikon, // enum如何表示数字呢？参考image库
-    Sony,
-    Canon,
-}
 
-pub fn read_logos(banner: &str, src_img: DynamicImage) {
     let zzz = "ℤ";
     let (w, h) = (src_img.width(), src_img.height());
     let (mut banner_w, mut banner_h) = (0u32, 0u32);
-    let mut banner_img: DynamicImage;
-    match banner.to_ascii_lowercase().as_str() {
-        "nikon" => {
-            print!("nikon");
-            (banner_w, banner_h) = (453u32, 453u32);
-            // LogoSize::Nikon,
-            banner_img = image::open("../src/assets/nikon.png").unwrap();
-        }
-        _ => {
-            print!("_nikon");
-            (banner_w, banner_h) = (453u32, 453u32);
-            // LogoSize::Nikon,
-            banner_img = image::open("../src/assets/nikon.png").unwrap();
-        }
-    }
+    let banner_img: &DynamicImage = &brand_image;
+    // match brand.to_ascii_lowercase().as_str() {
+    //     "nikon" => {
+    //         print!("nikon");
+    //         (banner_w, banner_h) = (453u32, 453u32);
+    //         // LogoSize::Nikon,
+    //         banner_img = image::open("../src/assets/nikon.png").unwrap();
+    //     }
+    //     _ => {
+    //         print!("_nikon");
+    //         (banner_w, banner_h) = (453u32, 453u32);
+    //         // LogoSize::Nikon,
+    //         banner_img = image::open("../src/assets/nikon.png").unwrap();
+    //     }
+    // }
     let new_banner_h = (h / 5).min(banner_h);
     let new_banner_w = ((new_banner_h as f32 / banner_h as f32) * banner_w as f32) as u32;
     // if (w <= banner_w) || (h <= banner_h) {
-    banner_img = banner_img.resize(new_banner_w, new_banner_h, FilterType::Gaussian);
+    let banner_img = banner_img.resize(new_banner_w, new_banner_h, FilterType::Gaussian);
     // }
 
     let mut newimg_buf = image::ImageBuffer::new(w as u32, banner_img.height() + h);
@@ -149,15 +146,6 @@ pub fn read_logos(banner: &str, src_img: DynamicImage) {
     }
 
     // draw text
-
-    let font_path = "../src/assets/DejaVuSans.ttf";
-
-    let font_file = File::open(font_path).expect("failed to open file");
-    let mut font_read = BufReader::new(font_file);
-    let mut font: Vec<u8> = vec![];
-    font_read.read_to_end(&mut font);
-    // let font = Vec::from(include_bytes!(font_path) as &[u8]);
-    let font = Font::try_from_vec(font).unwrap();
 
     let height = 24.0;
     let scale = Scale {
