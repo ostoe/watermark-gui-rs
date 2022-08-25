@@ -53,26 +53,26 @@ fn greet(name: &str) -> String {
     format!("Hello, {}!", name)
 }
 
-#[tauri::command]
-fn process_image(brand: &str, dir_path: &str, images_list: &[&str] ,state: State<(Font<'static>, (DynamicImage, DynamicImage, DynamicImage))>) {
-    if (dir_path != "") {
-        // glob -> images_list
-        // 
-    } else if (images_list.len() == 0) {
-         // send { error message }
-    }
+// #[tauri::command]
+// fn process_image(brand: &str, dir_path: &str, images_list: &[&str] ,state: State<(Font<'static>, (DynamicImage, DynamicImage, DynamicImage))>) {
+//     if (dir_path != "") {
+//         // glob -> images_list
+//         // 
+//     } else if (images_list.len() == 0) {
+//          // send { error message }
+//     }
 
-    let image_list = ["ff", ""];
+//     let image_list = ["ff", ""];
     
-    for image_path in images_list.iter() {
-        let exif_data = read_exif::read_exif(image_path).unwrap(); // todo
+//     for image_path in images_list.iter() {
+//         let exif_data = read_exif::read_exif(image_path).unwrap(); // todo
         
-        read_exif::process_single_image(image_path, brand, &state.0, state.1.0, exif_data)
-        // todo use image data mark 非统一
-        // send( message ) to front
-    }
+//         read_exif::process_single_image(image_path, brand, &state.0, state.1.0, exif_data)
+//         // todo use image data mark 非统一
+//         // send( message ) to front
+//     }
 
-}
+// }
 
 #[tauri::command]
 fn send_event(window: Window) {
