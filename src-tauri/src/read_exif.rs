@@ -1,6 +1,7 @@
 extern crate jpeg_decoder as jpeg;
 use std::collections::HashMap;
 
+use std::fmt::format;
 use std::fs::File;
 use std::io::{BufReader, Read};
 use std::path::Path;
@@ -79,7 +80,7 @@ pub fn process_single_image(img_path: &str, brand: &str, font: &Font, brand_imag
     };
     let focal_length = match exif_map.get(&ExifTag::FocalLength) {
         Some(v) => v,
-        _ => "0 mm",
+        _ => "0mm",
     };
     let data_time = match exif_map.get(&ExifTag::DateTime) {
         Some(v) => v,
@@ -87,40 +88,30 @@ pub fn process_single_image(img_path: &str, brand: &str, font: &Font, brand_imag
     };
     // read images to vec
     let src_img = image::open(img_path).unwrap();
-    let img_path = "./tests/img/jpg/gps/DSCN0010-99.jpg";
-    // let mut fout = &mut File::create(&Path::new(&format!("{}.jpg", img_path))).unwrap();
-    // img.write_to(&mut fout, ImageOutputFormat::Jpeg(10))
-    // // img.write_to(&mut Cursor::new(&mut small), ImageOutputFormat::Jpeg(99))
-    // .unwrap();
-    // read_logos("nikon", img);
 
+    let focal_length  =  focal_length.split(" ").map(|x|String::from(x)).collect::<Vec<String>>().join("");
+    let composit_text = format!("{} {} {} {}", focal_length, f_number, exposure_time, iso);
 
-
-    let zzz = "ℤ";
+    let _zzz = "ℤ";
     let (w, h) = (src_img.width(), src_img.height());
-    let (mut banner_w, mut banner_h) = (0u32, 0u32);
-    let banner_img: &DynamicImage = brand_image.0;
-    // match brand.to_ascii_lowercase().as_str() {
-    //     "nikon" => {
-    //         print!("nikon");
-    //         (banner_w, banner_h) = (453u32, 453u32);
-    //         // LogoSize::Nikon,
-    //         banner_img = image::open("../src/assets/nikon.png").unwrap();
-    //     }
-    //     _ => {
-    //         print!("_nikon");
-    //         (banner_w, banner_h) = (453u32, 453u32);
-    //         // LogoSize::Nikon,
-    //         banner_img = image::open("../src/assets/nikon.png").unwrap();
-    //     }
-    // }
-    let new_banner_h = (h / 5).min(banner_h);
-    let new_banner_w = ((new_banner_h as f32 / banner_h as f32) * banner_w as f32) as u32;
-    // if (w <= banner_w) || (h <= banner_h) {
-    let banner_img = banner_img.resize(new_banner_w, new_banner_h, FilterType::Gaussian);
-    // }
+    
+    let mut banner_img: &DynamicImage = brand_image.1;
+    let (mut banner_w, mut banner_h) = (banner_img.width(), banner_img.height());
+    let watermark_scale = 2.0;
+    let mut background_heigth = banner_h as f32 * watermark_scale;
+    let new_bg_h = (h as f32 / 5.0).min(background_heigth);
+    // let new_bg_w = (new_bg_h as f32 / banner_h as f32) * banner_w as f32;
+    let mut tmp_banner_img = DynamicImage::new_rgba8(1, 1);
 
-    let mut newimg_buf = image::ImageBuffer::new(w as u32, banner_img.height() + h);
+    if (new_bg_h <= background_heigth as f32) {
+        tmp_banner_img = banner_img.resize((banner_w as f32 * (new_bg_h / background_heigth)) as u32, (banner_h as f32 * (new_bg_h / background_heigth)) as u32, FilterType::Gaussian);
+        background_heigth = new_bg_h;
+        banner_img = &tmp_banner_img;
+        //  ( banner_w,  banner_h) = (banner_img.width(), banner_img.height());
+    }
+    println!("{} x {}", banner_w, banner_h);
+    
+    let mut newimg_buf = image::ImageBuffer::new(w as u32, background_heigth as u32 + h);
 
     // place src image
     match newimg_buf.copy_from(&src_img, 0, 0) {
@@ -131,14 +122,16 @@ pub fn process_single_image(img_path: &str, brand: &str, font: &Font, brand_imag
         }
     }
     // place white image that color control by user parameter.
-    let logo_banner_color: Rgba<u8> = Rgba([255u8, 255u8, 255u8, 0u8]);
-    for y in h..(banner_img.height() + h) {
+    let white_color: Rgba<u8> = Rgba([255u8, 255u8, 255u8, 0u8]);
+    for y in h..(background_heigth as u32 + h) {
         for x in 0..w {
-            newimg_buf.put_pixel(x, y, logo_banner_color);
+            newimg_buf.put_pixel(x, y, white_color);
         }
     }
     // place banner
-    match newimg_buf.copy_from(&banner_img, 0, h) {
+    println!("new image:size {} x {}", newimg_buf.width(), newimg_buf.height() );
+    println!("{} {} {}x{}",background_heigth, h + (background_heigth/watermark_scale/2.0 ) as u32 ,banner_img.width(), banner_img.height());
+    match newimg_buf.copy_from(banner_img, w/2, h + (background_heigth/watermark_scale/2.0 ) as u32) {
         Ok(_) => {}
         Err(e) => {
             // println!("{}", e);
@@ -146,31 +139,33 @@ pub fn process_single_image(img_path: &str, brand: &str, font: &Font, brand_imag
         }
     }
 
-    // draw text
 
-    let height = 24.0;
-    let scale = Scale {
-        x: height * 1.5,
-        y: height,
-    };
 
-    let text = "Nikon!!!";
-    draw_text_mut(
-        &mut newimg_buf,
-        Rgba([255u8, 0u8, 0u8, 180]),
-        banner_w as i32,
-        h as i32,
-        scale,
-        &font,
-        text,
-    );
-    let (w, h) = text_size(scale, &font, text);
-    println!("Text size: {}x{}", w, h);
 
-    generator_draw_text("f 1.8 1/0 ", 40.0, (banner_w/2, banner_h/3),
-        1.0, &font, Rgba([179, 63u8, 60u8, 0]), &mut newimg_buf);
+    // draw all text.
+    let first_text_y =     h + ((background_heigth as f32 * 0.25) as u32);
+    let second_text_y =     h + ((background_heigth as f32 * 0.55) as u32);
+    let second_text_x =     (w as f32 * 0.63) as u32;
+    let texts = vec![
+        ( camera_device, background_heigth * 0.25 ,((w as f32 * 0.03) as u32, first_text_y), 1.0, &font, Rgba([0u8, 0u8, 0u8, 0])),  // brand
+        ( &composit_text, background_heigth * 0.20 ,(second_text_x , first_text_y), 1.0, &font, Rgba([0u8, 0u8, 0u8, 0])), // 20mm f/1.8 1/100 iso 100
+        ( data_time, background_heigth * 0.20,(second_text_x , second_text_y), 1.0, &font, Rgba([168u8, 168u8, 168u8, 0])), // data
+    ];
 
-    let img_path = "./tests/img/jpg/gps/DSCN0010-99.jpg";
+    for x in texts.iter() {
+        generator_draw_text(x.0, x.1, x.2, x.3, x.4, x.5, &mut newimg_buf);
+    }
+
+    // place colume split line.
+    let col_color: Rgba<u8> = Rgba([168u8, 168u8, 168u8, 0]);
+    for y in h + (background_heigth/watermark_scale/2.0) as u32..(h + (background_heigth - background_heigth/watermark_scale/2.0 ) as u32) {
+        for x in (w as f32 * 0.60) as u32..(w as f32 * 0.60 + 2.0) as u32 {
+            newimg_buf.put_pixel(x, y, col_color);
+        }
+    }
+    // draw text do--> generator_draw_text("f 1.8 1/0 ", 40.0, (banner_w/2, banner_h/3),
+    //     1.0, &font, Rgba([179, 63u8, 60u8, 0]), &mut newimg_buf);
+    let img_path = "./tests/DSCN0010-99.jpg";
     let mut fout = &mut File::create(&Path::new(&format!("{}.jpg", img_path))).unwrap();
     newimg_buf
         .write_to(&mut fout, ImageOutputFormat::Jpeg(80))
