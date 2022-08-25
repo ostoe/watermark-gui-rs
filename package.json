@@ -13,11 +13,13 @@
     "@tauri-apps/api": "^1.0.2",
     "element-plus": "^2.2.14",
     "path": "^0.12.7",
+    "unplugin-icons": "^0.14.8",
     "vite-plugin-style-import": "^2.0.0",
     "vue": "^3.2.37",
     "vue-router": "^4.1.4"
   },
   "devDependencies": {
+    "@iconify-json/ep": "^1.1.7",
     "@tauri-apps/cli": "^1.0.5",
     "@types/node": "^18.7.9",
     "@vitejs/plugin-vue": "^3.0.3",

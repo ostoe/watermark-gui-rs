@@ -5,7 +5,9 @@ import { defineConfig } from 'vite'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
-
+//自动导入icons
+import IconsResolver from 'unplugin-icons/resolver'
+import Icons from 'unplugin-icons/vite'
 import { resolve } from '@tauri-apps/api/path'
 
 // import { vueResolve } from  "path"
@@ -33,10 +35,28 @@ export default defineConfig({
   plugins: [vue(),
     // ui自动导入
     AutoImport({
-      resolvers: [ElementPlusResolver()],
+      resolvers: [
+        // 自动导入 Element Plus 相关函数，如：ElMessage, ElMessageBox... (带样式)
+        ElementPlusResolver(),
+        // 自动导入图标组件
+        IconsResolver({
+          prefix: 'Icon',
+        })
+      ],
     }),
     Components({
-      resolvers: [ElementPlusResolver()],
+      resolvers: [
+        // 自动注册图标组件
+        IconsResolver({
+          enabledCollections: ['ep'],
+        }),
+        // 自动导入 Element Plus 组件
+        ElementPlusResolver(),
+      ],
+    }),
+
+    Icons({
+      autoInstall: true,
     }),
     // 快捷路径插件
     // styleImport({

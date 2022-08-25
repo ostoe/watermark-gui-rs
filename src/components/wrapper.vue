@@ -3,12 +3,18 @@ import HelloWorld from "./HelloWorld.vue";
 import H222 from "./H222.vue";
 import TopBar from "./TopBar.vue";
 
-import { defineComponent } from "vue";
+import { defineComponent, ref } from "vue";
 import { emit, listen } from "@tauri-apps/api/event";
 import { invoke } from "@tauri-apps/api";
 import { ElMessage } from "element-plus";
 
 export default defineComponent({
+  setup() {
+    const isCollapse = ref(true)
+    return({
+      isCollapse
+    })
+  },
   data() {
     return {
       count: 0,
@@ -18,9 +24,15 @@ export default defineComponent({
   },
   name: "index",
   methods: {
+    changeCollapse() {
+      console.log(this.isCollapse)
+      this.isCollapse = (this.isCollapse)?false:true
+    },
     // 这是个异步函数
     async greetTest() {
-      if (this.text == "") {this.text = "World!"}
+      if (this.text == "") {
+        this.text = "World!";
+      }
       let res = await invoke("greet", { name: this.text });
       console.log(res);
     },
@@ -78,30 +90,83 @@ export default defineComponent({
 </script>
 
 <template lang="">
-    <HelloWorld msg="Vite + Vue"/>
-    <div>--------------测试分割线头部----------------</div>
-    <div>
-      <!-- <div style="margin: 20px 0" /> -->
-      <div style="margin: 20px 30% 20px 30%">
-      <el-input v-model="text" size="large" clearable="true" placeholder="Please input"/>
-      </div>
-      <!-- <div style="margin: 20px 0" /> -->
+  <el-menu
+    default-active="2-1"
+    class="elmenu"
+    :collapse="isCollapse"
+  >
+    <el-menu-item index="1"  @click="changeCollapse">
+      <el-icon><i-ep-arrow-right/></el-icon>
+    </el-menu-item>
+    <el-sub-menu index="2">
+      <template #title>
+        <el-icon><i-ep-menu /></el-icon>
+        <span>基本</span>
+      </template>
+      <el-menu-item-group>
+        <el-menu-item index="2-1">不知道写啥</el-menu-item>
+        <el-menu-item index="2-2">不知道写啥</el-menu-item>
+      </el-menu-item-group>
+    </el-sub-menu>
+    <el-menu-item index="3">
+      <el-icon><i-ep-add-location /></el-icon>
+      <template #title>高级</template>
+    </el-menu-item>
+    <el-menu-item index="4">
+      <el-icon><i-ep-document /></el-icon>
+      <template #title>TODO</template>
+    </el-menu-item>
+  </el-menu>
+  <TopBar></TopBar>
+  <HelloWorld msg="Vite + Vue" />
+  <div>--------------测试分割线头部----------------</div>
+  <div>
+    <!-- <div style="margin: 20px 0" /> -->
+    <div style="margin: 20px 30% 20px 30%">
+      <el-input
+        v-model="text"
+        size="large"
+        clearable="true"
+        placeholder="Please input"
+      />
+    </div>
+    <!-- <div style="margin: 20px 0" /> -->
     <suspense>
       <el-col>
-      <el-button @click="send_event" color="#626aef" :dark="isDark" size="large" plain="true"> [s]测试event</el-button>
-      <button @click="greetTest"> 测试调用rust </button> 
+        <el-button
+          @click="send_event"
+          color="#626aef"
+          :dark="isDark"
+          size="large"
+          plain="true"
+        >
+          [s]测试event</el-button
+        >
+        <button @click="greetTest">测试调用rust</button>
       </el-col>
     </suspense>
     <div>
       <el-table :data="tableData" height="200" style="width: 100%">
-        <el-table-column sortable="true" sort-by="id"  sort-orders="descending" prop="msg" label="Date" width="300" />
+        <el-table-column
+          sortable="true"
+          sort-by="id"
+          sort-orders="descending"
+          prop="msg"
+          label="Date"
+          width="300"
+        />
       </el-table>
     </div>
     <div>--------------测试分割线尾部----------------</div>
-    </div>
-    <H222/>
+  </div>
+  <H222 />
 </template>
 
 <style>
+.elmenu {
+  z-index: 99;
+  position: absolute;
+  left: 0;
+  height: 100%;
+}
 </style>
-
