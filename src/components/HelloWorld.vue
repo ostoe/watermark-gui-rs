@@ -29,12 +29,6 @@ export default defineComponent({
       <code>components/HelloWorld.vue</code> to test HMR
     </p>
   </div>
-  <p>
-    Check out
-    <a href="https://vuejs.org/guide/quick-start.html#local" target="_blank"
-      >create-vue</a
-    >, the official Vue + Vite starter
-  </p>
    <el-input v-model="input" placeholder="Please input" />
 </template>
 

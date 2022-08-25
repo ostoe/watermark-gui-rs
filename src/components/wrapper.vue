@@ -1,11 +1,13 @@
 <script lang="ts">
 import HelloWorld from "./HelloWorld.vue";
 import H222 from "./H222.vue";
-import greet from "../main";
+import TopBar from "./TopBar.vue";
+
 import { defineComponent } from "vue";
 import { emit, listen } from "@tauri-apps/api/event";
 import {invoke} from '@tauri-apps/api'
 import { ElMessage } from "element-plus";
+
 export default defineComponent({
   data() {
     return {
@@ -16,8 +18,9 @@ export default defineComponent({
   name: "index",
   methods: {
     // 这是个异步函数
-    greetTest() {
-      greet("");
+    async greetTest() {
+      let res = await invoke('greet', {name: 'World'});
+      console.log(res);
     },
     async test_event_recv() {
       // listen to the `click` event and get a function to remove the event listener
@@ -73,6 +76,7 @@ export default defineComponent({
 </script>
 
 <template lang="">
+    <TopBar></TopBar>
     <div>
         111111111212121
     </div>
