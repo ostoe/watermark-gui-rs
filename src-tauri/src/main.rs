@@ -3,23 +3,39 @@
     windows_subsystem = "windows"
 )]
 
-use std::io::{BufReader, Read};
-
 use app::read_exif;
+use crossbeam_channel::unbounded;
 use image::DynamicImage;
-use tauri::{CustomMenuItem, Menu, MenuItem, Submenu, State};
-use tauri::{Manager, Window};
 use rusttype::{Font, Scale};
+use std::io::{BufReader, Read};
+use tauri::{CustomMenuItem, Menu, MenuItem, State, Submenu};
+use tauri::{Manager, Window};
 // the payload type must implement `Se&rialize` and `Clone`.
 #[derive(Clone, serde::Serialize)]
 struct Payload {
     message: String,
 }
 
-
-
 fn main() {
-    let (font, (n_logo, c_logo, s_logo)) = _init();
+    // image opration channel
+    let (st, operation_st) = unbounded::<String>();
+    let (st_clone, _rt_clone) = (st.clone(), operation_st.clone());
+
+    let (notify_front_st, notify_front_rt) = unbounded::<String>();
+    // let (notify_front_st_clone, notify_front_rt_clone) = (notify_front_st.clone(), notify_front_rt.clone());
+    // 图像处理线程，等待处理来自前端的消息，处理完成后发送消息通知至消息处理线程，这时消息处理线程再通知前端。
+    std::thread::spawn(move || {
+        
+        let (font, (n_logo, c_logo, s_logo)) = _init();
+        loop {
+            let opt = operation_st.recv().unwrap();
+            println!("图像处理线程 收到：{}", opt);
+            let opt = notify_front_st.send(opt);
+            // std::thread::sleep(std::time::Duration::from_secs(1));
+        }
+    });
+
+    // menu
     // here `"quit".to_string()` defines the menu item id, and the second parameter is the menu item label.
     let quit = CustomMenuItem::new("quit".to_string(), "Quit");
     let close = CustomMenuItem::new("close".to_string(), "Close");
@@ -29,50 +45,76 @@ fn main() {
         .add_item(CustomMenuItem::new("hide", "Hide"))
         .add_submenu(submenu);
 
+    //
     tauri::Builder::default()
         .menu(menu)
-        .manage((font, (n_logo, c_logo, s_logo)))
-        .invoke_handler(tauri::generate_handler![close_splashscreen, greet, send_event])
+        .manage(st)
+        .invoke_handler(tauri::generate_handler![
+            close_splashscreen,
+            greet,
+            send_event
+        ])
+        .setup(move |app| {
+            let main_window = app.get_window("main").unwrap();
+            // let mut main_windows_clone = main_window.clone();
+            std::thread::spawn(move || {
+                st_clone.send("_init_once".to_string()).unwrap();
+                // let id = main_window.listen("click", |event| {
+                //     println!("got window event-name with payload {:?}", event.payload());
+                // });
+                
+                loop {
+                    let opt_result = notify_front_rt.recv().unwrap();
+                println!("----{}", opt_result);
+                main_window.emit("click", Payload { message: opt_result},
+                    )
+                    .unwrap();
+                    // std::thread::sleep(std::time::Duration::from_secs(1));
+                }
+            });
+
+            Ok(())
+        })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
 
 #[tauri::command]
 async fn close_splashscreen(window: tauri::Window) {
-  // Close splashscreen
-  if let Some(splashscreen) = window.get_window("splashscreen") {
-    splashscreen.close().unwrap();
-  }
-  // Show main window
-  window.get_window("main").unwrap().show().unwrap();
+    // Close splashscreen
+    if let Some(splashscreen) = window.get_window("splashscreen") {
+        splashscreen.close().unwrap();
+    }
+    // Show main window
+    window.get_window("main").unwrap().show().unwrap();
 }
 
 #[tauri::command]
-fn greet(name: &str) -> String {
-    read_exif::read_exif("ff");
+fn greet(name: &str, state: State<crossbeam_channel::Sender<String>>) -> String {
+    state.send(name.to_string()).unwrap();
     format!("Hello, {}!", name)
 }
 
-#[tauri::command]
-fn process_image(brand: &str, dir_path: &str, images_list: &[&str] ,state: State<(Font<'static>, (DynamicImage, DynamicImage, DynamicImage))>) {
-    if (dir_path != "") {
-        // glob -> images_list
-        // 
-    } else if (images_list.len() == 0) {
-         // send { error message }
-    }
+// #[tauri::command]
+// fn process_image(brand: &str, dir_path: &str, images_list: &[&str] ,state: State<(Font<'static>, (DynamicImage, DynamicImage, DynamicImage))>) {
+//     if (dir_path != "") {
+//         // glob -> images_list
+//         //
+//     } else if (images_list.len() == 0) {
+//          // send { error message }
+//     }
 
-    let image_list = ["ff", ""];
-    
-    for image_path in images_list.iter() {
-        let exif_data = read_exif::read_exif(image_path).unwrap(); // todo
-        
-        read_exif::process_single_image(image_path, brand, &state.0, state.1.0, exif_data)
-        // todo use image data mark 非统一
-        // send( message ) to front
-    }
+//     let image_list = ["ff", ""];
 
-}
+//     for image_path in images_list.iter() {
+//         let exif_data = read_exif::read_exif(image_path).unwrap(); // todo
+
+//         read_exif::process_single_image(image_path, brand, &state.0, state.1.0, exif_data)
+//         // todo use image data mark 非统一
+//         // send( message ) to front
+//     }
+
+// }
 
 #[tauri::command]
 fn send_event(window: Window) {
@@ -90,9 +132,7 @@ fn send_event(window: Window) {
     //   });
 }
 
-
-
-fn _init() -> (Font<'static>, (DynamicImage, DynamicImage, DynamicImage)){
+fn _init() -> (Font<'static>, (DynamicImage, DynamicImage, DynamicImage)) {
     // read font
     let font_path = "../src/assets/FiraCode-Medium.ttf";
     let font_file = std::fs::File::open(font_path).expect("failed to open file");
@@ -106,5 +146,4 @@ fn _init() -> (Font<'static>, (DynamicImage, DynamicImage, DynamicImage)){
     let sony_banner_img = image::open("../src/assets/sony.png").unwrap();
 
     return (font, (nikon_banner_img, canon_banner_img, sony_banner_img));
-
 }

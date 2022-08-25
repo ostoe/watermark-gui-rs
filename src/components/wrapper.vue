@@ -1,7 +1,6 @@
 <script lang="ts">
 import HelloWorld from "./HelloWorld.vue";
 import H222 from "./H222.vue";
-import greet from "../main";
 import { defineComponent } from "vue";
 import { emit, listen } from "@tauri-apps/api/event";
 import {invoke} from '@tauri-apps/api'
@@ -16,8 +15,9 @@ export default defineComponent({
   name: "index",
   methods: {
     // 这是个异步函数
-    greetTest() {
-      greet("");
+    async greetTest() {
+      let res = await invoke('greet', {name: 'World'});
+      console.log(res);
     },
     async test_event_recv() {
       // listen to the `click` event and get a function to remove the event listener

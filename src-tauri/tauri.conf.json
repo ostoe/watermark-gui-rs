@@ -69,7 +69,7 @@
          "width": 320,
           "height": 240,
           "decorations": false,
-          "url": "../src/dist/splashscreen.html",
+          "url": "../dist/splashscreen.html",
           "label": "splashscreen",
           "visible": false 
         }

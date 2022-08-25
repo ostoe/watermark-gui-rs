@@ -25,8 +25,6 @@ app.mount('#app')
 // 你会看到控制台上输出了 "Hello, World!"！
 
 
-export default async function greet(params: string) {
-  console.log("will run greet");
-  let res = await invoke('greet', {name: 'World'});
-  console.log(res);
-}
+// export default async function greet(params: string) {
+
+// }

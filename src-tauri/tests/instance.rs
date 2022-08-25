@@ -3,7 +3,6 @@ use image::{RgbImage, Rgba, ImageOutputFormat};
 use imageproc::drawing::{draw_text_mut, text_size};
 use rexif::*;
 use rusttype::{Font, Scale};
-use std::env;
 use std::fs::File;
 use std::io::BufReader;
 use std::path::{Path, PathBuf};
