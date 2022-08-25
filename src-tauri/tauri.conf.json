@@ -59,10 +59,10 @@
     "windows": [
       {
         "fullscreen": false,
-        "height": 800,
+        "height": 600,
         "resizable": true,
         "title": "Wartermark",
-        "width": 1200,
+        "width": 800,
         "visible": false 
       },
       {
