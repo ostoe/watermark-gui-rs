@@ -17,12 +17,12 @@ use imageproc::drawing::{draw_text_mut, text_size, Canvas};
 use rusttype::{Font, Scale};
 
 pub fn read_exif(img_path: &str) -> Result<HashMap::<ExifTag, String>, std::io::Error> {
-    let img_path = "./tests/img/jpg/gps/DSCN0010.jpg";
+    // let img_path = "./tests/img/jpg/gps/DSCN0010.jpg";
     // let img_path = "./tests/img/jpg/Canon_40D_photoshop_import.jpg";
     // let img_path = "./tests/img/jpg/Canon_40D.jpg";
     let file = File::open(img_path).expect("failed to open file"); // todo
     let mut decoder = jpeg::Decoder::new(BufReader::new(file));
-    let pixels = decoder.read_info().expect("failed to decode image"); // todo
+    let _pixels = decoder.read_info().expect("failed to decode image"); // todo
     let metadata = decoder.info().unwrap();
     let exif_data = decoder.exif_data().unwrap();
     println!(
@@ -56,7 +56,7 @@ pub fn read_exif(img_path: &str) -> Result<HashMap::<ExifTag, String>, std::io::
 }
 
 
-pub fn process_single_image(img_path: &str, brand: &str, font: &Font, brand_image: DynamicImage, 
+pub fn process_single_image(img_path: &str, brand: &str, font: &Font, brand_image: (&DynamicImage, &DynamicImage, &DynamicImage), 
     exif_map: HashMap::<ExifTag, String>) {
     // convert to BannerStruct to draw..
     //
@@ -99,7 +99,7 @@ pub fn process_single_image(img_path: &str, brand: &str, font: &Font, brand_imag
     let zzz = "ℤ";
     let (w, h) = (src_img.width(), src_img.height());
     let (mut banner_w, mut banner_h) = (0u32, 0u32);
-    let banner_img: &DynamicImage = &brand_image;
+    let banner_img: &DynamicImage = brand_image.0;
     // match brand.to_ascii_lowercase().as_str() {
     //     "nikon" => {
     //         print!("nikon");

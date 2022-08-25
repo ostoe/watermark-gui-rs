@@ -5,7 +5,7 @@ import TopBar from "./TopBar.vue";
 
 import { defineComponent } from "vue";
 import { emit, listen } from "@tauri-apps/api/event";
-import {invoke} from '@tauri-apps/api'
+import { invoke } from "@tauri-apps/api";
 import { ElMessage } from "element-plus";
 
 export default defineComponent({
@@ -13,13 +13,15 @@ export default defineComponent({
     return {
       count: 0,
       tableData: [],
+      text: "./tests/img/jpg/gps/DSCN0010.jpg",
     };
   },
   name: "index",
   methods: {
     // 这是个异步函数
     async greetTest() {
-      let res = await invoke('greet', {name: 'World'});
+      if (this.text == "") {this.text = "World!"}
+      let res = await invoke("greet", { name: this.text });
       console.log(res);
     },
     async test_event_recv() {
@@ -32,7 +34,9 @@ export default defineComponent({
         console.log(
           `window name: ${event.windowLabel}, payload: ${event.payload.message}`
         );
-        this.message(`window name: ${event.windowLabel}, payload: ${event.payload.message}`)
+        this.message(
+          `window name: ${event.windowLabel}, payload: ${event.payload.message}`
+        );
       });
       // console.log("recv ok " + this.count);
     },
@@ -49,46 +53,43 @@ export default defineComponent({
     },
     async send_event() {
       console.log("will send_event");
-      let res = await invoke('send_event');
+      let res = await invoke("send_event");
       console.log("send_event ok");
     },
-    
-  message(msg: string) {
-  ElMessage({
-    message: msg,
-    type: 'success',
-  })
-}
 
+    message(msg: string) {
+      ElMessage({
+        message: msg,
+        type: "success",
+      });
+    },
   },
 
   mounted() {
     // 在其他方法或是生命周期中也可以调用方法
     this.test_event_recv();
     for (let i = 0; i < 5; i += 1) {
-    this.tableData.push({id: i, msg:  " " + i + " " + i + " " + i});
+      this.tableData.push({ id: i, msg: " " + i + " " + i + " " + i });
     }
-  }
-
+  },
 });
 
 // test event
 </script>
 
 <template lang="">
-    <TopBar></TopBar>
-    <div>
-        111111111212121
-    </div>
     <HelloWorld msg="Vite + Vue"/>
     <div>--------------测试分割线头部----------------</div>
     <div>
+      <!-- <div style="margin: 20px 0" /> -->
+      <div style="margin: 20px 30% 20px 30%">
+      <el-input v-model="text" size="large" clearable="true" placeholder="Please input"/>
+      </div>
+      <!-- <div style="margin: 20px 0" /> -->
     <suspense>
       <el-col>
       <el-button @click="send_event" color="#626aef" :dark="isDark" size="large" plain="true"> [s]测试event</el-button>
       <button @click="greetTest"> 测试调用rust </button> 
-
-
       </el-col>
     </suspense>
     <div>

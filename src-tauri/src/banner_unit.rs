@@ -11,3 +11,18 @@ pub enum  BannerType{
     Logo,
     Text(String),
 }
+
+
+pub enum UserOperation {
+    Cancel,
+    Pause,
+    Update(String, String),
+    DirPath(String),
+    ImagePath(String),
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum Notification {
+    Single(String),
+    Complated,
+}
