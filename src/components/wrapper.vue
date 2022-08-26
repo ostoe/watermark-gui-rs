@@ -1,6 +1,6 @@
 <script lang="ts">
 import HelloWorld from "./HelloWorld.vue";
-import H222 from "./H222.vue";
+import TextImageProcess from "./TextImageProcess.vue";
 import TopBar from "./TopBar.vue";
 
 import { defineComponent, ref } from "vue";
@@ -10,10 +10,10 @@ import { ElMessage } from "element-plus";
 
 export default defineComponent({
   setup() {
-    const isCollapse = ref(true)
-    return({
-      isCollapse
-    })
+    const isCollapse = ref(true);
+    return {
+      isCollapse,
+    };
   },
   data() {
     return {
@@ -25,8 +25,8 @@ export default defineComponent({
   name: "index",
   methods: {
     changeCollapse() {
-      console.log(this.isCollapse)
-      this.isCollapse = (this.isCollapse)?false:true
+      console.log(this.isCollapse);
+      this.isCollapse = this.isCollapse ? false : true;
     },
     // 这是个异步函数
     async greetTest() {
@@ -79,10 +79,10 @@ export default defineComponent({
 
   mounted() {
     // 在其他方法或是生命周期中也可以调用方法
-    this.test_event_recv();
-    for (let i = 0; i < 5; i += 1) {
-      this.tableData.push({ id: i, msg: " " + i + " " + i + " " + i });
-    }
+    // this.test_event_recv();
+    // for (let i = 0; i < 5; i += 1) {
+    //   this.tableData.push({ id: i, msg: " " + i + " " + i + " " + i });
+    // }
   },
 });
 
@@ -90,7 +90,12 @@ export default defineComponent({
 </script>
 
 <template lang="">
-  <el-menu
+
+<div class="common-layout index">
+    <el-container>
+      <el-aside width="100px">
+
+<el-menu
     default-active="2-1"
     class="elmenu"
     :collapse="isCollapse"
@@ -117,49 +122,37 @@ export default defineComponent({
       <template #title>TODO</template>
     </el-menu-item>
   </el-menu>
-  <TopBar></TopBar>
-  <HelloWorld msg="Vite + Vue" />
-  <div>--------------测试分割线头部----------------</div>
-  <div>
-    <!-- <div style="margin: 20px 0" /> -->
-    <div style="margin: 20px 30% 20px 30%">
-      <el-input
-        v-model="text"
-        size="large"
-        clearable="true"
-        placeholder="Please input"
-      />
-    </div>
-    <!-- <div style="margin: 20px 0" /> -->
-    <suspense>
-      <el-col>
-        <el-button
-          @click="send_event"
-          color="#626aef"
-          :dark="isDark"
-          size="large"
-          plain="true"
-        >
-          [s]测试event</el-button
-        >
-        <button @click="greetTest">测试调用rust</button>
-      </el-col>
-    </suspense>
-    <div>
-      <el-table :data="tableData" height="200" style="width: 100%">
-        <el-table-column
-          sortable="true"
-          sort-by="id"
-          sort-orders="descending"
-          prop="msg"
-          label="Date"
-          width="300"
-        />
-      </el-table>
-    </div>
-    <div>--------------测试分割线尾部----------------</div>
+
+      </el-aside>
+      <el-container>
+        <el-header>
+
+          <TopBar/>
+
+        </el-header>
+        <el-main >
+          
+          <el-container direction="vertical">
+            <!-- <el-row > -->
+             <HelloWorld msg="Vite + Vue" />
+            <TextImageProcess />
+          <!-- </el-row> -->
+       
+          </el-container>
+
+        </el-main>
+          <el-footer>
+            <div class="footer-div">
+          <span class="footer-div">&copy; Watermark-gui</span>
+        </div>
+      </el-footer>
+      </el-container>
+    </el-container>
   </div>
-  <H222 />
+
+  
+  
+  
 </template>
 
 <style>
@@ -168,5 +161,15 @@ export default defineComponent({
   position: absolute;
   left: 0;
   height: 100%;
+}
+
+.footer-div {
+  background-color: rgb(255, 255, 255);
+  display: flex;
+  height: 4vh;
+  width: 100%;
+  bottom: 0;
+  right: 0;
+  align-items: center;
 }
 </style>

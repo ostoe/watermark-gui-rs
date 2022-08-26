@@ -3,7 +3,7 @@
 import { createRouter,createWebHashHistory} from "vue-router"
 
 const helloworld = () => import('../components/HelloWorld.vue') 
-const h222 = () => import('../components/H222.vue')
+const textImageProcess = () => import('../components/TextImageProcess.vue')
 const wrapper = () => import('../components/Wrapper.vue')
 
 const router = [{
@@ -16,9 +16,9 @@ const router = [{
         component:helloworld
     },
     {
-        path:'/h222',
-        name:'h222',
-        component:h222
+        path:'/textImageProcess',
+        name:'textImageProcess',
+        component:textImageProcess
     }]
 }]
 

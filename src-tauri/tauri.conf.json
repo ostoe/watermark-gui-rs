@@ -63,7 +63,7 @@
         "resizable": true,
         "title": "Wartermark",
         "width": 800,
-        "visible": false 
+        "visible": true 
       },
       {
          "width": 320,
@@ -71,7 +71,7 @@
           "decorations": false,
           "url": "../src/assets/splashscreen.html",
           "label": "splashscreen",
-          "visible": true 
+          "visible": false 
         }
     ]
   }
