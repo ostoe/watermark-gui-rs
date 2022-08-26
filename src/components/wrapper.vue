@@ -143,8 +143,9 @@ export default defineComponent({
         </el-main>
           <el-footer>
             <div class="footer-div">
-          <span class="footer-div">&copy; Watermark-gui</span>
-        </div>
+              <el-divider content-position="left"><span class="footer-div">&copy; Watermark-gui</span></el-divider>
+              
+            </div>
       </el-footer>
       </el-container>
     </el-container>

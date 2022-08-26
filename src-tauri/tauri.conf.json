@@ -12,6 +12,14 @@
   },
   "tauri": {
     "allowlist": {
+      "dialog": {
+        "all": true, 
+        "open": true, 
+        "save": true 
+      },
+      "fs": {
+        "scope": ["$APP/databases/*"]
+      },
       "all": true
     },
     "bundle": {

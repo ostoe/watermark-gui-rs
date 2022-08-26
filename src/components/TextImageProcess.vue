@@ -5,6 +5,7 @@ import { event, invoke } from "@tauri-apps/api";
 import { ElMessage } from "element-plus";
 import { open } from "@tauri-apps/api/dialog";
 import { appDir } from "@tauri-apps/api/path";
+import { UploadFilled } from '@element-plus/icons-vue'
 
 export default defineComponent({
   setup() {
@@ -51,6 +52,25 @@ export default defineComponent({
       });
       // console.log("recv ok " + this.count);
     },
+
+    async test_drag_event_recv() {
+      // listen to the `click` event and get a function to remove the event listener
+      // there's also a `once` function that subscribes to an event and automatically unsubscribes the listener on the first event
+      // emits the `click` event with the object payload
+
+      const unlisten = await listen<string>("tauri://file-drop", (event) => {
+        // 是一个循环函数
+        console.log(
+          `drap payload: ${event.id} ${event.payload}`
+        );
+        console.log(event.payload);
+        this.message(
+          `drap payload: ${event.payload}`
+        );
+      });
+      // console.log("recv ok " + this.count);
+    },
+
     async test_event_send() {
       // listen to the `click` event and get a function to remove the event listener
       // there's also a `once` function that subscribes to an event and automatically unsubscribes the listener on the first event
@@ -144,6 +164,7 @@ export default defineComponent({
     for (let i = 0; i < 5; i += 1) {
       this.tableData.push({ id: i, msg: " " + i + " " + i + " " + i });
     }
+    this.test_drag_event_recv();
   },
 });
 
@@ -215,6 +236,11 @@ export default defineComponent({
     </div>
   </div>
   </el-container>
+
+  <div>
+    
+</div>
+
 </template>
 
 <style>
