@@ -33,6 +33,8 @@ declare module '@vue/runtime-core' {
     IEpAddDocument: typeof import('~icons/ep/add-document')['default']
     IEpAddIconMenu: typeof import('~icons/ep/add-icon-menu')['default']
     IEpAddLocation: typeof import('~icons/ep/add-location')['default']
+    IEpArrowLef: typeof import('~icons/ep/arrow-lef')['default']
+    IEpArrowLeft: typeof import('~icons/ep/arrow-left')['default']
     IEpArrowRight: typeof import('~icons/ep/arrow-right')['default']
     IEpDocument: typeof import('~icons/ep/document')['default']
     IEpIconMenu: typeof import('~icons/ep/icon-menu')['default']

@@ -7,6 +7,12 @@ import { defineComponent, ref } from "vue";
 import { emit, listen } from "@tauri-apps/api/event";
 import { invoke } from "@tauri-apps/api";
 import { ElMessage } from "element-plus";
+import { Context } from "vm";
+
+function changeCollapse(that: Context) {
+  that.isCollapse = that.isCollapse ? false : true;
+  that.extendStyle = that.isCollapse ? "" : "padding-left:70px;";
+}
 
 export default defineComponent({
   setup() {
@@ -17,6 +23,7 @@ export default defineComponent({
   },
   data() {
     return {
+      extendStyle: "",
       count: 0,
       tableData: [],
       text: "./tests/img/jpg/gps/DSCN0010.jpg",
@@ -24,9 +31,12 @@ export default defineComponent({
   },
   name: "index",
   methods: {
-    changeCollapse() {
-      console.log(this.isCollapse);
-      this.isCollapse = this.isCollapse ? false : true;
+    changeThisCollapse() {
+      changeCollapse(this);
+    },
+    //获取鼠标点击消除遮罩
+    clickMask() {
+      changeCollapse(this);
     },
     // 这是个异步函数
     async greetTest() {
@@ -90,70 +100,62 @@ export default defineComponent({
 </script>
 
 <template lang="">
-
-<div class="common-layout index">
+  <div class="common-layout index">
     <el-container>
-      <el-aside width="100px">
-
-<el-menu
-    default-active="2-1"
-    class="elmenu"
-    :collapse="isCollapse"
-  >
-    <el-menu-item index="1"  @click="changeCollapse">
-      <el-icon><i-ep-arrow-right/></el-icon>
-    </el-menu-item>
-    <el-sub-menu index="2">
-      <template #title>
-        <el-icon><i-ep-menu /></el-icon>
-        <span>基本</span>
-      </template>
-      <el-menu-item-group>
-        <el-menu-item index="2-1">不知道写啥</el-menu-item>
-        <el-menu-item index="2-2">不知道写啥</el-menu-item>
-      </el-menu-item-group>
-    </el-sub-menu>
-    <el-menu-item index="3">
-      <el-icon><i-ep-add-location /></el-icon>
-      <template #title>高级</template>
-    </el-menu-item>
-    <el-menu-item index="4">
-      <el-icon><i-ep-document /></el-icon>
-      <template #title>TODO</template>
-    </el-menu-item>
-  </el-menu>
-
-      </el-aside>
-      <el-container>
-        <el-header>
-
-          <TopBar/>
-
-        </el-header>
-        <el-main >
-          
-          <el-container direction="vertical">
-            <!-- <el-row > -->
-             <HelloWorld msg="Vite + Vue" />
-            <TextImageProcess />
-          <!-- </el-row> -->
-       
-          </el-container>
-
-        </el-main>
+      <el-aside width="">
+        <el-menu default-active="1-1" class="elmenu" :collapse="isCollapse">
+          <div style="margin-top: 30px"></div>
+          <div @click="changeThisCollapse" class="extend" :style="extendStyle">
+            <el-icon>
+              <i-ep-arrow-right v-if="isCollapse" />
+              <i-ep-arrow-left v-if="!isCollapse" />
+            </el-icon>
+          </div>
+          <el-sub-menu index="1">
+            <template #title>
+              <el-icon><i-ep-menu /></el-icon>
+              <span>基本</span>
+            </template>
+            <el-menu-item-group>
+              <el-menu-item index="1-1">不知道写啥</el-menu-item>
+              <el-menu-item index="1-2">不知道写啥</el-menu-item>
+            </el-menu-item-group>
+          </el-sub-menu>
+          <el-menu-item index="2">
+            <el-icon><i-ep-add-location /></el-icon>
+            <template #title>高级</template>
+          </el-menu-item>
+          <el-menu-item index="3">
+            <el-icon><i-ep-document /></el-icon>
+            <template #title>TODO</template>
+          </el-menu-item>
           <el-footer>
             <div class="footer-div">
-              <el-divider content-position="left"><span class="footer-div">&copy; Watermark-gui</span></el-divider>
-              
+              <el-divider content-position="left"
+                ><span class="footer-div"
+                  >&copy;</span
+                ></el-divider
+              >
             </div>
-      </el-footer>
+          </el-footer>
+        </el-menu>
+      </el-aside>
+      <div v-if="!isCollapse" class="shadowmask" @click="clickMask"></div>
+      <el-container>
+        <el-header>
+          <TopBar />
+        </el-header>
+        <el-main>
+          <el-container direction="vertical">
+            <!-- <el-row > -->
+            <HelloWorld msg="Vite + Vue" />
+            <TextImageProcess />
+            <!-- </el-row> -->
+          </el-container>
+        </el-main>
       </el-container>
     </el-container>
   </div>
-
-  
-  
-  
 </template>
 
 <style>
@@ -172,5 +174,27 @@ export default defineComponent({
   bottom: 0;
   right: 0;
   align-items: center;
+}
+
+/* .el-container {
+  width: var(--el-aside-width,120px);
+} */
+
+.common-layout .shadowmask {
+  position: absolute;
+  top: 0 auto;
+  left: 0 auto;
+  width: 100%;
+  height: 100%;
+  z-index: 98;
+  background-color: #000;
+  opacity: 0.7;
+}
+
+.common-layout .extend {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 10px 5px 20px 5px;
 }
 </style>
