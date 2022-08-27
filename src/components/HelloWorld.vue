@@ -1,9 +1,17 @@
 <template>
   <!-- <div class="home"> -->
+  <el-button @click="backRoute">back</el-button>
+
   <h1>DropZone</h1>
-  <el-button @click="backRoute"></el-button>
-  <div @dragenter.prevent="toggleActive" @dragleave.prevent="toggleActive" @dragover.prevent @drop.prevent="drop"
-    @change="selectedFile" :class="{ 'active-dropzone': active }" class="dropzone">
+  <div
+    @dragenter.prevent="toggleActive"
+    @dragleave.prevent="toggleActive"
+    @dragover.prevent
+    @drop.prevent="drop"
+    @change="selectedFile"
+    :class="{ 'active-dropzone': active }"
+    class="dropzone"
+  >
     <span>Drag or Drop File</span>
     <span>OR</span>
     <label for="dropzoneFile">Select File</label>
@@ -26,11 +34,8 @@ import { useRoute, useRouter } from "vue-router";
 const route = useRoute();
 const router = useRouter();
 const backRoute = () => {
-  router.push("/")
-}
-return {
-  backRoute
-}
+  router.push("/");
+};
 
 function toggleActive() {
   console.log("toggle once ");
@@ -47,11 +52,11 @@ let dropzoneFile = ref("");
 function drop(e) {
   console.log(e);
   dropzoneFile.value = e.dataTransfer.files[0];
-};
+}
 
 function selectedFile() {
   dropzoneFile.value = document.querySelector(".dropzoneFile").files[0];
-};
+}
 
 //     return { dropzoneFile, drop, selectedFile };
 //   },

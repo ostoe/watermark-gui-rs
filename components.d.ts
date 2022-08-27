@@ -25,14 +25,11 @@ declare module '@vue/runtime-core' {
     ElProgress: typeof import('element-plus/es')['ElProgress']
     ElRow: typeof import('element-plus/es')['ElRow']
     ElSubMenu: typeof import('element-plus/es')['ElSubMenu']
-<<<<<<< HEAD
     ElTable: typeof import('element-plus/es')['ElTable']
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
     ElUpload: typeof import('element-plus/es')['ElUpload']
     H222: typeof import('./src/components/H222.vue')['default']
-=======
->>>>>>> 9217b8c8c5919ef7713a67c7dc66442434e463c0
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     IEpAddLocation: typeof import('~icons/ep/add-location')['default']
     IEpArrowLef: typeof import('~icons/ep/arrow-lef')['default']
