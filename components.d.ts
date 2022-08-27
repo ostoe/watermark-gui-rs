@@ -26,6 +26,8 @@ declare module '@vue/runtime-core' {
     ElSubMenu: typeof import('element-plus/es')['ElSubMenu']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     IEpAddLocation: typeof import('~icons/ep/add-location')['default']
+    IEpArrowLef: typeof import('~icons/ep/arrow-lef')['default']
+    IEpArrowLeft: typeof import('~icons/ep/arrow-left')['default']
     IEpArrowRight: typeof import('~icons/ep/arrow-right')['default']
     IEpDocument: typeof import('~icons/ep/document')['default']
     IEpMenu: typeof import('~icons/ep/menu')['default']
