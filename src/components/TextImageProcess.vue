@@ -5,7 +5,6 @@ import { event, invoke } from "@tauri-apps/api";
 import { ElMessage } from "element-plus";
 import { open } from "@tauri-apps/api/dialog";
 import { appDir } from "@tauri-apps/api/path";
-import { UploadFilled } from '@element-plus/icons-vue'
 
 export default defineComponent({
   setup() {
@@ -123,7 +122,7 @@ export default defineComponent({
         // user selected multiple files
       } else if (selected === null) {
         // user cancelled the selection
-          ElMessage({
+        ElMessage({
           message: "null file selected.",
           type: "warning",
         });
@@ -136,8 +135,8 @@ export default defineComponent({
     async selectDirs() {
       const selected = await open({
         directory: true,
-        multiple: true,
-        defaultPath: await appDir(),
+        multiple: false,
+        // defaultPath: await appDir(),
       });
       if (Array.isArray(selected)) {
         console.log("selected dirs" + selected);
@@ -145,7 +144,7 @@ export default defineComponent({
         // user selected multiple files
       } else if (selected === null) {
         // user cancelled the selection
-          ElMessage({
+        ElMessage({
           message: "null dir selected.",
           type: "warning",
         });
@@ -183,7 +182,6 @@ export default defineComponent({
         type="textarea"
         size="large"
         autosize="{ minRows: 2, maxRows: 6 }"
-        clearable="true"
         placeholder="Please input"
       />
     </div>
@@ -192,19 +190,10 @@ export default defineComponent({
         <suspense>
           <!-- <el-col > -->
         <el-container direction="horizontal">
-          <el-button @click="send_event" color="#de4781" :dark="isDark"
-          size="large"
-          plain="true"
-          >[s]测试event</el-button>
+          <el-button @click="send_event" color="#de4781" size="large" plain=true>[s]测试event</el-button>
         <!-- </suspense>
         <suspense> -->
-              <el-button
-          @click="greetTest"
-          color="#322aef"
-          :dark="isDark"
-          size="large"
-          plain="true"
-        >[i]测试Rust </el-button>
+         <el-button @click="greetTest"  color="#322aef"  size="large"  plain=true >[i]测试Rust </el-button>
         <!-- </el-col> -->
         </el-container>
         </suspense>
@@ -251,6 +240,7 @@ export default defineComponent({
   box-shadow: 0 0 10px rgb(79, 223, 255);
   padding: 20px 25px 20px 25px;
 }
+
 .b-border {
   /* border: 1px solid #de4781; */
   margin: 10px auto 10px auto;
@@ -264,7 +254,7 @@ export default defineComponent({
 
 
 <style scoped>
-.file-select > .select-button {
+.file-select>.select-button {
   padding: 1rem;
   width: 10rem;
   color: white;
@@ -275,7 +265,7 @@ export default defineComponent({
   font-weight: bold;
 }
 
-.file-select > input[type="file"] {
+.file-select>input[type="file"] {
   display: none;
 }
 </style>
