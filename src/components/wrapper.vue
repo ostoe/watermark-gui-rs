@@ -4,103 +4,110 @@ import TextImageProcess from "./TextImageProcess.vue";
 import TopBar from "./TopBar.vue";
 
 import { defineComponent, ref } from "vue";
-import { emit, listen } from "@tauri-apps/api/event";
-import { invoke } from "@tauri-apps/api";
-import { ElMessage } from "element-plus";
-import { Context } from "vm";
+// import { Context } from "vm";
 
-function changeCollapse(that: Context) {
-  that.isCollapse = that.isCollapse ? false : true;
-  that.extendPadding = that.isCollapse ? "" : "70";
-}
+//dark mode
+import { useDark, useToggle } from "@vueuse/core";
+//引入路由
+import { useRoute, useRouter } from "vue-router";
 
 export default defineComponent({
+  name: "index",
+  //自定义指令
+  directives: {
+    resize: {
+      mounted(el, binding) {
+        let ResizeObserver = window.ResizeObserver;
+        el._resizer = new ResizeObserver((entries) => {
+          for (const entry of entries) {
+            // console.log(entry.contentRect.width)
+            binding.value({ width: entry.contentRect.width });
+          }
+        });
+        el._resizer.observe(el);
+        // console.log(binding)
+      },
+      unmounted(el) {
+        el._resizer.disconnect();
+      },
+    },
+  },
+
   setup() {
+    const route = useRoute();
+    const router = useRouter();
+    const isDark = ref(true);
     const isCollapse = ref(true);
+    const delay = ref(200);
     const tooltipEffect = ref("light");
     const dynamicWidth = ref(false);
-    const extendPadding = ref("")
-    const count = ref(0)
-    const tableData = ref([])
-    const text = ref("./tests/img/jpg/gps/DSCN0010.jpg")
+    const extendPadding = ref("");
+    const count = ref(0);
+    const tableData = ref([]);
+    const text = ref("./tests/img/jpg/gps/DSCN0010.jpg");
+    let t: NodeJS.Timeout | null = null;
+
+    //获取鼠标点击消除遮罩
+    const changeThisCollapse = () => {
+      let firstClick = !t;
+      if (firstClick) {
+        isCollapse.value = isCollapse.value ? false : true;
+        extendPadding.value = isCollapse.value ? "" : "70";
+      }
+      if (t) {
+        clearTimeout(t);
+      }
+      t = setTimeout(() => {
+        t = null;
+        if (!firstClick) {
+          isCollapse.value = isCollapse.value ? false : true;
+          extendPadding.value = isCollapse.value ? "" : "70";
+        }
+      }, delay.value);
+    };
+
+    //监听dom变化
+    const resizeSideBar = (width: any) => {
+      let domWidth = width;
+      let initWidth = 63;
+      dynamicWidth.value = domWidth.width > 63 ? false : true;
+      // console.log(domWidth)
+    };
+
+    //路由
+    const route2Main = () => {
+      router.push("/textImageProcess")
+    }
+    const route2Test = () =>{
+      router.push("/HelloWorld")
+    }
+
+    const isDarkMode = useDark();
+    const toggleDark = useToggle(isDarkMode);
+    const toggleDarkMode = () => {
+      toggleDark;
+      isDark.value = isDark.value ? false : true;
+    };
 
     return {
       isCollapse,
+      delay,
       tooltipEffect,
       dynamicWidth,
       extendPadding,
       count,
       tableData,
-      text
-
-    };
-
-  },
-  watch: {
-
-  },
-
-  data() {
-    return {
+      text,
+      isDark,
+      changeThisCollapse,
+      resizeSideBar,
+      toggleDarkMode,
+      route2Main,
+      route2Test
     };
   },
-  name: "index",
-  methods: {
-    changeThisCollapse() {
-      changeCollapse(this);
-    },
-    //获取鼠标点击消除遮罩
-    clickMask() {
-      changeCollapse(this);
-    },
-    // 这是个异步函数
-    async greetTest() {
-      if (this.text == "") {
-        this.text = "World!";
-      }
-      let res = await invoke("greet", { name: this.text });
-      console.log(res);
-    },
-    async test_event_recv() {
-      // listen to the `click` event and get a function to remove the event listener
-      // there's also a `once` function that subscribes to an event and automatically unsubscribes the listener on the first event
-      // emits the `click` event with the object payload
 
-      const unlisten = await listen<string>("click", (event) => {
-        // 是一个循环函数
-        console.log(
-          `window name: ${event.windowLabel}, payload: ${event.payload.message}`
-        );
-        this.message(
-          `window name: ${event.windowLabel}, payload: ${event.payload.message}`
-        );
-      });
-      // console.log("recv ok " + this.count);
-    },
-    async test_event_send() {
-      // listen to the `click` event and get a function to remove the event listener
-      // there's also a `once` function that subscribes to an event and automatically unsubscribes the listener on the first event
-      // emits the `click` event with the object payload
-      this.count++;
-
-      emit("click", {
-        theMessage: "send content: " + this.count,
-      });
-      console.log("send ok " + this.count);
-    },
-    async send_event() {
-      console.log("will send_event");
-      let res = await invoke("send_event");
-      console.log("send_event ok");
-    },
-
-    message(msg: string) {
-      ElMessage({
-        message: msg,
-        type: "success",
-      });
-    },
-  },
+  watch: {},
 
   mounted() {
     // 在其他方法或是生命周期中也可以调用方法
@@ -108,23 +115,31 @@ export default defineComponent({
     // for (let i = 0; i < 5; i += 1) {
     //   this.tableData.push({ id: i, msg: " " + i + " " + i + " " + i });
     // }
-
   },
 });
 
-// test event
 </script>
 
 <template lang="">
   <div class="common-layout index">
     <el-container>
       <el-aside width="50px">
-        <el-menu default-active="1-1" class="elmenu" :collapse="isCollapse">
+        <el-menu
+          default-active="1-1"
+          class="elmenu"
+          :collapse="isCollapse"
+          :delay="delay"
+          v-resize:1="resizeSideBar"
+        >
           <div style="margin-top: 30px"></div>
-          <div @click="changeThisCollapse" class="extend" :style="{ 'padding-left': extendPadding + 'px' }">
+          <div
+            @click="changeThisCollapse"
+            class="extend"
+            :style="{ 'padding-left': extendPadding + 'px' }"
+          >
             <el-icon>
               <i-ep-arrow-right v-if="isCollapse" />
-              <i-ep-arrow-left v-if="!isCollapse" />
+              <i-ep-arrow-left v-else />
             </el-icon>
           </div>
           <el-sub-menu index="1">
@@ -133,8 +148,8 @@ export default defineComponent({
               <span>基本</span>
             </template>
             <el-menu-item-group>
-              <el-menu-item index="1-1">不知道写啥</el-menu-item>
-              <el-menu-item index="1-2">不知道写啥</el-menu-item>
+              <el-menu-item index="1-1"  @click="route2Main">测试页</el-menu-item>
+              <el-menu-item index="1-2" @click="route2Test">HelloWorld</el-menu-item>
             </el-menu-item-group>
           </el-sub-menu>
           <el-menu-item index="2">
@@ -148,31 +163,41 @@ export default defineComponent({
           <el-footer>
             <div class="footer-div">
               <el-divider content-position="center">
-              <el-tooltip
-                class="tooltip"
-                :effect="tooltipEffect"
-                content="gui测试"
-                placement="right-start"
-                v-if="isTooltip"
-              >
-              <span>&copy;</span>
-              </el-tooltip>
-              <span v-else class="copyrightSpan">&copy;gui</span>
+                <el-tooltip
+                  class="tooltip"
+                  :effect="tooltipEffect"
+                  content="gui测试"
+                  placement="right-start"
+                  v-if="dynamicWidth"
+                >
+                  <span>&copy;</span>
+                </el-tooltip>
+                <span v-else class="copyrightSpan">&copy;gui</span>
               </el-divider>
             </div>
           </el-footer>
+          <div @click="toggleDarkMode" class="darkBtn">
+            <el-icon>
+              <i-ep-arrow-right v-if="isDark" />
+              <i-ep-arrow-left v-else />
+            </el-icon>
+          </div>
         </el-menu>
       </el-aside>
-      <div v-if="!isCollapse" class="shadowmask" @click="clickMask"></div>
+      <div
+        v-if="!isCollapse"
+        class="shadowmask"
+        @click="changeThisCollapse"
+      ></div>
       <el-container>
-        <el-header>
-          <el-tooltip></el-tooltip>
+        <el-header height="40px">
           <TopBar />
         </el-header>
+        <el-divider></el-divider>
         <el-main>
           <el-container direction="vertical">
             <!-- <el-row > -->
-            <HelloWorld msg="Vite + Vue" />
+            <!-- <HelloWorld msg="Vite + Vue" /> -->
             <TextImageProcess />
             <!-- </el-row> -->
           </el-container>
@@ -215,7 +240,8 @@ export default defineComponent({
   opacity: 0.7;
 }
 
-.common-layout .extend {
+.common-layout .extend,
+.darkBtn {
   display: flex;
   flex-direction: column;
   align-items: center;

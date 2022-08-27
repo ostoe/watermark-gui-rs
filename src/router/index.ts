@@ -1,28 +1,32 @@
 // hash history模式
 // https://router.vuejs.org/guide/essentials/history-mode.html#hash-mode
-import { createRouter,createWebHashHistory} from "vue-router"
+import { createRouter, createWebHashHistory } from "vue-router";
 
-const helloworld = () => import('../components/HelloWorld.vue') 
-const textImageProcess = () => import('../components/TextImageProcess.vue')
-const wrapper = () => import('../components/Wrapper.vue')
+const helloworld = () => import("../components/HelloWorld.vue");
+const textImageProcess = () => import("../components/TextImageProcess.vue");
+const wrapper = () => import("../components/Wrapper.vue");
 
-const router = [{
-    path:'/',
-    name:'index',
-    component:wrapper,
-    children:[{
-        path:'/HelloWorld',
-        name:'helloworld',
-        component:helloworld
-    },
-    {
-        path:'/textImageProcess',
-        name:'textImageProcess',
-        component:textImageProcess
-    }]
-}]
+const router = [
+  {
+    path: "/",
+    name: "index",
+    component: wrapper,
+    children: [
+      {
+        path: "/textImageProcess",
+        name: "textImageProcess",
+        component: textImageProcess,
+      },
+    ],
+  },
+  {
+    path: "/HelloWorld",
+    name: "helloworld",
+    component: helloworld,
+  },
+];
 
 export const routers = createRouter({
-    history: createWebHashHistory(),
-    routes: router
-})
+  history: createWebHashHistory(),
+  routes: router,
+});

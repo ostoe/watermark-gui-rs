@@ -60,25 +60,39 @@ onUnmounted() {
 </script> -->
 
 <script lang="ts">
-import { ref, onMounted, onUnmounted, defineEmits} from "vue"
+import { ref, onMounted, onUnmounted, defineEmits } from "vue"
+//引入路由
+import { useRoute, useRouter } from "vue-router";
+
 export default {
   props: ["msg"],
+  setup() {
+    const route = useRoute();
+    const router = useRouter();
+    const backRoute = () => {
+      router.push("/")
+    }
+    return {
+      backRoute
+    }
+  }
 };
 const emit = defineEmits(["files-dropped"]);
+
 
 
 // Create `active` state and manage it with functions
 let active = ref(false);
 let inActiveTimeout = null;
 function setActive() {
-    active.value = true
-    clearTimeout(inActiveTimeout) // clear the timeout
+  active.value = true
+  clearTimeout(inActiveTimeout) // clear the timeout
 }
 function setInactive() {
-    // wrap it in a `setTimeout`
-    inActiveTimeout = setTimeout(() => {
-        active.value = false
-    }, 50)
+  // wrap it in a `setTimeout`
+  inActiveTimeout = setTimeout(() => {
+    active.value = false
+  }, 50)
 }
 
 function onDrop(e) {
@@ -103,6 +117,7 @@ onUnmounted(() => {
     document.body.removeEventListener(eventName, preventDefaults);
   });
 });
+
 </script>
 
 
@@ -110,22 +125,17 @@ onUnmounted(() => {
 <template>
   <h1>{{ msg }}</h1>
   <div style="width:fit-content">
+    <button @click="backRoute">back</button>
 
+    <div :data-active="active" @dragenter.prevent="setActive" @dragover.prevent="setActive"
+      @dragleave.prevent="setInactive" @drop.prevent="onDrop">
+      <!-- share state with the scoped slot -->
+      <slot :dropZoneActive="active"></slot>
+    </div>
 
-  <div
-    :data-active="active"
-    @dragenter.prevent="setActive"
-    @dragover.prevent="setActive"
-    @dragleave.prevent="setInactive"
-    @drop.prevent="onDrop"
-  >
-    <!-- share state with the scoped slot -->
-    <slot :dropZoneActive="active"></slot>
-  </div>
-
-  <div class="card">
-  </div>
-  <!-- <el-input v-model="input" placeholder="Please input" /> -->
+    <div class="card">
+    </div>
+    <!-- <el-input v-model="input" placeholder="Please input" /> -->
 
     <div id="drop-area">
       <form class="my-form">
@@ -146,12 +156,15 @@ onUnmounted(() => {
 .read-the-docs {
   color: #888;
 }
+
 body {
   font-family: sans-serif;
 }
+
 a {
   color: #369;
 }
+
 .note {
   width: 500px;
   margin: 50px auto;
@@ -159,6 +172,7 @@ a {
   color: #333;
   text-align: justify;
 }
+
 #drop-area {
   border: 2px dashed #ccc;
   border-radius: 20px;
@@ -166,24 +180,30 @@ a {
   margin: 50px auto;
   padding: 20px;
 }
+
 #drop-area.highlight {
   border-color: purple;
 }
+
 p {
   margin-top: 0;
 }
+
 .my-form {
   margin-bottom: 10px;
 }
+
 #gallery {
   margin-top: 10px;
 }
+
 #gallery img {
   width: 150px;
   margin-bottom: 10px;
   margin-right: 10px;
   vertical-align: middle;
 }
+
 .button {
   display: inline-block;
   padding: 10px;
@@ -192,9 +212,11 @@ p {
   border-radius: 5px;
   border: 1px solid #ccc;
 }
+
 .button:hover {
   background: #ddd;
 }
+
 #fileElem {
   display: none;
 }
