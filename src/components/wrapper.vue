@@ -11,22 +11,37 @@ import { Context } from "vm";
 
 function changeCollapse(that: Context) {
   that.isCollapse = that.isCollapse ? false : true;
-  that.extendStyle = that.isCollapse ? "" : "padding-left:70px;";
+  that.extendPadding = that.isCollapse ? "" : "70";
 }
 
 export default defineComponent({
   setup() {
     const isCollapse = ref(true);
+    const tooltipEffect = ref("light");
+    const dynamicWidth = ref(false);
+    const extendPadding = ref("")
+    const count = ref(0)
+    const tableData = ref([])
+    const text = ref("./tests/img/jpg/gps/DSCN0010.jpg")
+
     return {
       isCollapse,
+      tooltipEffect,
+      dynamicWidth,
+      extendPadding,
+      count,
+      tableData,
+      text
+
     };
+
   },
+  watch: {
+
+  },
+
   data() {
     return {
-      extendStyle: "",
-      count: 0,
-      tableData: [],
-      text: "./tests/img/jpg/gps/DSCN0010.jpg",
     };
   },
   name: "index",
@@ -93,6 +108,7 @@ export default defineComponent({
     // for (let i = 0; i < 5; i += 1) {
     //   this.tableData.push({ id: i, msg: " " + i + " " + i + " " + i });
     // }
+
   },
 });
 
@@ -102,10 +118,10 @@ export default defineComponent({
 <template lang="">
   <div class="common-layout index">
     <el-container>
-      <el-aside width="">
+      <el-aside width="50px">
         <el-menu default-active="1-1" class="elmenu" :collapse="isCollapse">
           <div style="margin-top: 30px"></div>
-          <div @click="changeThisCollapse" class="extend" :style="extendStyle">
+          <div @click="changeThisCollapse" class="extend" :style="{ 'padding-left': extendPadding + 'px' }">
             <el-icon>
               <i-ep-arrow-right v-if="isCollapse" />
               <i-ep-arrow-left v-if="!isCollapse" />
@@ -131,11 +147,18 @@ export default defineComponent({
           </el-menu-item>
           <el-footer>
             <div class="footer-div">
-              <el-divider content-position="left"
-                ><span class="footer-div"
-                  >&copy;</span
-                ></el-divider
+              <el-divider content-position="center">
+              <el-tooltip
+                class="tooltip"
+                :effect="tooltipEffect"
+                content="gui测试"
+                placement="right-start"
+                v-if="isTooltip"
               >
+              <span>&copy;</span>
+              </el-tooltip>
+              <span v-else class="copyrightSpan">&copy;gui</span>
+              </el-divider>
             </div>
           </el-footer>
         </el-menu>
@@ -143,6 +166,7 @@ export default defineComponent({
       <div v-if="!isCollapse" class="shadowmask" @click="clickMask"></div>
       <el-container>
         <el-header>
+          <el-tooltip></el-tooltip>
           <TopBar />
         </el-header>
         <el-main>
@@ -196,5 +220,9 @@ export default defineComponent({
   flex-direction: column;
   align-items: center;
   margin: 10px 5px 20px 5px;
+}
+
+.copyrightSpan {
+  font-size: xx-small;
 }
 </style>
