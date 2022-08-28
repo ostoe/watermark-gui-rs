@@ -5,7 +5,7 @@ import { event, invoke } from "@tauri-apps/api";
 import { ElMessage } from "element-plus";
 import { open } from "@tauri-apps/api/dialog";
 import { appDir } from "@tauri-apps/api/path";
-
+import { pictureDir } from '@tauri-apps/api/path';
 export default defineComponent({
   setup() {
     const isCollapse = ref(true);
@@ -35,6 +35,19 @@ export default defineComponent({
       let res = await invoke("greet", { name: this.text });
       console.log(res);
     },
+
+    async process_single_image(image_path: object) {
+      let send_content = JSON.stringify(image_path);
+      console.log(send_content);
+      let res = await invoke("handle_front_select_files", { imagesObj: image_path });
+      this.message("process_single_image result: " + res);
+    },
+
+    async handle_front_update_data(key: string, value: string) {
+      let res = await invoke("handle_front_update_data", { key: key, value: value });
+      this.message("update output dir: " + res);
+    },
+
     async test_event_recv() {
       // listen to the `click` event and get a function to remove the event listener
       // there's also a `once` function that subscribes to an event and automatically unsubscribes the listener on the first event
@@ -52,6 +65,21 @@ export default defineComponent({
       // console.log("recv ok " + this.count);
     },
 
+    async set_drap_hover_evet() {
+      const dropzoneElement = document.querySelector("#drap-area-sq1");
+      const unlisten = await listen("tauri://file-drop-hover", (e) => {
+                console.log(e);
+        const hoveredElement = document.elementFromPoint(e.x, e.y);
+
+        if (dropzoneElement.contains(hoveredElement)) {
+          // ...
+          console.log("drag in la" + hoveredElement);
+          // toggleActive();
+        }
+      });
+
+    },
+
     async test_drag_event_recv() {
       // listen to the `click` event and get a function to remove the event listener
       // there's also a `once` function that subscribes to an event and automatically unsubscribes the listener on the first event
@@ -59,9 +87,6 @@ export default defineComponent({
 
       const unlisten = await listen<string>("tauri://file-drop", (event) => {
         // 是一个循环函数
-        console.log(
-          `drap payload: ${event.id} ${event.payload}`
-        );
         console.log(event.payload);
         this.message(
           `drap payload: ${event.payload}`
@@ -93,6 +118,7 @@ export default defineComponent({
         type: "success",
       });
     },
+    
     handleFileChange(e: InputEvent) {
       const el = e.target as HTMLInputElement;
       if (!el.files || el.files?.length === 0) {
@@ -112,13 +138,15 @@ export default defineComponent({
         filters: [
           {
             name: "Image",
-            extensions: ["png", "jpeg"],
+            extensions: ["jpg", "jpeg"],
           },
         ],
       });
-      if (Array.isArray(selected)) {
-        console.log("selected files" + selected);
-        this.message("selected files" + selected);
+      if (Array.isArray(selected) && selected?.length != 0) {
+        // console.log(selected);
+        let handle_json = {count: selected.length, image_paths: selected};
+        // this.message("handle_json: " + handle_json);
+        await this.process_single_image(handle_json);
         // user selected multiple files
       } else if (selected === null) {
         // user cancelled the selection
@@ -127,9 +155,10 @@ export default defineComponent({
           type: "warning",
         });
       } else {
-        console.log("selected single file" + selected);
-        this.message("selected single file" + selected);
-        // user selected a single file
+        // console.log("single fil: " + selected);
+        let handle_json = {count: selected.length, image_paths: [selected]};
+        // this.message("handle_json: " + handle_json.count);
+        await this.process_single_image(handle_json);
       }
     },
     async selectDirs() {
@@ -149,11 +178,15 @@ export default defineComponent({
           type: "warning",
         });
       } else {
-        console.log("selected single dir" + selected);
-        this.message("selected single dir" + selected);
-        // user selected a single file
+        console.log("selected single dir " + selected);
+        this.message("selected single dir " + selected);
+        this.handle_front_update_data("output_dir", selected)
       }
     },
+    async update_output_dir() {
+      const pictureDirPath = await pictureDir();
+    this.handle_front_update_data("output_dir", pictureDirPath);
+    }
     //
   },
 
@@ -164,6 +197,8 @@ export default defineComponent({
       this.tableData.push({ id: i, msg: " " + i + " " + i + " " + i });
     }
     this.test_drag_event_recv();
+    // this.set_drap_hover_evet();
+    this.update_output_dir();
   },
 });
 
@@ -174,7 +209,7 @@ export default defineComponent({
   
   <el-container  class="a-border">
   
-  <div >
+  <div id="drap-area-sq1">
     <!-- <div style="margin: 20px 0" /> -->
     <div style="margin: 20px 5% 20px 5%">
       <el-input

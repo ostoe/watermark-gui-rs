@@ -1,3 +1,5 @@
+use serde::{Serialize, Deserialize};
+
 
 
 pub struct BannerUnit{
@@ -25,4 +27,9 @@ pub enum UserOperation {
 pub enum Notification {
     Single(String),
     Complated,
+}
+#[derive(Serialize, Deserialize)]
+pub struct ImagesPathFromFront {
+    pub count: u32,
+    pub image_paths: Vec<String>,
 }

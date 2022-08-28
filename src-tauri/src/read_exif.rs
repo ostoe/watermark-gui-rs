@@ -57,7 +57,7 @@ pub fn read_exif(img_path: &str) -> Result<HashMap::<ExifTag, String>, std::io::
 }
 
 
-pub fn process_single_image(img_path: &str, brand: &str, font: &Font, brand_image: (&DynamicImage, &DynamicImage, &DynamicImage), 
+pub fn process_single_image(img_path: &str, output_path: &str, brand: &str, font: &Font, brand_image: (&DynamicImage, &DynamicImage, &DynamicImage), 
     exif_map: HashMap::<ExifTag, String>) {
     // convert to BannerStruct to draw..
     //
@@ -139,9 +139,6 @@ pub fn process_single_image(img_path: &str, brand: &str, font: &Font, brand_imag
         }
     }
 
-
-
-
     // draw all text.
     let first_text_y =     h + ((background_heigth as f32 * 0.25) as u32);
     let second_text_y =     h + ((background_heigth as f32 * 0.55) as u32);
@@ -165,8 +162,19 @@ pub fn process_single_image(img_path: &str, brand: &str, font: &Font, brand_imag
     }
     // draw text do--> generator_draw_text("f 1.8 1/0 ", 40.0, (banner_w/2, banner_h/3),
     //     1.0, &font, Rgba([179, 63u8, 60u8, 0]), &mut newimg_buf);
-    let img_path = "./tests/DSCN0010-99.jpg";
-    let mut fout = &mut File::create(&Path::new(&format!("{}.jpg", img_path))).unwrap();
+    // let img_path = "./tests/DSCN0010-99.jpg";
+    let output_filename = Path::new(&img_path);
+    let output_dir = Path::new(output_path);
+    let file_prefix = output_filename.file_name().unwrap();
+    let mut file_name_arr = file_prefix.to_str().unwrap().split(".").collect::<Vec<&str>>();
+    file_name_arr.pop();
+    let filename_suffix = format!("{}.{}", "-w", "jpg");
+    file_name_arr.push(&filename_suffix);
+    let file_prefix = file_name_arr.join(".");
+    println!("output: {}-{}-{}",output_dir.display(), file_prefix, filename_suffix);
+    let output_dir = output_dir.join(file_prefix);
+    println!("mululljf-->{}", output_dir.display());
+    let mut fout = &mut File::create(output_dir).unwrap();
     newimg_buf
         .write_to(&mut fout, ImageOutputFormat::Jpeg(80))
         .unwrap();

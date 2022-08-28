@@ -3,15 +3,8 @@
   <el-button @click="backRoute">back</el-button>
 
   <h1>DropZone</h1>
-  <div
-    @dragenter.prevent="toggleActive"
-    @dragleave.prevent="toggleActive"
-    @dragover.prevent
-    @drop.prevent="drop"
-    @change="selectedFile"
-    :class="{ 'active-dropzone': active }"
-    class="dropzone"
-  >
+  <div @dragenter.prevent="toggleActive" @dragleave.prevent="toggleActive" @dragover.prevent @drop.prevent="drop"
+    @change="selectedFile" :class="{ 'active-dropzone': active }" class="dropzone" id="drap-area-sq1">
     <span>Drag or Drop File</span>
     <span>OR</span>
     <label for="dropzoneFile">Select File</label>
@@ -26,10 +19,12 @@
 <script setup>
 // @ is an alias to /src
 // import DropZone from "@/components/DropZone.vue";
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
+import selectFiles from "./TextImageProcess.vue";
 const active = ref(false);
 //引入路由
 import { useRoute, useRouter } from "vue-router";
+// import selectFiles from "TextImageProcessVue.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -37,8 +32,12 @@ const backRoute = () => {
   router.push("/");
 };
 
+
+
+
+
 function toggleActive() {
-  console.log("toggle once ");
+  // console.log("toggle once ");
   active.value = !active.value;
 }
 // export default {
@@ -56,7 +55,23 @@ function drop(e) {
 
 function selectedFile() {
   dropzoneFile.value = document.querySelector(".dropzoneFile").files[0];
+  selectFiles();
 }
+import { event } from '@tauri-apps/api';
+
+const dropzoneElement = document.querySelector("#drap-area-sq1");
+
+event.listen('tauri://file-drop-hover', (e) => {
+  // console.log(e.x, e.y); // undifined 
+  toggleActive();
+});
+
+
+event.listen('tauri://file-drop-cancelled', (e) => {
+  toggleActive();
+});
+
+// onMounted(set_drap_hover_evet);
 
 //     return { dropzoneFile, drop, selectedFile };
 //   },

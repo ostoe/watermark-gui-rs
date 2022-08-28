@@ -3,7 +3,7 @@
     windows_subsystem = "windows"
 )]
 
-use app::banner_unit::{UserOperation, Notification};
+use app::banner_unit::{UserOperation, Notification, ImagesPathFromFront};
 use app::read_exif;
 use crossbeam_channel::unbounded;
 use image::DynamicImage;
@@ -32,13 +32,14 @@ fn main() {
         let mut image_list = Vec::<String>::new(); // Vec<String>
         let mut image_length = 0usize;
         let mut index = 0usize;
+        let mut output_path = String::from("");
         loop {
             let opt = operation_st.recv().unwrap(); 
             match opt {
                 UserOperation::ImagePath(name) => {
                     // 调用处理图像
                     image_list = name.split("\n").map(|x|String::from(x)).collect::<Vec<String>>();
-                    println!("{:?}", image_list);
+                    println!("UserOperation{:?} ", image_list);
                     // gen imagelist_  image_index = 0 
                     image_length = image_list.len();
                     index = 0;
@@ -57,8 +58,17 @@ fn main() {
                     is_pause = true;
                     image_length = 0usize;
                     index = 0usize;
+                },
+                UserOperation::Update(k, v) => {
+                    match k.as_str() {
+                        "output_dir" => {
+                            output_path = v;
+                            println!("outputDir update --> {}", output_path);
+                        }
+                        _ => {println!("unsupported update key... #TODO")}
+                    }
                 }
-                _ => {}
+                // _ => {}
             }
             if !is_pause {
 
@@ -68,7 +78,7 @@ fn main() {
                     let exif_data = read_exif::read_exif(image_path).unwrap(); // todo
                     // todo let brand = exif_data.get(&rexif::ExifTag::Make).unwrap();
                     let brand = "nikon";
-    read_exif::process_single_image(image_path, brand, &font, (&c_logo, &n_logo, &s_logo), exif_data);
+    read_exif::process_single_image(image_path, &output_path, brand, &font, (&c_logo, &n_logo, &s_logo), exif_data);
                     // img = image_list[index]...;
                     
                     if let Ok(opt) = operation_st.recv_timeout(std::time::Duration::from_millis(1)) {
@@ -102,6 +112,8 @@ fn main() {
         .manage(st)
         .invoke_handler(tauri::generate_handler![
             close_splashscreen,
+            handle_front_select_files,
+            handle_front_update_data,
             greet,
             send_event
         ])
@@ -152,6 +164,31 @@ async fn close_splashscreen(window: tauri::Window) {
 fn greet(name: &str, state: State<crossbeam_channel::Sender<UserOperation>>) -> String {
     state.send(UserOperation::ImagePath(String::from(name))).unwrap();
     format!("Hello, {}!", name)
+}
+
+#[tauri::command]
+fn handle_front_select_files(images_obj: ImagesPathFromFront, state: State<crossbeam_channel::Sender<UserOperation>>) -> String {
+    if images_obj.count != 0 {
+        state.send(UserOperation::ImagePath(images_obj.image_paths.join("\n"))).unwrap();
+        // for x in images_obj.image_paths.iter() {
+            //TODO verify the path
+            // TODO convert univers fle format
+            // println!("image path: {}", x);
+            
+        // }
+    }
+    
+    format!("handle_front_select_files, {}!", "handling...")
+}
+
+#[tauri::command]
+fn handle_front_update_data(key: String,  value: String, state: State<crossbeam_channel::Sender<UserOperation>>) -> String {
+    let a = ["output_dir", "brand"];
+    if a.contains(&key.as_str()) {
+            state.send(UserOperation::Update(String::from("output_dir"), value)).unwrap();
+            return format!("updating user data");
+    }
+    return format!("error key.");
 }
 
 // #[tauri::command]
