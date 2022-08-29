@@ -17,7 +17,7 @@ use image::{RgbImage, Rgba};
 use imageproc::drawing::{draw_text_mut, text_size, Canvas};
 use rusttype::{Font, Scale};
 
-pub fn read_exif(img_path: &str) -> Result<HashMap::<ExifTag, String>, std::io::Error> {
+pub fn read_exif(img_path: &str) -> Option<HashMap::<ExifTag, String>> {
     // let img_path = "./tests/img/jpg/gps/DSCN0010.jpg";
     // let img_path = "./tests/img/jpg/Canon_40D_photoshop_import.jpg";
     // let img_path = "./tests/img/jpg/Canon_40D.jpg";
@@ -25,35 +25,39 @@ pub fn read_exif(img_path: &str) -> Result<HashMap::<ExifTag, String>, std::io::
     let mut decoder = jpeg::Decoder::new(BufReader::new(file));
     let _pixels = decoder.read_info().expect("failed to decode image"); // todo
     let metadata = decoder.info().unwrap();
-    let exif_data = decoder.exif_data().unwrap();
-    println!(
-        "{:?} {} \n{:?}",
-        metadata,
-        exif_data.len(),
-        &exif_data[..100]
-    );
-    let exif_parsed = parse_buffer(exif_data).unwrap();
-    let (w, h) = (metadata.width, metadata.height);
-
-    println!("{}", exif_parsed.mime);
-    let mut exif_map = HashMap::<ExifTag, String>::new();
-    for entry in exif_parsed.entries.into_iter() {
-        let tag = entry.tag;
-        match exif_map.entry(tag) {
-            std::collections::hash_map::Entry::Vacant(vacant) => {
-                let value = entry.value_more_readable.trim();
-                vacant.insert(String::from(value));
+    if let Some(exif_data) = decoder.exif_data() {
+        println!(
+            "{:?} {} \n",
+            metadata,
+            exif_data.len(),
+            // &exif_data[..100]
+        );
+        let exif_parsed = parse_buffer(exif_data).unwrap();
+        let (w, h) = (metadata.width, metadata.height);
+    
+        println!("{}", exif_parsed.mime);
+        let mut exif_map = HashMap::<ExifTag, String>::new();
+        for entry in exif_parsed.entries.into_iter() {
+            let tag = entry.tag;
+            match exif_map.entry(tag) {
+                std::collections::hash_map::Entry::Vacant(vacant) => {
+                    let value = entry.value_more_readable.trim();
+                    vacant.insert(String::from(value));
+                }
+                _ => {}
             }
-            _ => {}
+            // println!(
+            //     "[{:?}] {}: {} --{} ",
+            //     entry.kind, entry.tag, entry.value_more_readable, entry.ifd.tag
+            // );
         }
-        // println!(
-        //     "[{:?}] {}: {} --{} ",
-        //     entry.kind, entry.tag, entry.value_more_readable, entry.ifd.tag
-        // );
+        println!("{:?}", exif_map);
+        println!("read exif ok");
+        return Some(exif_map);
+    } else {
+        return None
     }
-    println!("{:?}", exif_map);
-    println!("read exif ok");
-    return Ok(exif_map);
+    
 }
 
 
@@ -97,7 +101,7 @@ pub fn process_single_image(img_path: &str, output_path: &str, brand: &str, font
     
     let mut banner_img: &DynamicImage = brand_image.1;
     let (mut banner_w, mut banner_h) = (banner_img.width(), banner_img.height());
-    let watermark_scale = 2.0;
+    let watermark_scale = 1.7;
     let mut background_heigth = banner_h as f32 * watermark_scale;
     let new_bg_h = (h as f32 / 5.0).min(background_heigth);
     // let new_bg_w = (new_bg_h as f32 / banner_h as f32) * banner_w as f32;

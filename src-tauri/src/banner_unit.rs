@@ -27,6 +27,8 @@ pub enum UserOperation {
 pub enum Notification {
     Single(String),
     Complated,
+    Error(String),
+    SkipFile,
 }
 #[derive(Serialize, Deserialize)]
 pub struct ImagesPathFromFront {

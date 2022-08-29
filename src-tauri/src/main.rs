@@ -3,7 +3,7 @@
     windows_subsystem = "windows"
 )]
 
-use app::banner_unit::{UserOperation, Notification, ImagesPathFromFront};
+use app::banner_unit::{ImagesPathFromFront, Notification, UserOperation};
 use app::read_exif;
 use crossbeam_channel::unbounded;
 use image::DynamicImage;
@@ -25,76 +25,96 @@ fn main() {
     let (notify_front_st, notify_front_rt) = unbounded::<Notification>();
     // let (notify_front_st_clone, notify_front_rt_clone) = (notify_front_st.clone(), notify_front_rt.clone());
     // 图像处理线程，等待处理来自前端的消息，处理完成后发送消息通知至消息处理线程，这时消息处理线程再通知前端。
-    std::thread::spawn(move || {
-        
-        let (font, (n_logo, c_logo, s_logo)) = _init();
-        let mut is_pause = true;
-        let mut image_list = Vec::<String>::new(); // Vec<String>
-        let mut image_length = 0usize;
-        let mut index = 0usize;
-        let mut output_path = String::from("");
-        loop {
-            let opt = operation_st.recv().unwrap(); 
-            match opt {
-                UserOperation::ImagePath(name) => {
-                    // 调用处理图像
-                    image_list = name.split("\n").map(|x|String::from(x)).collect::<Vec<String>>();
-                    println!("UserOperation{:?} ", image_list);
-                    // gen imagelist_  image_index = 0 
-                    image_length = image_list.len();
-                    index = 0;
-                    is_pause ^= true
-                },
-                UserOperation::DirPath(path) => {
-                    // gen imagelist_  image_index = 0 
-                    image_length = 10
-                },
+    let image_handle = std::thread::Builder::new()
+        .name("ImageHandle".to_string())
+        .spawn(move || {
+            let (font, (n_logo, c_logo, s_logo)) = _init();
+            let mut is_pause = true;
+            let mut image_list = Vec::<String>::new(); // Vec<String>
+            let mut image_length = 0usize;
+            let mut index = 0usize;
+            let mut output_path = String::from("");
+            loop {
+                let opt = operation_st.recv().unwrap();
+                match opt {
+                    UserOperation::ImagePath(name) => {
+                        // 调用处理图像
+                        image_list = name
+                            .split("\n")
+                            .map(|x| String::from(x))
+                            .collect::<Vec<String>>();
+                        println!("UserOperation{:?} ", image_list);
+                        // gen imagelist_  image_index = 0
+                        image_length = image_list.len();
+                        index = 0;
+                        is_pause ^= true
+                    }
+                    UserOperation::DirPath(path) => {
+                        // gen imagelist_  image_index = 0
+                        image_length = 10
+                    }
 
-                UserOperation::Pause => {
-                    // xor with true --> ref: https://doc.rust-lang.org/reference/types/boolean.html#logical-xor
-                    is_pause ^= true
-                },
-                UserOperation::Cancel => {
-                    is_pause = true;
-                    image_length = 0usize;
-                    index = 0usize;
-                },
-                UserOperation::Update(k, v) => {
-                    match k.as_str() {
+                    UserOperation::Pause => {
+                        // xor with true --> ref: https://doc.rust-lang.org/reference/types/boolean.html#logical-xor
+                        is_pause ^= true
+                    }
+                    UserOperation::Cancel => {
+                        is_pause = true;
+                        image_length = 0usize;
+                        index = 0usize;
+                    }
+                    UserOperation::Update(k, v) => match k.as_str() {
                         "output_dir" => {
                             output_path = v;
                             println!("outputDir update --> {}", output_path);
                         }
-                        _ => {println!("unsupported update key... #TODO")}
-                    }
+                        _ => {
+                            println!("unsupported update key... #TODO")
+                        }
+                    }, // _ => {}
                 }
-                // _ => {}
-            }
-            if !is_pause {
+                if !is_pause {
+                    loop {
+                        // process image
+                        let image_path = image_list.get(index).unwrap();
+                        if let Some(exif_data) = read_exif::read_exif(image_path) {
+                            // todo let brand = exif_data.get(&rexif::ExifTag::Make).unwrap();
+                            let brand = "nikon";
+                            read_exif::process_single_image(
+                                image_path,
+                                &output_path,
+                                brand,
+                                &font,
+                                (&c_logo, &n_logo, &s_logo),
+                                exif_data,
+                            );
+                            // img = image_list[index]...;
 
-                loop {
-                    // process image
-                    let image_path = image_list.get(index).unwrap();
-                    let exif_data = read_exif::read_exif(image_path).unwrap(); // todo
-                    // todo let brand = exif_data.get(&rexif::ExifTag::Make).unwrap();
-                    let brand = "nikon";
-    read_exif::process_single_image(image_path, &output_path, brand, &font, (&c_logo, &n_logo, &s_logo), exif_data);
-                    // img = image_list[index]...;
-                    
-                    if let Ok(opt) = operation_st.recv_timeout(std::time::Duration::from_millis(1)) {
-                        if let UserOperation::Pause = opt {
-                            is_pause ^= true;
+                            if let Ok(opt) =
+                                operation_st.recv_timeout(std::time::Duration::from_millis(1))
+                            {
+                                if let UserOperation::Pause = opt {
+                                    is_pause ^= true;
+                                    break;
+                                }
+                            }
+                            let opt = notify_front_st
+                                .send(Notification::Single(String::from(image_path)));
+                        } else {
+                            let opt = notify_front_st
+                                .send(Notification::SkipFile);
+                        }
+                        index += 1;
+                        if index >= image_length {
+                            index = 0;
+                            image_length = 0;
+                            is_pause = true;
                             break;
                         }
                     }
-                    let opt = notify_front_st.send(Notification::Single(String::from(image_path)));
-                    index += 1;
-                    if index >= image_length { index = 0; image_length = 0; is_pause = true; break; }
-                    
                 }
             }
-        }
-    });
+        });
 
     // menu------------------------begin
     // here `"quit".to_string()` defines the menu item id, and the second parameter is the menu item label.
@@ -106,7 +126,7 @@ fn main() {
         .add_item(CustomMenuItem::new("hide", "Hide"))
         .add_submenu(submenu);
     // menu------------------------end
-    
+
     tauri::Builder::default()
         .menu(menu)
         .manage(st)
@@ -120,29 +140,44 @@ fn main() {
         .setup(move |app| {
             let main_window = app.get_window("main").unwrap();
             let splashscreen_window = app.get_window("splashscreen").unwrap();
-            std::thread::spawn(move || {
-                st_clone.send(UserOperation::Update("ABCD".to_string(), "EFG".to_string())).unwrap();
-                // let id = main_window.listen("click", |event| {
-                //     println!("got window event-name with payload {:?}", event.payload());
-                // });
-                std::thread::sleep(std::time::Duration::from_secs(2));
-                splashscreen_window.close().unwrap();
-                main_window.show().unwrap();
-                loop {
-                    let opt_result = notify_front_rt.recv().unwrap();
-                    match opt_result {
-                        Notification::Single(opt_result) => {
-                            println!("----{:?}", opt_result);
-                            main_window.emit("click", Payload { message: opt_result},
-                                )
-                                .unwrap();
-                        },
-                        Notification::Complated => {
-                            windows_send_msg(&main_window, "click", "1001");
+            let control_center = std::thread::Builder::new()
+                .name("ControlCenter".to_string())
+                .spawn(move || {
+                    st_clone
+                        .send(UserOperation::Update("ABCD".to_string(), "EFG".to_string()))
+                        .unwrap();
+                    // let id = main_window.listen("click", |event| {
+                    //     println!("got window event-name with payload {:?}", event.payload());
+                    // });
+                    std::thread::sleep(std::time::Duration::from_secs(2));
+                    splashscreen_window.close().unwrap();
+                    main_window.show().unwrap();
+                    loop {
+                        let opt_result = notify_front_rt.recv().unwrap();
+                        match opt_result {
+                            Notification::Single(opt_result) => {
+                                println!("----{:?}", opt_result);
+                                main_window
+                                    .emit(
+                                        "click",
+                                        Payload {
+                                            message: opt_result,
+                                        },
+                                    )
+                                    .unwrap();
+                            }
+                            Notification::Complated => {
+                                windows_send_msg(&main_window, "click", "200");
+                            },
+                             Notification::Error(e) => {
+                                windows_send_msg(&main_window, "click", "500");
+                             },
+                             Notification::SkipFile => {
+                                windows_send_msg(&main_window, "click", "300");
+                             }
                         }
                     }
-                }
-            });
+                });
 
             Ok(())
         })
@@ -162,31 +197,44 @@ async fn close_splashscreen(window: tauri::Window) {
 
 #[tauri::command]
 fn greet(name: &str, state: State<crossbeam_channel::Sender<UserOperation>>) -> String {
-    state.send(UserOperation::ImagePath(String::from(name))).unwrap();
+    state
+        .send(UserOperation::ImagePath(String::from(name)))
+        .unwrap();
     format!("Hello, {}!", name)
 }
 
 #[tauri::command]
-fn handle_front_select_files(images_obj: ImagesPathFromFront, state: State<crossbeam_channel::Sender<UserOperation>>) -> String {
+fn handle_front_select_files(
+    images_obj: ImagesPathFromFront,
+    state: State<crossbeam_channel::Sender<UserOperation>>,
+) -> String {
     if images_obj.count != 0 {
-        state.send(UserOperation::ImagePath(images_obj.image_paths.join("\n"))).unwrap();
+        state
+            .send(UserOperation::ImagePath(images_obj.image_paths.join("\n")))
+            .unwrap();
         // for x in images_obj.image_paths.iter() {
-            //TODO verify the path
-            // TODO convert univers fle format
-            // println!("image path: {}", x);
-            
+        //TODO verify the path
+        // TODO convert univers fle format
+        // println!("image path: {}", x);
+
         // }
     }
-    
+
     format!("handle_front_select_files, {}!", "handling...")
 }
 
 #[tauri::command]
-fn handle_front_update_data(key: String,  value: String, state: State<crossbeam_channel::Sender<UserOperation>>) -> String {
+fn handle_front_update_data(
+    key: String,
+    value: String,
+    state: State<crossbeam_channel::Sender<UserOperation>>,
+) -> String {
     let a = ["output_dir", "brand"];
     if a.contains(&key.as_str()) {
-            state.send(UserOperation::Update(String::from("output_dir"), value)).unwrap();
-            return format!("updating user data");
+        state
+            .send(UserOperation::Update(String::from("output_dir"), value))
+            .unwrap();
+        return format!("updating user data");
     }
     return format!("error key.");
 }
@@ -237,7 +285,13 @@ fn _init() -> (Font<'static>, (DynamicImage, DynamicImage, DynamicImage)) {
     return (font, (nikon_banner_img, canon_banner_img, sony_banner_img));
 }
 
-
 pub fn windows_send_msg(window: &Window, event: &str, msg: &str) {
-    window.emit(event, Payload { message: String::from(msg)}).unwrap();
+    window
+        .emit(
+            event,
+            Payload {
+                message: String::from(msg),
+            },
+        )
+        .unwrap();
 }
