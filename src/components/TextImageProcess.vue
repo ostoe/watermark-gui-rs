@@ -1,5 +1,5 @@
-<script lang="ts">
-import { defineComponent, ref } from "vue";
+<script setup lang="ts">
+import { defineComponent, ref, onMounted } from "vue";
 import update_progress from "./TopBar.vue";
 import { emit, listen } from "@tauri-apps/api/event";
 import { event, invoke } from "@tauri-apps/api";
@@ -8,221 +8,204 @@ import { open } from "@tauri-apps/api/dialog";
 import { appDir } from "@tauri-apps/api/path";
 import { pictureDir } from '@tauri-apps/api/path';
 
-export default defineComponent({
-  setup() {
-    const isCollapse = ref(true);
-    return {
-      isCollapse,
-    };
-  },
-  data() {
-    const progress_count = ref({ completed: 0, total: 0 });
-    return {
-      count: 0,
-      tableData: [],
-      text: "./tests/img/jpg/gps/DSCN0010.jpg",
-      selectImage: "",
-      progress_count,
-    };
-  },
-  name: "index",
-  methods: {
-    changeCollapse() {
-      console.log(this.isCollapse);
-      this.isCollapse = this.isCollapse ? false : true;
-    },
-    // 这是个异步函数
-    async greetTest() {
-      if (this.text == "") {
-        this.text = "World!";
-      }
-      let res = await invoke("greet", { name: this.text });
-      console.log(res);
-    },
+const isCollapse = ref(true);
+const progress_count = ref({ completed: 0, total: 0 });
+const count = ref(0);
+const tableData = ref([]);
+const text = ref("./tests/img/jpg/gps/DSCN0010.jpg");
+const selectImage = ref("");
+//  const      progress_count = ,
+interface MsgProps {
+  message: string,
+  stateCode: number
+}
 
-    async process_single_image(image_path) {
-      let send_content = JSON.stringify(image_path);
-      console.log(send_content);
-      let res = await invoke("handle_front_select_files", { imagesObj: image_path });
-      this.message("process_single_image result: " + res);
-    },
+interface ImageProps {
+  image_paths: [string],
+  count: number
+}
+// {count: selected.length, image_paths: [selected]}
 
-    async handle_front_update_data(key, value) {
-      let res = await invoke("handle_front_update_data", { key: key, value: value });
-      this.message("update output dir: " + res);
-    },
+function changeCollapse() {
+  console.log(isCollapse.value);
+  isCollapse.value = isCollapse.value ? false : true;
+};
+// 这是个异步函数
+async function greetTest() {
+  if (text.value == "") {
+    text.value = "World!";
+  }
+  let res = await invoke("greet", { name: text.value });
+  console.log(res);
+};
 
-    async test_event_recv() {
-      // listen to the `click` event and get a function to remove the event listener
-      // there's also a `once` function that subscribes to an event and automatically unsubscribes the listener on the first event
-      // emits the `click` event with the object payload
+async function process_single_image(image_path: ImageProps) {
+  let send_content = JSON.stringify(image_path);
+  console.log(send_content);
+  let res = await invoke("handle_front_select_files", { imagesObj: image_path });
+  message("process_single_image result: " + res);
+};
 
-      const unlisten = await listen<string>("front-backend", (event) => {
-        // 是一个循环函数
-        console.log(
-          `[r] : ${event.payload.message}`
-        );
-        let state_code = Number(event.payload.message.substring(0, 4));
-        let data = event.payload.message.substring(4);
-        switch (state_code) {
-          case 200 : 
-          progress_count.value.completed += 1;
-          update_progress(progress_count.value.completed, progress_count.value.total);
-          case 300:
-          console.log("skip file: " + data);
-          progress_count.value.completed += 1;
-          update_progress(progress_count.value.completed, progress_count.value.total);
-          case 500:
-            ;
-          default: console.log("unknown nofitication.: " + event.payload.message)
-        }
-        if (progress_count.value.completed == progress_count.value.total) {
-          this.message(
-          `[r] : ${event.payload.message}`
-        );
-        }
+async function handle_front_update_data(key: string, value: string) {
+  let res = await invoke("handle_front_update_data", { key: key, value: value });
+  message("update output dir: " + res);
+};
 
-      });
-      // console.log("recv ok " + this.count);
-    },
+async function test_event_recv() {
+  // listen to the `click` event and get a function to remove the event listener
+  // there's also a `once` function that subscribes to an event and automatically unsubscribes the listener on the first event
+  // emits the `click` event with the object payload
 
-    async set_drap_hover_evet() {
-      const dropzoneElement = document.querySelector("#drap-area-sq1");
-      const unlisten = await listen("tauri://file-drop-hover", (e) => {
-                console.log(e);
-        const hoveredElement = document.elementFromPoint(e.x, e.y);
-
-        if (dropzoneElement.contains(hoveredElement)) {
-          // ...
-          console.log("drag in la" + hoveredElement);
-          // toggleActive();
-        }
-      });
-
-    },
-
-    async test_drag_event_recv() {
-      // listen to the `click` event and get a function to remove the event listener
-      // there's also a `once` function that subscribes to an event and automatically unsubscribes the listener on the first event
-      // emits the `click` event with the object payload
-
-      const unlisten = await listen<string>("tauri://file-drop", (event) => {
-        // 是一个循环函数
-        console.log(event.payload);
-        this.message(
-          `drap payload: ${event.payload}`
-        );
-      });
-      // console.log("recv ok " + this.count);
-    },
-
-    // async test_event_send() {
-    //   // listen to the `click` event and get a function to remove the event listener
-    //   // there's also a `once` function that subscribes to an event and automatically unsubscribes the listener on the first event
-    //   // emits the `click` event with the object payload
-    //   this.count++;
-
-    //   emit("click", {
-    //     theMessage: "send content: " + this.count,
-    //   });
-    //   console.log("send ok " + this.count);
-    // },
-    async send_event() {
-      console.log("will send_event");
-      let res = await invoke("send_event");
-      console.log("send_event ok");
-    },
-
-    message(msg) {
-      ElMessage({
-        message: msg,
-        type: "success",
-      });
-    },
-    
-    handleFileChange(el) {// : InputEvent) {
-      // const el = e.target as HTMLInputElement;
-      if (!el.files || el.files?.length === 0) {
-        return;
-      }
-      // console.log(el.files);
-      console.log(e.target.files[0]);
-      // this.$emit('input', e.target.files[0])
-      // console.log(e.target.files[0].path);
-      // console.log(typeof (e.target));
-      this.selectImage = "./tests/img/jpg/gps/DSCN0010.jpg";
-    },
-
-    async selectFiles() {
-      const selected = await open({
-        multiple: true,
-        filters: [
-          {
-            name: "Image",
-            extensions: ["jpg", "jpeg"],
-          },
-        ],
-      });
-      if (Array.isArray(selected) && selected?.length != 0) {
-        // console.log(selected);
-        let handle_json = {count: selected.length, image_paths: selected};
-        // this.message("handle_json: " + handle_json);
-        // await this.process_single_image(handle_json);
-        update_progress(0, selected.length);
-        // user selected multiple files
-      } else if (selected === null) {
-        // user cancelled the selection
-        ElMessage({
-          message: "null file selected.",
-          type: "warning",
-        });
-      } else {
-        // console.log("single fil: " + selected);
-        let handle_json = {count: selected.length, image_paths: [selected]};
-        // this.message("handle_json: " + handle_json.count);
-        await this.process_single_image(handle_json);
-      }
-    },
-    async selectDirs() {
-      const selected = await open({
-        directory: true,
-        multiple: false,
-        // defaultPath: await appDir(),
-      });
-      if (Array.isArray(selected)) {
-        console.log("selected dirs" + selected);
-        this.message("selected dirs" + selected);
-        // user selected multiple files
-      } else if (selected === null) {
-        // user cancelled the selection
-        ElMessage({
-          message: "null dir selected.",
-          type: "warning",
-        });
-      } else {
-        console.log("selected single dir " + selected);
-        this.message("selected single dir " + selected);
-        this.handle_front_update_data("output_dir", selected)
-      }
-    },
-    async update_output_dir() {
-      const pictureDirPath = await pictureDir();
-    this.handle_front_update_data("output_dir", pictureDirPath);
+  const unlisten = await listen<MsgProps>("front-backend", (event) => {
+    // 是一个循环函数
+    console.log(
+      `[r] : ${event.payload}`
+    );
+    // let state_code = Number(event.payload.message.substring(0, 4));
+    // let data = event.payload.message.substring(4);
+    switch (event.payload.stateCode) {
+      case 200:
+        progress_count.value.completed += 1;
+        update_progress(progress_count.value.completed, progress_count.value.total);
+      case 300:
+        console.log("skip file: " + event.payload.message);
+        progress_count.value.completed += 1;
+        update_progress(progress_count.value.completed, progress_count.value.total);
+      case 500:
+        ;
+      default: console.log("unknown nofitication.: " + event.payload)
     }
-    //
-  },
-
-  mounted() {
-    // 在其他方法或是生命周期中也可以调用方法
-    this.test_event_recv();
-    for (let i = 0; i < 5; i += 1) {
-      this.tableData.push({ id: i, msg: " " + i + " " + i + " " + i });
+    if (progress_count.value.completed == progress_count.value.total) {
+      message(
+        `[r] : 已完成处理！`
+      );
     }
-    this.test_drag_event_recv();
-    // this.set_drap_hover_evet();
-    this.update_output_dir();
-  },
+
+  });
+};
+
+async function set_drap_hover_evet() {
+  const dropzoneElement = document.querySelector("#drap-area-sq1");
+  const unlisten = await listen("tauri://file-drop-hover", (e) => {
+    console.log(e);
+    const hoveredElement = document.elementFromPoint(e.x, e.y);
+
+    if (dropzoneElement != null && dropzoneElement.contains(hoveredElement)) {
+      // ...
+      console.log("drag in la" + hoveredElement);
+      // toggleActive();
+    }
+  });
+
+};
+
+async function test_drag_event_recv() {
+  // listen to the `click` event and get a function to remove the event listener
+  // there's also a `once` function that subscribes to an event and automatically unsubscribes the listener on the first event
+  // emits the `click` event with the object payload
+
+  const unlisten = await listen<string>("tauri://file-drop", (event) => {
+    // 是一个循环函数
+    console.log(event.payload);
+    message(
+      `drap payload: ${event.payload}`
+    );
+  });
+};
+async function send_event() {
+  console.log("will send_event");
+  let res = await invoke("send_event");
+  console.log("send_event ok");
+};
+
+function message(msg: string) {
+  ElMessage({
+    message: msg,
+    type: "success",
+  });
+};
+
+function handleFileChange(e: InputEvent) {
+  const el = e.target as HTMLInputElement;
+  if (!el.files || el.files?.length === 0) {
+    return;
+  }
+  // console.log(el.files);
+  console.log(e.target ? e.target.files[0] : null);
+  // this.$emit('input', e.target.files[0])
+  // console.log(e.target.files[0].path);
+  // console.log(typeof (e.target));
+  selectImage.value = "./tests/img/jpg/gps/DSCN0010.jpg";
+};
+
+async function selectFiles() {
+  const selected = await open({
+    multiple: true,
+    filters: [
+      {
+        name: "Image",
+        extensions: ["jpg", "jpeg"],
+      },
+    ],
+  });
+  if (Array.isArray(selected) && selected?.length != 0) {
+    // console.log(selected);
+    let handle_json = { count: selected.length, image_paths: selected };
+    update_progress(0, selected.length);
+    // user selected multiple files
+  } else if (selected === null) {
+    // user cancelled the selection
+    ElMessage({
+      message: "null file selected.",
+      type: "warning",
+    });
+  } else {
+    // console.log("single fil: " + selected);
+    let handle_json: ImageProps = { count: selected.length, image_paths: [selected] };
+    // this.message("handle_json: " + handle_json.count);
+    await process_single_image(handle_json);
+  }
+};
+async function selectDirs() {
+  const selected = await open({
+    directory: true,
+    multiple: false,
+    // defaultPath: await appDir(),
+  });
+  if (Array.isArray(selected)) {
+    console.log("selected dirs" + selected);
+    message("selected dirs" + selected);
+    // user selected multiple files
+  } else if (selected === null) {
+    // user cancelled the selection
+    ElMessage({
+      message: "null dir selected.",
+      type: "warning",
+    });
+  } else {
+    console.log("selected single dir " + selected);
+    message("selected single dir " + selected);
+    handle_front_update_data("output_dir", selected)
+  }
+};
+async function update_output_dir() {
+  const pictureDirPath = await pictureDir();
+  handle_front_update_data("output_dir", pictureDirPath);
+};
+
+onMounted(() => {
+  test_event_recv();
+  for (let i = 0; i < 5; i += 1) {
+    tableData.value.push({ id: i, msg: " " + i + " " + i + " " + i });
+  }
+  test_drag_event_recv();
+  // this.set_drap_hover_evet(); // e.x e.y invalid.
+  update_output_dir();
 });
+
+defineExpose({
+  selectFiles
+})
 
 // test event
 </script>

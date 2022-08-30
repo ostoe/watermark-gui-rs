@@ -3,7 +3,7 @@ import { floor } from 'lodash';
 import { onMounted, ref } from 'vue';
 
 
-const percentage = ref(0);
+const percentage = ref(90);
 const progress_count = ref({ completed: 0, total: 0 });
 const colors = [
   { color: '#f56c6c', percentage: 0 },
@@ -15,29 +15,31 @@ const colors = [
 
 function color() {
   const index = floor(percentage.value / 25.01);
+  console.log(index);
   const startC = colorRgb(colors[index].color);
   const endC = colorRgb(colors[index + 1].color);
   return gerColorOfWeight1(1, 25, startC, endC, percentage.value % 25);
 }
 
-function update_progress (completed: number, total: number) {
+function update_progress(completed: number, total: number) {
   progress_count.value.completed = completed;
   progress_count.value.total = total;
   if (total > 0) {
     let value = completed / total;
-  if (value <0) {value = 0;}  else if (value >100) { value =100; }
-  percentage.value = Math.round((value + Number.EPSILON) * 10000) / 100;
+    if (value < 0) { value = 0; } else if (value > 100) { value = 100; }
+    percentage.value = Math.round((value + Number.EPSILON) * 10000) / 100;
   }
 
   // color();
 }
 
 const increase = () => {
-  percentage.value += 2
-  if (percentage.value < 0) {
-    percentage.value = 0
+  if (percentage.value <= 98) {
+    percentage.value += 2
+    if (percentage.value < 0) {
+      percentage.value = 0
+    }
   }
-    // color();
 }
 
 
@@ -45,7 +47,13 @@ function format(percentage: number) {
   return percentage === 100 ? "✔️" : `${progress_count.value.completed}/${progress_count.value.total}`;
 }
 
-function gerColorOfWeight1(minNum: number, maxNum: number, colorStart, colorEnd, number) {
+interface colorObj {
+  red: number,
+  green: number,
+  blue: number,
+}
+
+function gerColorOfWeight1(minNum: number, maxNum: number, colorStart: colorObj, colorEnd: colorObj, number: number) {
   const colorR =
     ((colorEnd.red - colorStart.red) * (number - minNum)) / (maxNum - minNum) + colorStart.red;
   const colorG =
@@ -58,11 +66,12 @@ function gerColorOfWeight1(minNum: number, maxNum: number, colorStart, colorEnd,
   const color = `rgb(${parseInt(colorR).toString()},${parseInt(colorG).toString()},${parseInt(
     colorB
   ).toString()})`;
+  console.log(color);
   // #color=getColorstr((int(colorR),int(colorG),int(colorB)))#转换为16进制颜色
   return color;
 }
 
-function colorRgb(color) {
+function colorRgb(color: string) {
   var reg = /^#([0-9a-fA-f]{3}|[0-9a-fA-f]{6})$/;
   var sColor = color.toLowerCase();
   if (sColor && reg.test(sColor)) {
@@ -81,7 +90,7 @@ function colorRgb(color) {
     return { red: sColorChange[0], green: sColorChange[1], blue: sColorChange[2] }
     // return "rgba(" + sColorChange.join(",") + ")";
   } else {
-    return { red: 128, green: 128, blue: 128};
+    return { red: 128, green: 128, blue: 128 };
   }
 }
 
@@ -96,7 +105,9 @@ function colorRgb(color) {
         <el-button class="btn">选择图片</el-button>
         <el-progress id="progress-bar" :percentage="percentage" :format="format" :color="color"></el-progress>
         <div>
-          <div><el-button @click="increase"> +++ </el-button></div>
+          <div>
+            <el-button @click="increase"> +++ </el-button>
+          </div>
         </div>
       </div>
     </el-col>

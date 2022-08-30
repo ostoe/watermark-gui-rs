@@ -15,6 +15,7 @@ use tauri::{Manager, Window};
 #[derive(Clone, serde::Serialize)]
 struct Payload {
     message: String,
+    stateCode: u32,
 }
 
 fn main() {
@@ -164,18 +165,19 @@ fn main() {
                                         "front-backend",
                                         Payload {
                                             message: opt_result,
+                                            stateCode: 200,
                                         },
                                     )
                                     .unwrap();
                             }
                             Notification::Complated => {
-                                windows_send_msg(&main_window, "front-backend", "200:");
+                                windows_send_msg(&main_window, "front-backend", "", 200);
                             },
                              Notification::Error(e) => {
-                                windows_send_msg(&main_window, "front-backend", &format!("500:{}", e));
+                                windows_send_msg(&main_window, "front-backend", &e, 500);
                              },
                              Notification::SkipFile(fname) => {
-                                windows_send_msg(&main_window, "front-backend", &format!("300:{}", fname));
+                                windows_send_msg(&main_window, "front-backend", &fname, 300);
                              }
                         }
                     }
@@ -266,7 +268,7 @@ fn handle_front_update_data(
 fn send_event(window: Window) {
     //   std::thread::spawn(move || {
     // loop {
-    windows_send_msg(&window, "front-backend", "ZZZ");
+    windows_send_msg(&window, "front-backend", "ZZZ", 200);
     // }
     //   });
 }
@@ -287,12 +289,13 @@ fn _init() -> (Font<'static>, (DynamicImage, DynamicImage, DynamicImage)) {
     return (font, (nikon_banner_img, canon_banner_img, sony_banner_img));
 }
 
-pub fn windows_send_msg(window: &Window, event: &str, msg: &str) {
+pub fn windows_send_msg(window: &Window, event: &str, msg: &str, code: u32) {
     window
         .emit(
             event,
             Payload {
                 message: String::from(msg),
+                stateCode: code, 
             },
         )
         .unwrap();

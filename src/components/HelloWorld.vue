@@ -2,11 +2,11 @@
 <script setup lang="ts">
 // @ is an alias to /src
 // import DropZone from "@/components/DropZone.vue";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, defineExpose } from "vue";
 import selectFiles from "./TextImageProcess.vue";
-
+import { event } from '@tauri-apps/api';
 //引入路由
-import {  useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 
 const active = ref(false);
 const router = useRouter();
@@ -27,9 +27,10 @@ function toggleActive() {
 //   },
 //   setup() {
 let dropzoneFile = ref("");
+const dropzoneElement = document.querySelector("#drap-area-sq1");
 
 function drop(e) {
-  console.log(e);
+  console.log(typeof e);
   dropzoneFile.value = e.dataTransfer.files[0];
 }
 
@@ -37,11 +38,12 @@ function selectedFile() {
   dropzoneFile.value = document.querySelector(".dropzoneFile").files[0];
   selectFiles();
 }
-import { event } from '@tauri-apps/api';
 
-const dropzoneElement = document.querySelector("#drap-area-sq1");
 
-event.listen('tauri://file-drop-hover', (e) => {
+
+onMounted(() => {
+
+  event.listen('tauri://file-drop-hover', (e) => {
   // console.log(e.x, e.y); // undifined 
   toggleActive();
 });
@@ -50,12 +52,9 @@ event.listen('tauri://file-drop-hover', (e) => {
 event.listen('tauri://file-drop-cancelled', (e) => {
   toggleActive();
 });
+});
 
-// onMounted(set_drap_hover_evet);
 
-//     return { dropzoneFile, drop, selectedFile };
-//   },
-// };
 </script>
 
 
