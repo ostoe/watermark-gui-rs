@@ -1,7 +1,10 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 import { floor } from 'lodash';
-import { onMounted, ref } from 'vue'
-const percentage = ref(80);
+import { onMounted, ref } from 'vue';
+
+
+const percentage = ref(0);
+const progress_count = ref({ completed: 0, total: 0 });
 const colors = [
   { color: '#f56c6c', percentage: 0 },
   { color: '#e6a23c', percentage: 25 },
@@ -12,50 +15,45 @@ const colors = [
 
 function color() {
   const index = floor(percentage.value / 25.01);
-  const startC = olorRgb(colors[index].color);
-  const endC = olorRgb(colors[index + 1].color);
+  const startC = colorRgb(colors[index].color);
+  const endC = colorRgb(colors[index + 1].color);
   return gerColorOfWeight1(1, 25, startC, endC, percentage.value % 25);
+}
+
+function update_progress (completed: number, total: number) {
+  progress_count.value.completed = completed;
+  progress_count.value.total = total;
+  if (total > 0) {
+    let value = completed / total;
+  if (value <0) {value = 0;}  else if (value >100) { value =100; }
+  percentage.value = Math.round((value + Number.EPSILON) * 10000) / 100;
+  }
+
+  // color();
 }
 
 const increase = () => {
   percentage.value += 2
-
-  if (percentage.value > 100) {
-    percentage.value = 100
-  }
-  console.log(percentage.value);
-    color();
-}
-
-const decrease = () => {
-  percentage.value -= 2
-
   if (percentage.value < 0) {
     percentage.value = 0
   }
-    color();
+    // color();
 }
 
 
-function format(percentage) {
-  return percentage === 100 ? "Done!" : `${percentage}%`;
+function format(percentage: number) {
+  return percentage === 100 ? "✔️" : `${progress_count.value.completed}/${progress_count.value.total}`;
 }
 
-function gerColorOfWeight1(minNum, maxNum, colorStart, colorEnd, number) {
-  // console.log(55, minNum, maxNum, colorStart, colorEnd, number);
-  // return "#f56c6c";
+function gerColorOfWeight1(minNum: number, maxNum: number, colorStart, colorEnd, number) {
   const colorR =
     ((colorEnd.red - colorStart.red) * (number - minNum)) / (maxNum - minNum) + colorStart.red;
-  // console.log(22, colorR);
   const colorG =
     ((colorEnd.green - colorStart.green) * (number - minNum)) / (maxNum - minNum) +
     colorStart.green;
-  // console.log(223, colorG);
-
   const colorB =
     ((colorEnd.blue - colorStart.blue) * (number - minNum)) / (maxNum - minNum) +
     colorStart.blue;
-  // console.log(2233, colorB);
 
   const color = `rgb(${parseInt(colorR).toString()},${parseInt(colorG).toString()},${parseInt(
     colorB
@@ -64,7 +62,7 @@ function gerColorOfWeight1(minNum, maxNum, colorStart, colorEnd, number) {
   return color;
 }
 
-function olorRgb(color: string) {
+function colorRgb(color) {
   var reg = /^#([0-9a-fA-f]{3}|[0-9a-fA-f]{6})$/;
   var sColor = color.toLowerCase();
   if (sColor && reg.test(sColor)) {
@@ -83,7 +81,7 @@ function olorRgb(color: string) {
     return { red: sColorChange[0], green: sColorChange[1], blue: sColorChange[2] }
     // return "rgba(" + sColorChange.join(",") + ")";
   } else {
-    return sColor;
+    return { red: 128, green: 128, blue: 128};
   }
 }
 
@@ -98,6 +96,7 @@ function olorRgb(color: string) {
         <el-button class="btn">选择图片</el-button>
         <el-progress id="progress-bar" :percentage="percentage" :format="format" :color="color"></el-progress>
         <div>
+          <div><el-button @click="increase"> +++ </el-button></div>
         </div>
       </div>
     </el-col>

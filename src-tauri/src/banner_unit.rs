@@ -28,7 +28,7 @@ pub enum Notification {
     Single(String),
     Complated,
     Error(String),
-    SkipFile,
+    SkipFile(String),
 }
 #[derive(Serialize, Deserialize)]
 pub struct ImagesPathFromFront {

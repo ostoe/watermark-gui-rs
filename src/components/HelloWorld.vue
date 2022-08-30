@@ -1,42 +1,22 @@
-<template>
-  <!-- <div class="home"> -->
-  <el-button @click="backRoute">back</el-button>
 
-  <h1>DropZone</h1>
-  <div @dragenter.prevent="toggleActive" @dragleave.prevent="toggleActive" @dragover.prevent @drop.prevent="drop"
-    @change="selectedFile" :class="{ 'active-dropzone': active }" class="dropzone" id="drap-area-sq1">
-    <span>Drag or Drop File</span>
-    <span>OR</span>
-    <label for="dropzoneFile">Select File</label>
-    <input type="file" id="dropzoneFile" class="dropzoneFile" />
-  </div>
-
-  <!-- <DropZone @drop.prevent="drop" @change="selectedFile" /> -->
-  <span class="file-info">File: {{ dropzoneFile.name }}</span>
-  <!-- </div> -->
-</template>
-
-<script setup>
+<script setup lang="ts">
 // @ is an alias to /src
 // import DropZone from "@/components/DropZone.vue";
 import { ref, onMounted } from "vue";
 import selectFiles from "./TextImageProcess.vue";
-const active = ref(false);
-//引入路由
-import { useRoute, useRouter } from "vue-router";
-// import selectFiles from "TextImageProcessVue.vue";
 
-const route = useRoute();
+//引入路由
+import {  useRouter } from "vue-router";
+
+const active = ref(false);
 const router = useRouter();
 const backRoute = () => {
   router.push("/");
 };
 
 
-
-
-
 function toggleActive() {
+  // test_pro()
   // console.log("toggle once ");
   active.value = !active.value;
 }
@@ -77,6 +57,26 @@ event.listen('tauri://file-drop-cancelled', (e) => {
 //   },
 // };
 </script>
+
+
+<template>
+  <!-- <div class="home"> -->
+  <el-button @click="backRoute">back</el-button>
+
+  <h1>DropZone</h1>
+  <div @dragenter.prevent="toggleActive" @dragleave.prevent="toggleActive" @dragover.prevent @drop.prevent="drop"
+    @change="selectedFile" :class="{ 'active-dropzone': active }" class="dropzone" id="drap-area-sq1">
+    <span>Drag or Drop File</span>
+    <span>OR</span>
+    <label for="dropzoneFile">Select File</label>
+    <input type="file" id="dropzoneFile" class="dropzoneFile" />
+  </div>
+
+  <!-- <DropZone @drop.prevent="drop" @change="selectedFile" /> -->
+  <span class="file-info">File: {{ dropzoneFile.name }}</span>
+  <!-- </div> -->
+</template>
+
 
 <style lang="scss" scoped>
 .home {

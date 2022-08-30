@@ -99,10 +99,12 @@ fn main() {
                                 }
                             }
                             let opt = notify_front_st
-                                .send(Notification::Single(String::from(image_path)));
+                                // .send(Notification::Single(String::from(image_path)));
+                                .send(Notification::Complated);
+
                         } else {
                             let opt = notify_front_st
-                                .send(Notification::SkipFile);
+                                .send(Notification::SkipFile(String::from(image_path)));
                         }
                         index += 1;
                         if index >= image_length {
@@ -146,7 +148,7 @@ fn main() {
                     st_clone
                         .send(UserOperation::Update("ABCD".to_string(), "EFG".to_string()))
                         .unwrap();
-                    // let id = main_window.listen("click", |event| {
+                    // let id = main_window.listen("front-backend", |event| {
                     //     println!("got window event-name with payload {:?}", event.payload());
                     // });
                     std::thread::sleep(std::time::Duration::from_secs(2));
@@ -159,7 +161,7 @@ fn main() {
                                 println!("----{:?}", opt_result);
                                 main_window
                                     .emit(
-                                        "click",
+                                        "front-backend",
                                         Payload {
                                             message: opt_result,
                                         },
@@ -167,13 +169,13 @@ fn main() {
                                     .unwrap();
                             }
                             Notification::Complated => {
-                                windows_send_msg(&main_window, "click", "200");
+                                windows_send_msg(&main_window, "front-backend", "200:");
                             },
                              Notification::Error(e) => {
-                                windows_send_msg(&main_window, "click", "500");
+                                windows_send_msg(&main_window, "front-backend", &format!("500:{}", e));
                              },
-                             Notification::SkipFile => {
-                                windows_send_msg(&main_window, "click", "300");
+                             Notification::SkipFile(fname) => {
+                                windows_send_msg(&main_window, "front-backend", &format!("300:{}", fname));
                              }
                         }
                     }
@@ -264,7 +266,7 @@ fn handle_front_update_data(
 fn send_event(window: Window) {
     //   std::thread::spawn(move || {
     // loop {
-    windows_send_msg(&window, "click", "ZZZ");
+    windows_send_msg(&window, "front-backend", "ZZZ");
     // }
     //   });
 }

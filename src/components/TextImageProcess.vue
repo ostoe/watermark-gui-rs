@@ -1,11 +1,13 @@
 <script lang="ts">
 import { defineComponent, ref } from "vue";
+import update_progress from "./TopBar.vue";
 import { emit, listen } from "@tauri-apps/api/event";
 import { event, invoke } from "@tauri-apps/api";
 import { ElMessage } from "element-plus";
 import { open } from "@tauri-apps/api/dialog";
 import { appDir } from "@tauri-apps/api/path";
 import { pictureDir } from '@tauri-apps/api/path';
+
 export default defineComponent({
   setup() {
     const isCollapse = ref(true);
@@ -14,11 +16,13 @@ export default defineComponent({
     };
   },
   data() {
+    const progress_count = ref({ completed: 0, total: 0 });
     return {
       count: 0,
       tableData: [],
       text: "./tests/img/jpg/gps/DSCN0010.jpg",
       selectImage: "",
+      progress_count,
     };
   },
   name: "index",
@@ -36,14 +40,14 @@ export default defineComponent({
       console.log(res);
     },
 
-    async process_single_image(image_path: object) {
+    async process_single_image(image_path) {
       let send_content = JSON.stringify(image_path);
       console.log(send_content);
       let res = await invoke("handle_front_select_files", { imagesObj: image_path });
       this.message("process_single_image result: " + res);
     },
 
-    async handle_front_update_data(key: string, value: string) {
+    async handle_front_update_data(key, value) {
       let res = await invoke("handle_front_update_data", { key: key, value: value });
       this.message("update output dir: " + res);
     },
@@ -53,14 +57,31 @@ export default defineComponent({
       // there's also a `once` function that subscribes to an event and automatically unsubscribes the listener on the first event
       // emits the `click` event with the object payload
 
-      const unlisten = await listen<string>("click", (event) => {
+      const unlisten = await listen<string>("front-backend", (event) => {
         // 是一个循环函数
         console.log(
-          `window name: ${event.windowLabel}, payload: ${event.payload.message}`
+          `[r] : ${event.payload.message}`
         );
-        this.message(
-          `window name: ${event.windowLabel}, payload: ${event.payload.message}`
+        let state_code = Number(event.payload.message.substring(0, 4));
+        let data = event.payload.message.substring(4);
+        switch (state_code) {
+          case 200 : 
+          progress_count.value.completed += 1;
+          update_progress(progress_count.value.completed, progress_count.value.total);
+          case 300:
+          console.log("skip file: " + data);
+          progress_count.value.completed += 1;
+          update_progress(progress_count.value.completed, progress_count.value.total);
+          case 500:
+            ;
+          default: console.log("unknown nofitication.: " + event.payload.message)
+        }
+        if (progress_count.value.completed == progress_count.value.total) {
+          this.message(
+          `[r] : ${event.payload.message}`
         );
+        }
+
       });
       // console.log("recv ok " + this.count);
     },
@@ -95,32 +116,32 @@ export default defineComponent({
       // console.log("recv ok " + this.count);
     },
 
-    async test_event_send() {
-      // listen to the `click` event and get a function to remove the event listener
-      // there's also a `once` function that subscribes to an event and automatically unsubscribes the listener on the first event
-      // emits the `click` event with the object payload
-      this.count++;
+    // async test_event_send() {
+    //   // listen to the `click` event and get a function to remove the event listener
+    //   // there's also a `once` function that subscribes to an event and automatically unsubscribes the listener on the first event
+    //   // emits the `click` event with the object payload
+    //   this.count++;
 
-      emit("click", {
-        theMessage: "send content: " + this.count,
-      });
-      console.log("send ok " + this.count);
-    },
+    //   emit("click", {
+    //     theMessage: "send content: " + this.count,
+    //   });
+    //   console.log("send ok " + this.count);
+    // },
     async send_event() {
       console.log("will send_event");
       let res = await invoke("send_event");
       console.log("send_event ok");
     },
 
-    message(msg: string) {
+    message(msg) {
       ElMessage({
         message: msg,
         type: "success",
       });
     },
     
-    handleFileChange(e: InputEvent) {
-      const el = e.target as HTMLInputElement;
+    handleFileChange(el) {// : InputEvent) {
+      // const el = e.target as HTMLInputElement;
       if (!el.files || el.files?.length === 0) {
         return;
       }
@@ -146,7 +167,8 @@ export default defineComponent({
         // console.log(selected);
         let handle_json = {count: selected.length, image_paths: selected};
         // this.message("handle_json: " + handle_json);
-        await this.process_single_image(handle_json);
+        // await this.process_single_image(handle_json);
+        update_progress(0, selected.length);
         // user selected multiple files
       } else if (selected === null) {
         // user cancelled the selection
