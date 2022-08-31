@@ -10,7 +10,6 @@ declare module '@vue/runtime-core' {
     Base: typeof import('./src/components/Base.vue')['default']
     ElAside: typeof import('element-plus/es')['ElAside']
     ElButton: typeof import('element-plus/es')['ElButton']
-    ElButtonGroup: typeof import('element-plus/es')['ElButtonGroup']
     ElCol: typeof import('element-plus/es')['ElCol']
     ElConfigProvider: typeof import('element-plus/es')['ElConfigProvider']
     ElContainer: typeof import('element-plus/es')['ElContainer']
@@ -37,7 +36,6 @@ declare module '@vue/runtime-core' {
     RouterView: typeof import('vue-router')['RouterView']
     TextImageProcess: typeof import('./src/components/TextImageProcess.vue')['default']
     TopBar: typeof import('./src/components/TopBar.vue')['default']
-    TTT: typeof import('./src/components/TTT.vue')['default']
     Wrapper: typeof import('./src/components/wrapper.vue')['default']
   }
 }

@@ -40,3 +40,19 @@ event.listen('tauri://file-drop-hover', (e) => {
  - 自定义后缀 防止覆盖文件
  - 集成其他工具，如计算景深 超焦距之类
 
+
+-------------------
+```error
+image/tiff
+read exif ok
+read exif---2.4659ms
+read image---9.0118174s
+453 x 453
+resize ---9.5345489s
+copy 126---14.2708617s
+copy 139---14.6111246s
+draw 153---14.7396533s
+draw 162---14.739949s
+write image---42.3066473s
+write ok
+```
