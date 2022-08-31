@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import { main } from '@popperjs/core';
 import { floor } from 'lodash';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, reactive } from 'vue';
+import { image_progress, tools } from '../main';
+import { invoke } from '@tauri-apps/api';
 
-
-const percentage = ref(90);
-const progress_count = ref({ completed: 0, total: 0 });
+// const percentage = ref(90);
+// const progress_count = ref({ completed: 0, total: 0 });
 const colors = [
   { color: '#f56c6c', percentage: 0 },
   { color: '#e6a23c', percentage: 25 },
@@ -14,37 +16,17 @@ const colors = [
 ]
 
 function color() {
-  const index = floor(percentage.value / 25.01);
+  const index = floor(image_progress.value / 25.01);
   console.log(index);
   const startC = colorRgb(colors[index].color);
   const endC = colorRgb(colors[index + 1].color);
-  return gerColorOfWeight1(1, 25, startC, endC, percentage.value % 25);
+  return gerColorOfWeight1(1, 25, startC, endC, image_progress.value % 25);
 }
 
-function update_progress(completed: number, total: number) {
-  progress_count.value.completed = completed;
-  progress_count.value.total = total;
-  if (total > 0) {
-    let value = completed / total;
-    if (value < 0) { value = 0; } else if (value > 100) { value = 100; }
-    percentage.value = Math.round((value + Number.EPSILON) * 10000) / 100;
-  }
-
-  // color();
-}
-
-const increase = () => {
-  if (percentage.value <= 98) {
-    percentage.value += 2
-    if (percentage.value < 0) {
-      percentage.value = 0
-    }
-  }
-}
 
 
 function format(percentage: number) {
-  return percentage === 100 ? "✔️" : `${progress_count.value.completed}/${progress_count.value.total}`;
+  return percentage === 100 ? "✔️" : `${image_progress.count.completed}/${image_progress.count.total}`;
 }
 
 interface colorObj {
@@ -92,7 +74,23 @@ function colorRgb(color: string) {
   } else {
     return { red: 128, green: 128, blue: 128 };
   }
-}
+};
+
+async function process_image() {
+  if ((image_progress.count.total != 0) && (image_progress.count.completed != image_progress.count.total)) {
+    let send_content = JSON.stringify(image_progress.image_paths);
+    console.log(send_content);
+    let res = await invoke("handle_front_select_files", { imagesObj: image_progress.image_paths });
+    tools.message("process_single_image result: " + res);
+  } else {
+    tools.message("未选择文件或已完成");
+  }
+
+};
+
+defineExpose({
+  image_progress
+})
 
 </script>
 
@@ -103,14 +101,25 @@ function colorRgb(color: string) {
     <el-col :span="18" class="left">
       <div class="photoSelector">
         <el-button class="btn">选择图片</el-button>
-        <el-progress id="progress-bar" :percentage="percentage" :format="format" :color="color"></el-progress>
+        <el-progress id="progress-bar" :percentage="image_progress.value" :format="format" :color="color"></el-progress>
         <div>
           <div>
-            <el-button @click="increase"> +++ </el-button>
+            <el-button @click="image_progress.increase()"> +++ </el-button>
           </div>
+        </div>
+        <div>
+          <el-button class="btn" @click="image_progress.selectFiles()">选择文件</el-button>
+          <!-- </div> -->
+          <!-- <div class="photoSelector"> -->
+          <el-button class="btn" @click="image_progress.selectDirs()">选择目录</el-button>
+          <el-button class="btn " @click="process_image" color="#de4781" size="large" plain>开始处理</el-button>
+
         </div>
       </div>
     </el-col>
+    <!-- <el-col :span="18" class="right">
+
+    </el-col> -->
     <el-col :span="6" class="right">
       <div class="previewer">
         <el-button class="btn">预览图片</el-button>

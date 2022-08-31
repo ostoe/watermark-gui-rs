@@ -3,7 +3,7 @@
 // @ is an alias to /src
 // import DropZone from "@/components/DropZone.vue";
 import { ref, onMounted, defineExpose } from "vue";
-import selectFiles from "./TextImageProcess.vue";
+import {image_progress} from "../main";
 import { event } from '@tauri-apps/api';
 //引入路由
 import { useRouter } from "vue-router";
@@ -36,9 +36,13 @@ function drop(e) {
 
 function selectedFile() {
   dropzoneFile.value = document.querySelector(".dropzoneFile").files[0];
-  selectFiles();
+  image_progress.selectFiles();
 }
 
+const x = ref(0)
+function onMousemove(e) {
+  x.value = e.clientX
+}
 
 
 onMounted(() => {
@@ -69,6 +73,16 @@ event.listen('tauri://file-drop-cancelled', (e) => {
     <span>OR</span>
     <label for="dropzoneFile">Select File</label>
     <input type="file" id="dropzoneFile" class="dropzoneFile" />
+    
+    <div
+  @mousemove="onMousemove"
+  :style="{ backgroundColor: `hsl(${x}, 80%, 50%)` }"
+  class="movearea"
+>
+  <p>Move your mouse across this div...</p>
+  <p>x: {{ x }}</p>
+</div>
+
   </div>
 
   <!-- <DropZone @drop.prevent="drop" @change="selectedFile" /> -->
@@ -95,7 +109,9 @@ event.listen('tauri://file-drop-cancelled', (e) => {
     margin-top: 32px;
   }
 }
-
+.movearea {
+  transition: 0.3s background-color ease;
+}
 .dropzone {
   width: 400px;
   height: 200px;
