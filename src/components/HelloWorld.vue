@@ -7,6 +7,7 @@ import {image_progress} from "../main";
 import { event } from '@tauri-apps/api';
 //引入路由
 import { useRouter } from "vue-router";
+import { Event } from "@tauri-apps/api/event";
 
 const active = ref(false);
 const router = useRouter();
@@ -26,21 +27,22 @@ function toggleActive() {
 //     DropZone,
 //   },
 //   setup() {
-let dropzoneFile = ref("");
+const dropzoneFile = ref("");
 const dropzoneElement = document.querySelector("#drap-area-sq1");
 
-function drop(e) {
-  console.log(typeof e);
-  dropzoneFile.value = e.dataTransfer.files[0];
+
+function drop(e: DragEvent) {
+
 }
 
 function selectedFile() {
-  dropzoneFile.value = document.querySelector(".dropzoneFile").files[0];
+  // dropzoneFile.value = document.querySelector(".dropzoneFile").files[0]; ?????
   image_progress.selectFiles();
 }
 
 const x = ref(0)
-function onMousemove(e) {
+function onMousemove(e: MouseEvent) {
+  console.log(typeof e);
   x.value = e.clientX
 }
 
@@ -86,7 +88,7 @@ event.listen('tauri://file-drop-cancelled', (e) => {
   </div>
 
   <!-- <DropZone @drop.prevent="drop" @change="selectedFile" /> -->
-  <span class="file-info">File: {{ dropzoneFile.name }}</span>
+  <span class="file-info">File: {{ dropzoneFile }}</span>
   <!-- </div> -->
 </template>
 

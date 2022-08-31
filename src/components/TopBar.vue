@@ -44,11 +44,11 @@ function gerColorOfWeight1(minNum: number, maxNum: number, colorStart: colorObj,
   const colorB =
     ((colorEnd.blue - colorStart.blue) * (number - minNum)) / (maxNum - minNum) +
     colorStart.blue;
-
-  const color = `rgb(${parseInt(colorR).toString()},${parseInt(colorG).toString()},${parseInt(
+  console.log(typeof colorR);
+  const color = `rgb(${floor(colorR).toString()},${floor(colorG).toString()},${floor(
     colorB
   ).toString()})`;
-  // console.log(color);
+  console.log(color);
   // #color=getColorstr((int(colorR),int(colorG),int(colorB)))#转换为16进制颜色
   return color;
 }
