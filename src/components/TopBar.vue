@@ -17,7 +17,7 @@ const colors = [
 
 function color() {
   const index = floor(image_progress.value / 25.01);
-  console.log(index);
+  // console.log(index);
   const startC = colorRgb(colors[index].color);
   const endC = colorRgb(colors[index + 1].color);
   return gerColorOfWeight1(1, 25, startC, endC, image_progress.value % 25);
@@ -48,7 +48,7 @@ function gerColorOfWeight1(minNum: number, maxNum: number, colorStart: colorObj,
   const color = `rgb(${parseInt(colorR).toString()},${parseInt(colorG).toString()},${parseInt(
     colorB
   ).toString()})`;
-  console.log(color);
+  // console.log(color);
   // #color=getColorstr((int(colorR),int(colorG),int(colorB)))#转换为16进制颜色
   return color;
 }
@@ -98,21 +98,19 @@ defineExpose({
 <template>
   <!-- jindutiao -->
   <el-row class="row">
-    <el-col :span="18" class="left">
+    <el-col :span="20" class="left">
       <div class="photoSelector">
         <el-button class="btn">选择图片</el-button>
         <el-progress id="progress-bar" :percentage="image_progress.value" :format="format" :color="color"></el-progress>
         <div>
           <div>
-            <el-button @click="image_progress.increase()"> +++ </el-button>
+            <el-button @click="image_progress.increase()"> + </el-button>
           </div>
         </div>
         <div>
-          <el-button class="btn" @click="image_progress.selectFiles()">选择文件</el-button>
-          <!-- </div> -->
-          <!-- <div class="photoSelector"> -->
-          <el-button class="btn" @click="image_progress.selectDirs()">选择目录</el-button>
-          <el-button class="btn " @click="process_image" color="#de4781" size="large" plain>开始处理</el-button>
+          <el-button  @click="image_progress.selectFiles()">选择文件</el-button>
+          <el-button  @click="image_progress.selectDirs()">选择目录</el-button>
+          <el-button  @click="process_image" color="#de4781" size="" plain>开始处理</el-button>
 
         </div>
       </div>
@@ -162,7 +160,7 @@ defineExpose({
 .el-progress--line {
   margin-left: 20px;
   margin-bottom: 8px;
-  width: 350px;
+  width: 250px;
 }
 
 .options {

@@ -7,7 +7,7 @@ use app::banner_unit::{ImagesPathFromFront, Notification, UserOperation};
 use app::read_exif;
 use crossbeam_channel::unbounded;
 use image::DynamicImage;
-use rusttype::{Font, Scale};
+use rusttype::{Font};
 use std::io::{BufReader, Read};
 use tauri::{CustomMenuItem, Menu, MenuItem, State, Submenu};
 use tauri::{Manager, Window};
@@ -15,7 +15,7 @@ use tauri::{Manager, Window};
 #[derive(Clone, serde::Serialize)]
 struct Payload {
     message: String,
-    stateCode: u32,
+    state_code: u32,
 }
 
 fn main() {
@@ -81,14 +81,23 @@ fn main() {
                         if let Some(exif_data) = read_exif::read_exif(image_path) {
                             // todo let brand = exif_data.get(&rexif::ExifTag::Make).unwrap();
                             let brand = "nikon";
-                            read_exif::process_single_image(
+                            match read_exif::process_single_image(
                                 image_path,
                                 &output_path,
                                 brand,
                                 &font,
                                 (&c_logo, &n_logo, &s_logo),
                                 exif_data,
-                            );
+                            ) {
+                                Ok(_) => {
+                                    notify_front_st
+                                    .send(Notification::Complated).unwrap();
+                                }
+                                Err(e) => {
+                                    println!("ImageError: {:?}", e);
+                                    notify_front_st.send(Notification::Error(format!("{}---图片解码错误{:?}",image_path, e))).unwrap();
+                                 }
+                            }
                             // img = image_list[index]...;
 
                             if let Ok(opt) =
@@ -99,11 +108,10 @@ fn main() {
                                     break;
                                 }
                             }
-                            let opt = notify_front_st
-                                // .send(Notification::Single(String::from(image_path)));
-                                .send(Notification::Complated);
+
 
                         } else {
+                            println!("skip: {}", &image_path);
                             let opt = notify_front_st
                                 .send(Notification::SkipFile(String::from(image_path)));
                         }
@@ -143,7 +151,7 @@ fn main() {
         .setup(move |app| {
             let main_window = app.get_window("main").unwrap();
             let splashscreen_window = app.get_window("splashscreen").unwrap();
-            let control_center = std::thread::Builder::new()
+            let _control_center = std::thread::Builder::new()
                 .name("ControlCenter".to_string())
                 .spawn(move || {
                     st_clone
@@ -158,17 +166,9 @@ fn main() {
                     loop {
                         let opt_result = notify_front_rt.recv().unwrap();
                         match opt_result {
-                            Notification::Single(opt_result) => {
-                                println!("----{:?}", opt_result);
-                                main_window
-                                    .emit(
-                                        "front-backend",
-                                        Payload {
-                                            message: opt_result,
-                                            stateCode: 200,
-                                        },
-                                    )
-                                    .unwrap();
+                            Notification::Single(fname) => {
+                                println!("----{:?}", fname);
+                                windows_send_msg(&main_window, "front-backend", &fname, 200);
                             }
                             Notification::Complated => {
                                 windows_send_msg(&main_window, "front-backend", "", 200);
@@ -295,7 +295,7 @@ pub fn windows_send_msg(window: &Window, event: &str, msg: &str, code: u32) {
             event,
             Payload {
                 message: String::from(msg),
-                stateCode: code, 
+                state_code: code, 
             },
         )
         .unwrap();

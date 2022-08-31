@@ -12,13 +12,12 @@ import { pictureDir } from '@tauri-apps/api/path';
 const isCollapse = ref(true);
 // const progress_count = ref({ completed: 0, total: 0 });
 const count = ref(0);
-const tableData = ref([]);
 const text = ref("./tests/img/jpg/gps/DSCN0010.jpg");
 const selectImage = ref("");
 //  const      progress_count = ,
 interface MsgProps {
   message: string,
-  stateCode: number
+  state_code: number
 }
 interface ImageProps {
     image_paths: [string],
@@ -55,22 +54,25 @@ async function backend_event_recv() {
 
   const unlisten = await listen<MsgProps>("front-backend", (event) => {
     // 是一个循环函数
-    console.log(
-      `[r] : ${event.payload}`
-    );
+    // console.log(
+    //   `[r]: ${event.payload.stateCode, event.payload.message}`
+    // );
     // let state_code = Number(event.payload.message.substring(0, 4));
     // let data = event.payload.message.substring(4);
-    switch (event.payload.stateCode) {
+    switch (event.payload.state_code) {
       case 200:
-        image_progress.count.completed += 1;
+        image_progress.increase_one();
         // progress.update_progress(progress.count.completed, progress.count.total);
+        break;
       case 300:
         console.log("skip file: " + event.payload.message);
-        image_progress.count.completed += 1;
+        image_progress.increase_one();
         // progress.update_progress(progress.count.completed, progress.count.total);
+        break;
       case 500:
-        ;
-      default: console.log("unknown nofitication.: " + event.payload)
+        console.log("500...");
+        break;
+      default: console.log("unknown nofitication.: " + event.payload.message);
     }
     if (image_progress.count.completed == image_progress.count.total) {
       tools.message(
@@ -85,13 +87,13 @@ async function drap_hover_event_handle() {
   const dropzoneElement = document.querySelector("#drap-area-sq1");
   const unlisten = await listen("tauri://file-drop-hover", (e) => {
     console.log(e);
-    const hoveredElement = document.elementFromPoint(e.x, e.y);
+    // const hoveredElement = document.elementFromPoint(e.x, e.y);
 
-    if (dropzoneElement != null && dropzoneElement.contains(hoveredElement)) {
-      // ...
-      console.log("drag in la" + hoveredElement);
-      // toggleActive();
-    }
+    // if (dropzoneElement != null && dropzoneElement.contains(hoveredElement)) {
+    //   // ...
+    //   console.log("drag in la" + hoveredElement);
+    //   // toggleActive();
+    // }
   });
 
 };
@@ -123,7 +125,7 @@ function handleFileChange(e: InputEvent) {
     return;
   }
   // console.log(el.files);
-  console.log(e.target ? e.target.files[0] : null);
+  console.log(el ? el.files[0] : null);
   // this.$emit('input', e.target.files[0])
   // console.log(e.target.files[0].path);
   // console.log(typeof (e.target));
@@ -137,9 +139,9 @@ async function init_output_dir() {
 
 onMounted(() => {
   backend_event_recv();
-  for (let i = 0; i < 5; i += 1) {
-    tableData.value.push({ id: i, msg: " " + i + " " + i + " " + i });
-  }
+  // for (let i = 0; i < 5; i += 1) {
+  //   tableData.value.push({ id: i, msg: " " + i + " " + i + " " + i });
+  // }
   drag_event_handle();
   // this.set_drap_hover_evet(); // e.x e.y invalid.
   init_output_dir();

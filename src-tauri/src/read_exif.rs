@@ -26,12 +26,7 @@ pub fn read_exif(img_path: &str) -> Option<HashMap::<ExifTag, String>> {
     let _pixels = decoder.read_info().expect("failed to decode image"); // todo
     let metadata = decoder.info().unwrap();
     if let Some(exif_data) = decoder.exif_data() {
-        println!(
-            "{:?} {} \n",
-            metadata,
-            exif_data.len(),
-            // &exif_data[..100]
-        );
+        println!( "{:?} {} \n", metadata, exif_data.len(), );
         let exif_parsed = parse_buffer(exif_data).unwrap();
         let (w, h) = (metadata.width, metadata.height);
     
@@ -62,7 +57,7 @@ pub fn read_exif(img_path: &str) -> Option<HashMap::<ExifTag, String>> {
 
 
 pub fn process_single_image(img_path: &str, output_path: &str, brand: &str, font: &Font, brand_image: (&DynamicImage, &DynamicImage, &DynamicImage), 
-    exif_map: HashMap::<ExifTag, String>) {
+    exif_map: HashMap::<ExifTag, String>) -> image::ImageResult<()> {
     // convert to BannerStruct to draw..
     //
     let exposure_time = match exif_map.get(&ExifTag::ExposureTime) {
@@ -91,7 +86,7 @@ pub fn process_single_image(img_path: &str, output_path: &str, brand: &str, font
         _ => "",
     };
     // read images to vec
-    let src_img = image::open(img_path).unwrap();
+    let src_img =  image::open(img_path)?;
 
     let focal_length  =  focal_length.split(" ").map(|x|String::from(x)).collect::<Vec<String>>().join("");
     let composit_text = format!("{} {} {} {}", focal_length, f_number, exposure_time, iso);
@@ -135,13 +130,7 @@ pub fn process_single_image(img_path: &str, output_path: &str, brand: &str, font
     // place banner
     println!("new image:size {} x {}", newimg_buf.width(), newimg_buf.height() );
     println!("{} {} {}x{}",background_heigth, h + (background_heigth/watermark_scale/2.0 ) as u32 ,banner_img.width(), banner_img.height());
-    match newimg_buf.copy_from(banner_img, w/2, h + (background_heigth/watermark_scale/2.0 ) as u32) {
-        Ok(_) => {}
-        Err(e) => {
-            // println!("{}", e);
-            panic!("{}", e)
-        }
-    }
+    newimg_buf.copy_from(banner_img, w/2, h + (background_heigth/watermark_scale/2.0 ) as u32) ?;
 
     // draw all text.
     let first_text_y =     h + ((background_heigth as f32 * 0.25) as u32);
@@ -181,8 +170,9 @@ pub fn process_single_image(img_path: &str, output_path: &str, brand: &str, font
     let mut fout = &mut File::create(output_dir).unwrap();
     newimg_buf
         .write_to(&mut fout, ImageOutputFormat::Jpeg(80))
-        .unwrap();
+        ?;
     println!("write ok");
+    return Ok(());
 }
 
 fn generator_draw_text(
