@@ -12,6 +12,14 @@
   },
   "tauri": {
     "allowlist": {
+      "dialog": {
+        "all": true, 
+        "open": true, 
+        "save": true 
+      },
+      "fs": {
+        "scope": ["$APP/databases/*"]
+      },
       "all": true
     },
     "bundle": {
@@ -59,11 +67,11 @@
     "windows": [
       {
         "fullscreen": false,
-        "height": 600,
+        "height": 1000,
         "resizable": true,
         "title": "Wartermark",
-        "width": 800,
-        "visible": false 
+        "width": 1200,
+        "visible": true 
       },
       {
          "width": 320,
@@ -71,7 +79,7 @@
           "decorations": false,
           "url": "../src/assets/splashscreen.html",
           "label": "splashscreen",
-          "visible": true 
+          "visible": false 
         }
     ]
   }

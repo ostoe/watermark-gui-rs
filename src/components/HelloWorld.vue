@@ -1,39 +1,149 @@
-<script lang="ts">
-import { ref, defineComponent } from 'vue'
+
+<script setup lang="ts">
+// @ is an alias to /src
+// import DropZone from "@/components/DropZone.vue";
+import { ref, onMounted, defineExpose } from "vue";
+import {image_progress} from "../main";
+import { event } from '@tauri-apps/api';
+//引入路由
+import { useRouter } from "vue-router";
+
+const active = ref(false);
+const router = useRouter();
+const backRoute = () => {
+  router.push("/");
+};
 
 
-export default defineComponent({
-  name: 'HelloWorld',
-  props: {
-    msg: String
-  },
-  setup(props){
-    const input = ref('')
-    const count = ref(0)
-    console.log(props)
-    return {
-      input,
-      count
-    }
-  }
-})
+function toggleActive() {
+  // test_pro()
+  // console.log("toggle once ");
+  active.value = !active.value;
+}
+// export default {
+//   name: "Home",
+//   components: {
+//     DropZone,
+//   },
+//   setup() {
+let dropzoneFile = ref("");
+const dropzoneElement = document.querySelector("#drap-area-sq1");
+
+function drop(e) {
+  console.log(typeof e);
+  dropzoneFile.value = e.dataTransfer.files[0];
+}
+
+function selectedFile() {
+  dropzoneFile.value = document.querySelector(".dropzoneFile").files[0];
+  image_progress.selectFiles();
+}
+
+const x = ref(0)
+function onMousemove(e) {
+  x.value = e.clientX
+}
+
+
+onMounted(() => {
+
+  event.listen('tauri://file-drop-hover', (e) => {
+  // console.log(e.x, e.y); // undifined 
+  toggleActive();
+});
+
+
+event.listen('tauri://file-drop-cancelled', (e) => {
+  toggleActive();
+});
+});
+
+
 </script>
 
-<template>
-  <h1>{{ msg }}</h1>
 
-  <div class="card">
-    <button type="button" @click="count++">count is {{ count }}</button>
-    <p>
-      Edit
-      <code>components/HelloWorld.vue</code> to test HMR
-    </p>
+<template>
+  <!-- <div class="home"> -->
+  <el-button @click="backRoute">back</el-button>
+
+  <h1>DropZone</h1>
+  <div @dragenter.prevent="toggleActive" @dragleave.prevent="toggleActive" @dragover.prevent @drop.prevent="drop"
+    @change="selectedFile" :class="{ 'active-dropzone': active }" class="dropzone" id="drap-area-sq1">
+    <span>Drag or Drop File</span>
+    <span>OR</span>
+    <label for="dropzoneFile">Select File</label>
+    <input type="file" id="dropzoneFile" class="dropzoneFile" />
+    
+    <div
+  @mousemove="onMousemove"
+  :style="{ backgroundColor: `hsl(${x}, 80%, 50%)` }"
+  class="movearea"
+>
+  <p>Move your mouse across this div...</p>
+  <p>x: {{ x }}</p>
+</div>
+
   </div>
-   <el-input v-model="input" placeholder="Please input" />
+
+  <!-- <DropZone @drop.prevent="drop" @change="selectedFile" /> -->
+  <span class="file-info">File: {{ dropzoneFile.name }}</span>
+  <!-- </div> -->
 </template>
 
-<style scoped>
-.read-the-docs {
-  color: #888;
+
+<style lang="scss" scoped>
+.home {
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #f1f1f1;
+
+  h1 {
+    font-size: 40px;
+    margin-bottom: 32px;
+  }
+
+  .file-info {
+    margin-top: 32px;
+  }
+}
+.movearea {
+  transition: 0.3s background-color ease;
+}
+.dropzone {
+  width: 400px;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  row-gap: 16px;
+  border: 2px dashed #41b883;
+  background-color: #fff;
+  transition: 0.3s ease all;
+
+  label {
+    padding: 8px 12px;
+    color: #fff;
+    background-color: #41b883;
+    transition: 0.3s ease all;
+  }
+
+  input {
+    display: none;
+  }
+}
+
+.active-dropzone {
+  color: #fff;
+  border-color: #fff;
+  background-color: #41b883;
+
+  label {
+    background-color: #fff;
+    color: #41b883;
+  }
 }
 </style>

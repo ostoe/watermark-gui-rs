@@ -1,12 +1,15 @@
 <script lang="ts">
 import HelloWorld from "./HelloWorld.vue";
-import H222 from "./H222.vue";
+import TextImageProcess from "./TextImageProcess.vue";
 import TopBar from "./TopBar.vue";
 
 import { defineComponent, ref } from "vue";
-import { emit, listen } from "@tauri-apps/api/event";
-import { invoke } from "@tauri-apps/api";
-import { ElMessage } from "element-plus";
+// import { Context } from "vm";
+
+//dark mode
+import { useDark, useToggle } from "@vueuse/core";
+//引入路由
+import { useRoute, useRouter } from "vue-router";
 
 export default defineComponent({
   setup() {
@@ -79,14 +82,13 @@ export default defineComponent({
 
   mounted() {
     // 在其他方法或是生命周期中也可以调用方法
-    this.test_event_recv();
-    for (let i = 0; i < 5; i += 1) {
-      this.tableData.push({ id: i, msg: " " + i + " " + i + " " + i });
-    }
+    // this.test_event_recv();
+    // for (let i = 0; i < 5; i += 1) {
+    //   this.tableData.push({ id: i, msg: " " + i + " " + i + " " + i });
+    // }
   },
 });
 
-// test event
 </script>
 
 <template lang="">
@@ -95,7 +97,7 @@ export default defineComponent({
     class="elmenu"
     :collapse="isCollapse"
   >
-    <el-menu-item index="1" @click="changeCollapse">
+    <el-menu-item index="1"  @click="changeCollapse">
       <el-icon><i-ep-arrow-right/></el-icon>
     </el-menu-item>
     <el-sub-menu index="2">
@@ -132,7 +134,7 @@ export default defineComponent({
     </div>
     <!-- <div style="margin: 20px 0" /> -->
     <suspense>
-      <el-col style="z-index:10000;position: relative;">
+      <el-col>
         <el-button
           @click="send_event"
           color="#626aef"
@@ -159,7 +161,6 @@ export default defineComponent({
     </div>
     <div>--------------测试分割线尾部----------------</div>
   </div>
-  <H222 />
 </template>
 
 <style>
@@ -168,5 +169,42 @@ export default defineComponent({
   position: absolute;
   left: 0;
   height: 100%;
+}
+
+.footer-div {
+  background-color: rgb(255, 255, 255);
+  display: flex;
+  height: 4vh;
+  width: 100%;
+  bottom: 0;
+  right: 0;
+  align-items: center;
+}
+
+/* .el-container {
+  width: var(--el-aside-width,120px);
+} */
+
+.common-layout .shadowmask {
+  position: absolute;
+  top: 0 auto;
+  left: 0 auto;
+  width: 100%;
+  height: 100%;
+  z-index: 98;
+  background-color: #000;
+  opacity: 0.7;
+}
+
+.common-layout .extend,
+.darkBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 10px 5px 20px 5px;
+}
+
+.copyrightSpan {
+  font-size: xx-small;
 }
 </style>
