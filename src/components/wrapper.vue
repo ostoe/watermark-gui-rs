@@ -95,7 +95,7 @@ export default defineComponent({
     class="elmenu"
     :collapse="isCollapse"
   >
-    <el-menu-item index="1"  @click="changeCollapse">
+    <el-menu-item index="1" @click="changeCollapse">
       <el-icon><i-ep-arrow-right/></el-icon>
     </el-menu-item>
     <el-sub-menu index="2">
@@ -132,7 +132,7 @@ export default defineComponent({
     </div>
     <!-- <div style="margin: 20px 0" /> -->
     <suspense>
-      <el-col>
+      <el-col style="z-index:10000;position: relative;">
         <el-button
           @click="send_event"
           color="#626aef"
