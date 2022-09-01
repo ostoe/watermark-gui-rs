@@ -10,7 +10,7 @@ import { routers } from './router'
 import { reactive } from 'vue'
 import { open } from "@tauri-apps/api/dialog";
 import { ElMessage, ElNotification } from "element-plus";
-
+import { appDir,configDir, homeDir, localDataDir, logDir, resourceDir, runtimeDir } from '@tauri-apps/api/path';
 
 const app = createApp(App)
 
@@ -32,6 +32,8 @@ app.mount('#app')
 // export default async function greet(params: string) {
 
 // }
+
+
 
 interface ImageProps {
   image_paths: [string],

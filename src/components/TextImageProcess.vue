@@ -201,7 +201,7 @@ onMounted(() => {
 
         <!-- </div> -->
       </el-col>
-      <text> {{ this.selectImage }}</text>
+      <text> {{ selectImage }}</text>
     </el-row>
         <!-- <button @click="greetTest" >测试调用rust</button> -->
       <!-- </el-col> -->

@@ -33,12 +33,16 @@ event.listen('tauri://file-drop-hover', (e) => {
 
 
 ## TODO [list]
+ - 图片logo位置和比例优化下、
+ - 支持目录
  - 选择字体
  - 拖动文件
  - .....
  - 自定义布局
  - 自定义后缀 防止覆盖文件
  - 集成其他工具，如计算景深 超焦距之类
+ - 进度条
+
 
 
 -------------------
@@ -56,3 +60,6 @@ draw 162---14.739949s
 write image---42.3066473s
 write ok
 ```
+
+
+ref: https://github.com/zzzgydi/clash-verge/blob/66ccbf70f8d51153ef097fb62deae833c683b26c/src-tauri/src/main.rs

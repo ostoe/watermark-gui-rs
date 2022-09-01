@@ -37,7 +37,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.tauri.release",
+      "identifier": "watermark-app",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
@@ -46,7 +46,7 @@
         "providerShortName": null,
         "signingIdentity": null
       },
-      "resources": [],
+      "resources": ["resources"],
       "shortDescription": "",
       "targets": "all",
       "windows": {
