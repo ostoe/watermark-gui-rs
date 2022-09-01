@@ -3,7 +3,7 @@ use std::collections::HashMap;
 
 use std::fmt::format;
 use std::fs::File;
-use std::io::{BufReader, Read};
+use std::io::{BufReader, Read, BufWriter};
 use std::path::Path;
 
 use banner_unit::{BannerType, BannerUnit};
@@ -174,9 +174,10 @@ pub fn process_single_image(img_path: &str, output_path: &str, brand: &str, font
     // println!("output: {}-{}-{}",output_dir.display(), file_prefix, filename_suffix);
     let output_dir = output_dir.join(file_prefix);
     // println!("mululljf-->{}", output_dir.display());
-    let mut fout = &mut File::create(output_dir).unwrap();
+    let fout = &mut BufWriter::new(File::create(output_dir).unwrap());
+    // let mut fout = &mut File::create(output_dir).unwrap();
     newimg_buf
-        .write_to(&mut fout, ImageOutputFormat::Jpeg(80))
+        .write_to( fout, ImageOutputFormat::Jpeg(80))
         ?;
     println!("write image---{:?}", start_time.elapsed());
     println!("write ok");
