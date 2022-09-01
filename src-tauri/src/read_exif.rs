@@ -26,12 +26,7 @@ pub fn read_exif(img_path: &str) -> Option<HashMap::<ExifTag, String>> {
     let _pixels = decoder.read_info().expect("failed to decode image"); // todo
     let metadata = decoder.info().unwrap();
     if let Some(exif_data) = decoder.exif_data() {
-        println!(
-            "{:?} {} \n",
-            metadata,
-            exif_data.len(),
-            // &exif_data[..100]
-        );
+        println!( "{:?} {} \n", metadata, exif_data.len(), );
         let exif_parsed = parse_buffer(exif_data).unwrap();
         let (w, h) = (metadata.width, metadata.height);
     
@@ -51,7 +46,7 @@ pub fn read_exif(img_path: &str) -> Option<HashMap::<ExifTag, String>> {
             //     entry.kind, entry.tag, entry.value_more_readable, entry.ifd.tag
             // );
         }
-        println!("{:?}", exif_map);
+        // println!("{:?}", exif_map);
         println!("read exif ok");
         return Some(exif_map);
     } else {
@@ -62,9 +57,10 @@ pub fn read_exif(img_path: &str) -> Option<HashMap::<ExifTag, String>> {
 
 
 pub fn process_single_image(img_path: &str, output_path: &str, brand: &str, font: &Font, brand_image: (&DynamicImage, &DynamicImage, &DynamicImage), 
-    exif_map: HashMap::<ExifTag, String>) {
+    exif_map: HashMap::<ExifTag, String>) -> image::ImageResult<()> {
     // convert to BannerStruct to draw..
     //
+    let start_time = std::time::Instant::now();
     let exposure_time = match exif_map.get(&ExifTag::ExposureTime) {
         Some(v) => v,
         _ => "0",
@@ -91,7 +87,8 @@ pub fn process_single_image(img_path: &str, output_path: &str, brand: &str, font
         _ => "",
     };
     // read images to vec
-    let src_img = image::open(img_path).unwrap();
+    let src_img =  image::open(img_path)?;
+    println!("read image---{:?}", start_time.elapsed());
 
     let focal_length  =  focal_length.split(" ").map(|x|String::from(x)).collect::<Vec<String>>().join("");
     let composit_text = format!("{} {} {} {}", focal_length, f_number, exposure_time, iso);
@@ -114,6 +111,7 @@ pub fn process_single_image(img_path: &str, output_path: &str, brand: &str, font
         //  ( banner_w,  banner_h) = (banner_img.width(), banner_img.height());
     }
     println!("{} x {}", banner_w, banner_h);
+    println!("resize ---{:?}", start_time.elapsed());
     
     let mut newimg_buf = image::ImageBuffer::new(w as u32, background_heigth as u32 + h);
 
@@ -125,6 +123,8 @@ pub fn process_single_image(img_path: &str, output_path: &str, brand: &str, font
             panic!("{}", e)
         }
     }
+    println!("copy 126---{:?}", start_time.elapsed());
+
     // place white image that color control by user parameter.
     let white_color: Rgba<u8> = Rgba([255u8, 255u8, 255u8, 0u8]);
     for y in h..(background_heigth as u32 + h) {
@@ -133,16 +133,10 @@ pub fn process_single_image(img_path: &str, output_path: &str, brand: &str, font
         }
     }
     // place banner
-    println!("new image:size {} x {}", newimg_buf.width(), newimg_buf.height() );
-    println!("{} {} {}x{}",background_heigth, h + (background_heigth/watermark_scale/2.0 ) as u32 ,banner_img.width(), banner_img.height());
-    match newimg_buf.copy_from(banner_img, w/2, h + (background_heigth/watermark_scale/2.0 ) as u32) {
-        Ok(_) => {}
-        Err(e) => {
-            // println!("{}", e);
-            panic!("{}", e)
-        }
-    }
-
+    // println!("new image:size {} x {}", newimg_buf.width(), newimg_buf.height() );
+    // println!("{} {} {}x{}",background_heigth, h + (background_heigth/watermark_scale/2.0 ) as u32 ,banner_img.width(), banner_img.height());
+    newimg_buf.copy_from(banner_img, w/2, h + (background_heigth/watermark_scale/2.0 ) as u32) ?;
+    println!("copy 139---{:?}", start_time.elapsed());
     // draw all text.
     let first_text_y =     h + ((background_heigth as f32 * 0.25) as u32);
     let second_text_y =     h + ((background_heigth as f32 * 0.55) as u32);
@@ -156,6 +150,7 @@ pub fn process_single_image(img_path: &str, output_path: &str, brand: &str, font
     for x in texts.iter() {
         generator_draw_text(x.0, x.1, x.2, x.3, x.4, x.5, &mut newimg_buf);
     }
+    println!("draw 153---{:?}", start_time.elapsed());
 
     // place colume split line.
     let col_color: Rgba<u8> = Rgba([168u8, 168u8, 168u8, 0]);
@@ -164,6 +159,7 @@ pub fn process_single_image(img_path: &str, output_path: &str, brand: &str, font
             newimg_buf.put_pixel(x, y, col_color);
         }
     }
+    println!("draw 162---{:?}", start_time.elapsed());
     // draw text do--> generator_draw_text("f 1.8 1/0 ", 40.0, (banner_w/2, banner_h/3),
     //     1.0, &font, Rgba([179, 63u8, 60u8, 0]), &mut newimg_buf);
     // let img_path = "./tests/DSCN0010-99.jpg";
@@ -175,14 +171,16 @@ pub fn process_single_image(img_path: &str, output_path: &str, brand: &str, font
     let filename_suffix = format!("{}.{}", "-w", "jpg");
     file_name_arr.push(&filename_suffix);
     let file_prefix = file_name_arr.join(".");
-    println!("output: {}-{}-{}",output_dir.display(), file_prefix, filename_suffix);
+    // println!("output: {}-{}-{}",output_dir.display(), file_prefix, filename_suffix);
     let output_dir = output_dir.join(file_prefix);
-    println!("mululljf-->{}", output_dir.display());
+    // println!("mululljf-->{}", output_dir.display());
     let mut fout = &mut File::create(output_dir).unwrap();
     newimg_buf
         .write_to(&mut fout, ImageOutputFormat::Jpeg(80))
-        .unwrap();
+        ?;
+    println!("write image---{:?}", start_time.elapsed());
     println!("write ok");
+    return Ok(());
 }
 
 fn generator_draw_text(
@@ -212,5 +210,5 @@ fn generator_draw_text(
         text,
     );
     let (w, h) = text_size(scale, &font, text);
-    println!("Text size: {}x{}", w, h);
+    // println!("Text size: {}x{}", w, h);
 }

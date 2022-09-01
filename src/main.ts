@@ -1,12 +1,12 @@
-import {createApp} from 'vue'
+import { createApp } from 'vue'
 import './style.css'
 import App from './App.vue'
 // 全局引入elementui
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
-import {invoke} from '@tauri-apps/api'
-import {routers} from './router'
+import { invoke } from '@tauri-apps/api'
+import { routers } from './router'
 import { reactive } from 'vue'
 import { open } from "@tauri-apps/api/dialog";
 import { ElMessage, ElNotification } from "element-plus";
@@ -34,27 +34,27 @@ app.mount('#app')
 // }
 
 interface ImageProps {
-    image_paths: [string],
-    count: number
+  image_paths: [string],
+  count: number
 }
 
 export const tools = reactive({
-    message(msg: string) {
-        ElNotification({
-            message: msg,
-            type: "success",
-            title: "🐮----🍺",
-            position: 'bottom-left',
-          });
-      },
+  message(msg: string) {
+    ElNotification({
+      message: msg,
+      type: "success",
+      title: "🐮----🍺",
+      position: 'bottom-left',
+    });
+  },
 
 })
 
 export const image_progress = reactive({
-    
+
   value: 90,
   count: { completed: 0, total: 0 },
-  image_paths:  { count: 0, image_paths: [""] },
+  image_paths: { count: 0, image_paths: [""] },
   increase() {
     if (this.value <= 98) {
       this.value += 2
@@ -64,6 +64,24 @@ export const image_progress = reactive({
     }
   },
   // 
+  reset_progress() {
+    this.value = 0;
+    this.count.completed = 0;
+    this.count.total = 0;
+    this.image_paths = { count: 0, image_paths: [""] };
+  },
+  increase_one() {
+    this.count.completed++;
+    if (this.count.total > 0) {
+      let value = this.count.completed / this.count.total;
+      if (value < 0) { this.value = 0; } 
+      else if
+        (value > 100) { this.value = 100; }
+      else {
+        this.value = Math.round((value + Number.EPSILON) * 10000) / 100;
+      }
+    }
+  },
   update_progress(completed: number, total: number) {
     this.count.completed = completed;
     this.count.total = total;
@@ -79,7 +97,7 @@ export const image_progress = reactive({
   //
 
 
-async  selectFiles() {
+  async selectFiles() {
     const selected = await open({
       multiple: true,
       filters: [
@@ -101,13 +119,13 @@ async  selectFiles() {
         message: "null file selected.",
         type: "warning",
       });
-    } else if (typeof(selected) === "string") {
+    } else if (typeof (selected) === "string") {
       // console.log("single fil: " + selected);
-    this.image_paths = { count: 1, image_paths: [selected] };
+      this.image_paths = { count: 1, image_paths: [selected] };
       // this.message("handle_json: " + handle_json.count);
-    //   await process_single_image(handle_json);
-    image_progress.update_progress(0, 1);
-    tools.message("selected: " + this.image_paths);
+      //   await process_single_image(handle_json);
+      image_progress.update_progress(0, 1);
+      tools.message("selected: " + this.image_paths);
     }
   },
 
@@ -117,7 +135,7 @@ async  selectFiles() {
   },
   //
 
-  async  selectDirs() {
+  async selectDirs() {
     const selected = await open({
       directory: true,
       multiple: false,
@@ -143,10 +161,10 @@ async  selectFiles() {
 })
 
 function message(msg: string) {
-    ElNotification({
-      message: msg,
-      type: "success",
-      title: "🐮----🍺",
-      position: 'bottom-left',
-    });
-  };
+  ElNotification({
+    message: msg,
+    type: "success",
+    title: "🐮----🍺",
+    position: 'bottom-left',
+  });
+};

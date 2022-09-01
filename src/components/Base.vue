@@ -1,5 +1,5 @@
 
-<script lang="ts">
+<script setup lang="ts">
 import { defineComponent, ref } from "vue";
 const isCollapse = ref(true);
 
