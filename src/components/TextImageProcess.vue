@@ -20,8 +20,8 @@ interface MsgProps {
   state_code: number
 }
 interface ImageProps {
-    image_paths: [string],
-    count: number
+  image_paths: [string],
+  count: number
 }
 
 // {count: selected.length, image_paths: [selected]}
@@ -207,19 +207,16 @@ onMounted(() => {
   </div>
   </el-container>
 
-  <div>
-    
-</div>
-
 </template>
 
 <style>
 .a-border {
   border: 1px solid rgb(8, 210, 255);
-  margin: 20px auto 20px auto;
+  margin: 20px 10% 20px 10%;
   text-align: center;
   box-shadow: 0 0 10px rgb(79, 223, 255);
   padding: 20px 25px 20px 25px;
+  align-items: center;
 }
 
 .b-border {

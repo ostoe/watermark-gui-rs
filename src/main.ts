@@ -6,7 +6,7 @@ import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import { invoke } from '@tauri-apps/api'
-import { routers } from './router'
+import { router } from './router'
 import { reactive } from 'vue'
 import { open } from "@tauri-apps/api/dialog";
 import { ElMessage, ElNotification } from "element-plus";
@@ -19,7 +19,7 @@ const app = createApp(App)
 //   locale: zhCn,
 // })
 
-app.use(routers)
+app.use(router)
 app.mount('#app')
 
 // createApp(App).mount('#app')

@@ -76,10 +76,11 @@ export default defineComponent({
 
     //路由
     const route2Main = () => {
+      console.log("main");
       router.push("/textImageProcess")
     }
     const route2Test = () =>{
-      router.push("/HelloWorld")
+      router.push("/helloWorld")
     }
 
     const isDarkMode = useDark();
@@ -110,6 +111,7 @@ export default defineComponent({
   watch: {},
 
   mounted() {
+    this.route2Main();
     // 在其他方法或是生命周期中也可以调用方法
     // this.test_event_recv();
     // for (let i = 0; i < 5; i += 1) {
@@ -148,6 +150,8 @@ export default defineComponent({
               <span>基本</span>
             </template>
             <el-menu-item-group>
+              <!-- <router-link to="/">Go to Home</router-link>
+              <router-link to="/about">Go to About</router-link> -->
               <el-menu-item index="1-1"  @click="route2Main">测试页</el-menu-item>
               <el-menu-item index="1-2" @click="route2Test">HelloWorld</el-menu-item>
             </el-menu-item-group>
@@ -198,13 +202,14 @@ export default defineComponent({
           <el-container direction="vertical">
             <!-- <el-row > -->
             <!-- <HelloWorld msg="Vite + Vue" /> -->
-            <TextImageProcess />
+            <!-- <TextImageProcess /> -->
             <!-- </el-row> -->
           </el-container>
         </el-main>
       </el-container>
     </el-container>
   </div>
+  <router-view></router-view>
 </template>
 
 <style>
