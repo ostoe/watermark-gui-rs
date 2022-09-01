@@ -1,9 +1,9 @@
-<script lang="ts">
+<script lang="ts" setup>
 import HelloWorld from "./HelloWorld.vue";
 import TextImageProcess from "./TextImageProcess.vue";
 import TopBar from "./TopBar.vue";
 
-import { defineComponent, ref } from "vue";
+import { ref } from "vue";
 // import { Context } from "vm";
 
 //dark mode
@@ -11,113 +11,75 @@ import { useDark, useToggle } from "@vueuse/core";
 //引入路由
 import { useRoute, useRouter } from "vue-router";
 
-export default defineComponent({
-  name: "index",
-  //自定义指令
-  directives: {
-    resize: {
-      mounted(el, binding) {
-        let ResizeObserver = window.ResizeObserver;
-        el._resizer = new ResizeObserver((entries) => {
-          for (const entry of entries) {
-            // console.log(entry.contentRect.width)
-            binding.value({ width: entry.contentRect.width });
-          }
-        });
-        el._resizer.observe(el);
-        // console.log(binding)
-      },
-      unmounted(el) {
-        el._resizer.disconnect();
-      },
-    },
-  },
-
-  setup() {
-    const route = useRoute();
-    const router = useRouter();
-    const isDark = ref(true);
-    const isCollapse = ref(true);
-    const delay = ref(200);
-    const tooltipEffect = ref("light");
-    const dynamicWidth = ref(false);
-    const extendPadding = ref("");
-    const count = ref(0);
-    const tableData = ref([]);
-    const text = ref("./tests/img/jpg/gps/DSCN0010.jpg");
-    let t: NodeJS.Timeout | null = null;
-
-    //获取鼠标点击消除遮罩
-    const changeThisCollapse = () => {
-      let firstClick = !t;
-      if (firstClick) {
-        isCollapse.value = isCollapse.value ? false : true;
-        extendPadding.value = isCollapse.value ? "" : "70";
+//自定义指令
+const vResize = {
+  mounted: (el: any, binding: { value: (arg0: { width: number; }) => void; }) => {
+    let ResizeObserver = window.ResizeObserver;
+    el._resizer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        // console.log(entry.contentRect.width)
+        binding.value({ width: entry.contentRect.width });
       }
-      if (t) {
-        clearTimeout(t);
-      }
-      t = setTimeout(() => {
-        t = null;
-        if (!firstClick) {
-          isCollapse.value = isCollapse.value ? false : true;
-          extendPadding.value = isCollapse.value ? "" : "70";
-        }
-      }, delay.value);
-    };
-
-    //监听dom变化
-    const resizeSideBar = (width: any) => {
-      let domWidth = width;
-      let initWidth = 63;
-      dynamicWidth.value = domWidth.width > 63 ? false : true;
-      // console.log(domWidth)
-    };
-
-    //路由
-    const route2Main = () => {
-      router.push("/textImageProcess")
-    }
-    const route2Test = () =>{
-      router.push("/HelloWorld")
-    }
-
-    const isDarkMode = useDark();
-    const toggleDark = useToggle(isDarkMode);
-    const toggleDarkMode = () => {
-      toggleDark;
-      isDark.value = isDark.value ? false : true;
-    };
-
-    return {
-      isCollapse,
-      delay,
-      tooltipEffect,
-      dynamicWidth,
-      extendPadding,
-      count,
-      tableData,
-      text,
-      isDark,
-      changeThisCollapse,
-      resizeSideBar,
-      toggleDarkMode,
-      route2Main,
-      route2Test
-    };
+    });
+    el._resizer.observe(el);
+    // console.log(binding)
   },
+  unmounted: (el: { _resizer: { disconnect: () => void; }; }) => {
+    el._resizer.disconnect();
+  }
+}
 
-  watch: {},
+//获取鼠标点击消除遮罩
+let t: NodeJS.Timeout | null = null;
+const isCollapse = ref(true);
+const delay = ref(200);
+const extendPadding = ref("");
+const changeThisCollapse = () => {
+  let firstClick = !t;
+  if (firstClick) {
+    isCollapse.value = isCollapse.value ? false : true;
+    extendPadding.value = isCollapse.value ? "" : "70";
+  }
+  if (t) {
+    clearTimeout(t);
+  }
+  t = setTimeout(() => {
+    t = null;
+    if (!firstClick) {
+      isCollapse.value = isCollapse.value ? false : true;
+      extendPadding.value = isCollapse.value ? "" : "70";
+    }
+  }, delay.value);
+};
 
-  mounted() {
-    // 在其他方法或是生命周期中也可以调用方法
-    // this.test_event_recv();
-    // for (let i = 0; i < 5; i += 1) {
-    //   this.tableData.push({ id: i, msg: " " + i + " " + i + " " + i });
-    // }
-  },
-});
+//监听dom变化
+const dynamicWidth = ref(false);
+const resizeSideBar = (width: any) => {
+  let domWidth = width;
+  let initWidth = 63;
+  dynamicWidth.value = domWidth.width > initWidth ? false : true;
+  // console.log(domWidth)
+};
 
+//路由
+const route = useRoute();
+const router = useRouter();
+const route2Main = () => {
+  router.push("/textImageProcess")
+}
+const route2Test = () => {
+  router.push("/HelloWorld")
+}
+
+// 深色模式
+const isDark = ref(true);
+const isDarkMode = useDark();
+const toggleDark = useToggle(isDarkMode);
+const tooltipEffect = ref("light");
+const toggleDarkMode = () => {
+  toggleDark;
+  isDark.value = isDark.value ? false : true;
+};
 </script>
 
 <template lang="">
