@@ -112,7 +112,7 @@ defineExpose({
 <template>
   <!-- jindutiao -->
   <el-row class="row">
-    <el-col :span="20" class="left">
+    <el-col :span="18" class="left">
       <div class="photoSelector">
         <el-button class="btn">选择图片</el-button>
         <el-progress id="progress-bar" :percentage="image_progress.value" :format="format" :color="color"></el-progress>
