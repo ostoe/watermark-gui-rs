@@ -2,24 +2,33 @@
     all(not(debug_assertions), target_os = "windows"),
     windows_subsystem = "windows"
 )]
-
+#[macro_use]
+extern crate log;
 use app::banner_unit::{ImagesPathFromFront, Notification, UserOperation};
-use app::control_center::control_center_thread;
-use app::read_exif;
+use app::image_handle::control_center_thread;
+use app::image_processing;
+use app::notify_center::{ notification_thread, windows_send_msg};
 use crossbeam_channel::unbounded;
+use env_logger::{Builder, Target};
 use image::DynamicImage;
-use rusttype::{Font};
+use rusttype::Font;
+use std::env;
 use std::io::{BufReader, Read};
+use std::path::PathBuf;
+use tauri::{
+    api::path::{home_dir, resource_dir},
+    Env, PackageInfo,
+};
 use tauri::{CustomMenuItem, Menu, MenuItem, State, Submenu};
 use tauri::{Manager, Window};
-// the payload type must implement `Se&rialize` and `Clone`.
-#[derive(Clone, serde::Serialize)]
-struct Payload {
-    message: String,
-    state_code: u32,
-}
+
 
 fn main() {
+    println!("current_dir {:?}", std::env::current_dir().unwrap());
+    let mut builder = Builder::from_default_env();
+    builder.target(Target::Stdout);
+
+    builder.init();
     // image opration channel
     let (st, operation_st) = unbounded::<UserOperation>();
     let (st_clone, _rt_clone) = (st.clone(), operation_st.clone());
@@ -29,8 +38,7 @@ fn main() {
     // 图像处理线程，等待处理来自前端的消息，处理完成后发送消息通知至消息处理线程，这时消息处理线程再通知前端。
     let _image_handle = std::thread::Builder::new()
         .name("ImageHandle".to_string())
-        .spawn(move || control_center_thread(operation_st, notify_front_st)
-        );
+        .spawn(move || control_center_thread(operation_st, notify_front_st));
 
     // menu------------------------begin
     // here `"quit".to_string()` defines the menu item id, and the second parameter is the menu item label.
@@ -56,37 +64,13 @@ fn main() {
         .setup(move |app| {
             let main_window = app.get_window("main").unwrap();
             let splashscreen_window = app.get_window("splashscreen").unwrap();
+            let resource_path = app_resources_dir(app.package_info());
+            println!("resource_path: {}", resource_path.display());
+            st_clone.send(UserOperation::Init(resource_path)).unwrap();
+             /* start interactive thread */
             let _control_center = std::thread::Builder::new()
                 .name("ControlCenter".to_string())
-                .spawn(move || {
-                    st_clone
-                        .send(UserOperation::Update("ABCD".to_string(), "EFG".to_string()))
-                        .unwrap();
-                    // let id = main_window.listen("front-backend", |event| {
-                    //     println!("got window event-name with payload {:?}", event.payload());
-                    // });
-                    std::thread::sleep(std::time::Duration::from_secs(2));
-                    splashscreen_window.close().unwrap();
-                    main_window.show().unwrap();
-                    loop {
-                        let opt_result = notify_front_rt.recv().unwrap();
-                        match opt_result {
-                            Notification::Single(fname) => {
-                                println!("----{:?}", fname);
-                                windows_send_msg(&main_window, "front-backend", &fname, 200);
-                            }
-                            Notification::Complated => {
-                                windows_send_msg(&main_window, "front-backend", "", 200);
-                            },
-                             Notification::Error(e) => {
-                                windows_send_msg(&main_window, "front-backend", &e, 500);
-                             },
-                             Notification::SkipFile(fname) => {
-                                windows_send_msg(&main_window, "front-backend", &fname, 300);
-                             }
-                        }
-                    }
-                });
+                .spawn(move || notification_thread(main_window, notify_front_rt));
 
             Ok(())
         })
@@ -179,15 +163,15 @@ fn send_event(window: Window) {
 }
 
 
+pub fn app_resources_dir(package_info: &PackageInfo) -> PathBuf {
+    let res_dir = resource_dir(package_info, &Env::default())
+        .unwrap()
+        .join("resources");
 
-pub fn windows_send_msg(window: &Window, event: &str, msg: &str, code: u32) {
-    window
-        .emit(
-            event,
-            Payload {
-                message: String::from(msg),
-                state_code: code, 
-            },
-        )
-        .unwrap();
+    #[cfg(windows)]
+    unsafe {
+        RESOURCE_DIR = Some(res_dir.clone());
+    }
+
+    res_dir
 }

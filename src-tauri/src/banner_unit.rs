@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use serde::{Serialize, Deserialize};
 
 
@@ -21,6 +23,7 @@ pub enum UserOperation {
     Update(String, String),
     DirPath(String),
     ImagePath(String),
+    Init(PathBuf),
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]

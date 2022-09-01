@@ -56,3 +56,6 @@ draw 162---14.739949s
 write image---42.3066473s
 write ok
 ```
+
+
+ref: https://github.com/zzzgydi/clash-verge/blob/66ccbf70f8d51153ef097fb62deae833c683b26c/src-tauri/src/main.rs

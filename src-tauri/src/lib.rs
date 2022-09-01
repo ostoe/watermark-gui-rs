@@ -1,3 +1,4 @@
-pub mod read_exif;
+pub mod image_processing;
 pub mod banner_unit;
-pub mod control_center;
+pub mod image_handle;
+pub mod notify_center;
