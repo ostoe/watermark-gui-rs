@@ -2,6 +2,7 @@
 import HelloWorld from "./HelloWorld.vue";
 import TextImageProcess from "./TextImageProcess.vue";
 import TopBar from "./TopBar.vue";
+import picList from "./PicList.vue";
 
 import { ref } from "vue";
 // import { Context } from "vm";
@@ -164,6 +165,7 @@ const toggleDarkMode = () => {
             <!-- </el-row> -->
           </el-container>
         </el-main>
+        <PicList></PicList>
       </el-container>
     </el-container>
   </div>
