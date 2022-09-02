@@ -4,25 +4,28 @@ import TextImageProcess from "./TextImageProcess.vue";
 import SideBar from "./SideBar.vue";
 import TopBar from "./TopBar.vue";
 import picList from "./PicList.vue";
+import BaseSettingsDrawerVue from "./BaseSettingsDrawer.vue";
 
 import { ref, onMounted } from "vue";
 // import { Context } from "vm";
-import { sidebarReactives } from "../scripts/reactives"
+import { sidebarReactives } from "../scripts/reactives";
 //获取鼠标点击消除遮罩
 let t: NodeJS.Timeout | null = null;
 // const isCollapse = ref(true);
 // const delay = ref(200);
 // const extendPadding = ref("");
 const changeThisCollapse = () => {
-  sidebarReactives.changeThisCollapse()
+  sidebarReactives.changeThisCollapse();
 };
 
 
 </script>
 
 <template lang="">
+                <BaseSettingsDrawerVue />
+
   <div class="common-layout index">
-    <el-container>
+    <div class="elcontainer">
       <SideBar>
         <template #elmenu>
           <el-menu-item index="4">
@@ -53,19 +56,19 @@ const changeThisCollapse = () => {
         </el-main>
         <PicList></PicList>
       </el-container>
-    </el-container>
+    </div>
   </div>
   <router-view></router-view>
 </template>
 
 <style scoped>
-.elmenu {
-  z-index: 99;
-  position: absolute;
-  left: 0;
-  height: 100%;
-}
-
+  .common-layout{
+    height: 100%;
+    width: auto;
+  }
+  .elcontainer{
+    margin-left: 50px;
+  }
 .footer-div {
   background-color: rgb(255, 255, 255);
   display: flex;
@@ -89,17 +92,5 @@ const changeThisCollapse = () => {
   z-index: 98;
   background-color: #000;
   opacity: 0.7;
-}
-
-.common-layout .extend,
-.darkBtn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 10px 5px 20px 5px;
-}
-
-.copyrightSpan {
-  font-size: xx-small;
 }
 </style>
