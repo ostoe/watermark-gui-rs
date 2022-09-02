@@ -1,8 +1,8 @@
 
   <script lang="ts" setup>
   import { reactive, ref } from 'vue'
-//   import { ElDrawer, ElMessageBox } from 'unp'
-  
+  //   import { ElDrawer, ElMessageBox } from 'unp'
+  import { invoke } from '@tauri-apps/api';
   const formLabelWidth = '80px'
   //   let timer
   
@@ -21,11 +21,23 @@
   
   const autoSelect = ref(true);
   
-
   
-  const saveSetting = () => {
-      console.log("save setting.");
+  interface UserSettings {
+      output_dir: string,
+      qulity: number,
+      auto_user_brand: boolean,
+      brand: string,
   }
+  
+  async function saveSetting() {
+      //  invoke("handle_front_select_files", { imagesObj: image_progress.image_paths });
+      let user_data: UserSettings = { output_dir: "", qulity: qulity.value, auto_user_brand: autoSelect.value, brand: form.brand };
+      console.log(user_data);
+  
+      let res = await invoke("handle_front_update_user_data", { userData: user_data });
+      console.log(res);
+  }
+  
   
   const handleClose = (done: (_: boolean) => void) => {
       console.log("close drawer" + done);
@@ -83,7 +95,14 @@
         <el-scrollbar wrap-class="max-height:200px">
             <el-checkbox v-model="autoSelect" label="根据exif自动设置" size="large" border />
             <el-select v-model="form.brand" :placeholder="form.brands[1].label" :disabled="autoSelect">
-                <el-option v-for="brand in form.brands" :value="brand.label" />
+                <el-option v-for="brand in form.brands" :key="brand.brand" :label="brand.label" :value="brand.brand">
+                    <span style="float:left">{{ brand.label }}</span>
+                    <span style="float: right;color: var(--el-text-color-secondary);font-size: 20px;">
+                        <el-icon>
+                            <i-ep-picture />
+                        </el-icon>
+                    </span>
+                </el-option>
             </el-select>
             <el-input-number v-model="qulity" :min="1" :max="100" controls-position="right" size="large" step-strictly
                 @change="handleChangeQulity" />

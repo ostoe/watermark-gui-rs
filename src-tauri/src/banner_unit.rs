@@ -20,7 +20,7 @@ pub enum  BannerType{
 pub enum UserOperation {
     Cancel,
     Pause,
-    Update(String, String),
+    Update(UserSetting),
     DirPath(String),
     ImagePath(String),
     Init(PathBuf),
@@ -39,11 +39,11 @@ pub struct ImagesPathFromFront {
     pub image_paths: Vec<String>,
 }
 
-pub enum UserSettings {
+pub enum UserSetting {
     OutputDir(String),
     Qulity(u8),
-    AutoUseBrand(bool),
-
+    AutoUseBrand(bool, String),
+    Font(String),
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
@@ -51,4 +51,5 @@ pub struct UserSettingsJson {
     pub output_dir: String,
     pub qulity: u8,
     pub auto_user_brand: bool,
+    pub brand: String,
 }

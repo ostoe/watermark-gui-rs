@@ -42,6 +42,7 @@ declare module '@vue/runtime-core' {
     IEpDArrowLeft: typeof import('~icons/ep/d-arrow-left')['default']
     IEpDocument: typeof import('~icons/ep/document')['default']
     IEpMenu: typeof import('~icons/ep/menu')['default']
+    IEpPicture: typeof import('~icons/ep/picture')['default']
     PicList: typeof import('./components/PicList.vue')['default']
     PreviewWidget: typeof import('./components/PreviewWidget.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']

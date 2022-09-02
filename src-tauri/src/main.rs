@@ -4,7 +4,7 @@
 )]
 #[macro_use]
 extern crate log;
-use app::banner_unit::{ImagesPathFromFront, Notification, UserOperation, UserSettingsJson};
+use app::banner_unit::{ImagesPathFromFront, Notification, UserOperation, UserSettingsJson, UserSetting};
 use app::image_handle::control_center_thread;
 use app::image_processing;
 use app::notify_center::{ notification_thread, windows_send_msg};
@@ -58,6 +58,7 @@ fn main() {
             close_splashscreen,
             handle_front_select_files,
             handle_front_update_key,
+            handle_front_update_user_data,
             greet,
             send_event
         ])
@@ -125,7 +126,7 @@ fn handle_front_update_key(
     let a = ["output_dir", "brand"];
     if a.contains(&key.as_str()) {
         state
-            .send(UserOperation::Update(String::from("output_dir"), value))
+            .send(UserOperation::Update(UserSetting::OutputDir(value)))
             .unwrap();
         return format!("updating user data");
     }
@@ -138,44 +139,27 @@ fn handle_front_update_user_data(
     state: State<crossbeam_channel::Sender<UserOperation>>,
 ) -> String {
     let a = ["output_dir", "brand"];
+    println!("{:?}", user_data);
     if user_data.output_dir != "" {
         state
-        .send(UserOperation::Update(String::from("output_dir"), user_data.output_dir))
-        .unwrap();
+        .send(UserOperation::Update(UserSetting::OutputDir(user_data.output_dir))).unwrap();
     }
     if user_data.qulity != 0 {
         state
-        .send(UserOperation::Update(String::from("qulity"), user_data.qulity.to_string()))
+        .send(UserOperation::Update(UserSetting::Qulity(user_data.qulity)))
         .unwrap();
     }
     if user_data.auto_user_brand {
         state
-        .send(UserOperation::Update(String::from("auto_user_brand"), "true".to_string()))
+        .send(UserOperation::Update(UserSetting::AutoUseBrand(true, String::from("_"))))
+        .unwrap();
+    } else {
+        state.send(UserOperation::Update(UserSetting::AutoUseBrand(false, user_data.brand)))
         .unwrap();
     }
-    return format!("error key.");
+    return format!("updating..");
 }
 
-// #[tauri::command]
-// fn process_image(brand: &str, dir_path: &str, images_list: &[&str] ,state: State<(Font<'static>, (DynamicImage, DynamicImage, DynamicImage))>) {
-//     if (dir_path != "") {
-//         // glob -> images_list
-//         //
-//     } else if (images_list.len() == 0) {
-//          // send { error message }
-//     }
-
-//     let image_list = ["ff", ""];
-
-//     for image_path in images_list.iter() {
-//         let exif_data = read_exif::read_exif(image_path).unwrap(); // todo
-
-//         read_exif::process_single_image(image_path, brand, &state.0, state.1.0, exif_data)
-//         // todo use image data mark 非统一
-//         // send( message ) to front
-//     }
-
-// }
 
 #[tauri::command]
 fn send_event(window: Window) {

@@ -46,7 +46,7 @@ pub fn read_exif(img_path: &str) -> Option<HashMap::<ExifTag, String>> {
             //     entry.kind, entry.tag, entry.value_more_readable, entry.ifd.tag
             // );
         }
-        // println!("{:?}", exif_map);
+        println!("{:?}", exif_map);
         println!("read exif ok");
         return Some(exif_map);
     } else {
@@ -56,8 +56,8 @@ pub fn read_exif(img_path: &str) -> Option<HashMap::<ExifTag, String>> {
 }
 
 
-pub fn process_single_image(img_path: &str, output_path: &str, brand: &str, font: &Font, brand_image: (&DynamicImage, &DynamicImage, &DynamicImage), 
-    exif_map: HashMap::<ExifTag, String>) -> image::ImageResult<()> {
+pub fn process_single_image(img_path: &str, output_path: &str,  font: &Font, brand_image: &DynamicImage, 
+    exif_map: HashMap::<ExifTag, String>, qulity: u8) -> image::ImageResult<()> {
     // convert to BannerStruct to draw..
     //
     let start_time = std::time::Instant::now();
@@ -96,7 +96,7 @@ pub fn process_single_image(img_path: &str, output_path: &str, brand: &str, font
     let _zzz = "ℤ";
     let (w, h) = (src_img.width(), src_img.height());
     
-    let mut banner_img: &DynamicImage = brand_image.1;
+    let mut banner_img: &DynamicImage = brand_image;
     let (mut banner_w, mut banner_h) = (banner_img.width() as f32, banner_img.height() as f32);
     let WATERMARK_SCALE = 1.3;
     let mut background_heigth = banner_h as f32 * WATERMARK_SCALE;
@@ -168,7 +168,7 @@ pub fn process_single_image(img_path: &str, output_path: &str, brand: &str, font
     let fout = &mut BufWriter::new(File::create(output_dir).unwrap());
     // let mut fout = &mut File::create(output_dir).unwrap();
     newimg_buf
-        .write_to( fout, ImageOutputFormat::Jpeg(80))
+        .write_to( fout, ImageOutputFormat::Jpeg(qulity))
         ?;
     println!("write image---{:?}", start_time.elapsed());
     println!("write ok");

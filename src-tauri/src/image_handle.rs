@@ -1,10 +1,10 @@
 use std::{
     io::{BufReader, Read},
-    path::{Path, PathBuf},
+    path::{Path, PathBuf, self}, collections::HashMap,
 };
 
 use crate::{
-    banner_unit::{Notification, UserOperation},
+    banner_unit::{Notification, UserOperation, UserSetting},
     image_processing,
 };
 use crossbeam_channel::{Receiver, Sender};
@@ -16,12 +16,15 @@ pub fn control_center_thread(
     notify_front_st: Sender<Notification>,
 ) {
     if let UserOperation::Init(resources_path) = operation_st.recv().unwrap() {
-        let (font, (n_logo, c_logo, s_logo)) = _init(resources_path);
+        let (mut font, mut brand_map) = _init(resources_path);
         let mut is_pause = true;
         let mut image_list = Vec::<String>::new(); // Vec<String>
         let mut image_length = 0usize;
         let mut index = 0usize;
         let mut output_path = String::from("");
+        let mut qulity: u8 = 85;
+        let mut brand = String::from("nikon");
+        let mut auto_user_brand = true;
         loop {
             let opt = operation_st.recv().unwrap();
             match opt {
@@ -51,15 +54,29 @@ pub fn control_center_thread(
                     image_length = 0usize;
                     index = 0usize;
                 }
-                UserOperation::Update(k, v) => match k.as_str() {
-                    "output_dir" => {
-                        output_path = v;
-                        println!("outputDir update --> {}", output_path);
+                UserOperation::Update(user_setting) =>  match user_setting {
+                        UserSetting::OutputDir(path) => {
+                            output_path = path;
+                            println!("outputDir update --> {}", output_path);
+                        },
+                        UserSetting::Qulity(q) =>  {qulity = q;},
+                        UserSetting::AutoUseBrand(is, v) => {
+                            if !is {
+                                auto_user_brand = false;
+                                brand = v;
+                            } else {
+                                auto_user_brand = true;
+                            }
+                        },
+                        UserSetting::Font(path) => {
+                            // update font
+                        }
+
+                        _ => { }
+                    
                     }
-                    _ => {
-                        println!("unsupported update key... #TODO")
-                    }
-                },
+
+                
                 _ => {
                     println!("error option.")
                 }
@@ -72,14 +89,21 @@ pub fn control_center_thread(
                     if let Some(exif_data) = image_processing::read_exif(image_path) {
                         println!("read exif---{:?}", start_time.elapsed());
                         // todo let brand = exif_data.get(&rexif::ExifTag::Make).unwrap();
-                        let brand = "nikon";
+                        // 
+                        if auto_user_brand {
+                            let camera_make = exif_data.get(&rexif::ExifTag::Make).unwrap();
+                            let make_vec: Vec<String> = camera_make.split(" ").map(|x| String::from(x) ).collect();
+                            // println!("{:?}", make_vec);
+                            brand = make_vec[0].to_lowercase();
+                            // *band --> str   &*brand --> &str :::::   String --> &str
+                        }
                         match image_processing::process_single_image(
                             image_path,
                             &output_path,
-                            brand,
                             &font,
-                            (&c_logo, &n_logo, &s_logo),
+                            brand_map.get(&*brand).expect("brand error..."),
                             exif_data,
+                            qulity,
                         ) {
                             Ok(_) => {
                                 notify_front_st.send(Notification::Complated).unwrap();
@@ -124,7 +148,7 @@ pub fn control_center_thread(
     }
 }
 
-fn _init(path: PathBuf) -> (Font<'static>, (DynamicImage, DynamicImage, DynamicImage)) {
+fn _init(path: PathBuf) -> (Font<'static>, HashMap<&'static str, DynamicImage>) {
     // read font
     let font_path = path.join("OPPOSans-H.ttf");
     let font_file = std::fs::File::open(font_path).expect("failed to open file");
@@ -133,9 +157,13 @@ fn _init(path: PathBuf) -> (Font<'static>, (DynamicImage, DynamicImage, DynamicI
     let _read_result = font_read.read_to_end(&mut font);
     let font = Font::try_from_vec(font).unwrap();
     //read logo * 3
-    let nikon_banner_img = image::open(path.join("nikon.png")).unwrap();
-    let canon_banner_img = image::open(path.join("canon.png")).unwrap();
-    let sony_banner_img = image::open(path.join("sony.png")).unwrap();
+    let mut map:  HashMap<&str, DynamicImage> = HashMap::new();
+    map.insert("nikon", image::open(path.join("nikon.png")).unwrap());
+    map.insert("canon", image::open(path.join("canon.png")).unwrap());
+    map.insert("sony", image::open(path.join("sony.png")).unwrap());
+    // let nikon_banner_img = ;
+    // let canon_banner_img = image::open(path.join("canon.png")).unwrap();
+    // let sony_banner_img = image::open(path.join("sony.png")).unwrap();
 
-    return (font, (nikon_banner_img, canon_banner_img, sony_banner_img));
+    return (font, map);
 }
