@@ -15,8 +15,6 @@ struct Payload {
 pub fn notification_thread(main_window: Window, notify_front_rt: Receiver<Notification> ) {
 
 
-    
-
 // let id = main_window.listen("front-backend", |event| {
 //     println!("got window event-name with payload {:?}", event.payload());
 // });

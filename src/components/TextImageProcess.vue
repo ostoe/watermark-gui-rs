@@ -8,6 +8,7 @@ import { ElMessage, ElNotification } from "element-plus";
 import { open } from "@tauri-apps/api/dialog";
 import { appDir } from "@tauri-apps/api/path";
 import { pictureDir } from '@tauri-apps/api/path';
+import BaseSettingsDrawerVue from "./BaseSettingsDrawer.vue";
 
 const isCollapse = ref(true);
 // const progress_count = ref({ completed: 0, total: 0 });
@@ -165,7 +166,7 @@ onMounted(() => {
         placeholder="Please input"
       />
     </div>
-    <div class=".b-border">
+    <div>
     <!-- <el-container direction="vertical"> -->
         <suspense>
           <!-- <el-col > -->
@@ -195,6 +196,7 @@ onMounted(() => {
           
         </div>
 
+
         <!-- </div> -->
       </el-col>
       <text> {{ selectImage }}</text>
@@ -204,6 +206,9 @@ onMounted(() => {
   
     <!-- </el-container> -->
     </div>
+  </div>
+  <div style="margin-right=10px margin:auto" >
+          <BaseSettingsDrawerVue/>
   </div>
   </el-container>
 
@@ -237,10 +242,11 @@ onMounted(() => {
   width: 10rem;
   color: white;
   background-color: #2ea169;
-
+  justify-content: center;
   border-radius: 0.3rem;
   text-align: center;
   font-weight: bold;
+  display: flex;
 }
 
 .file-select>input[type="file"] {

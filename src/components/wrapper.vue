@@ -1,5 +1,5 @@
 <script lang="ts">
-import HelloWorld from "./HelloWorld.vue";
+import DragTest from "./DragTest.vue";
 import TextImageProcess from "./TextImageProcess.vue";
 import TopBar from "./TopBar.vue";
 
@@ -80,7 +80,7 @@ export default defineComponent({
       router.push("/textImageProcess")
     }
     const route2Test = () =>{
-      router.push("/helloWorld")
+      router.push("/dragTest")
     }
 
     const isDarkMode = useDark();
@@ -153,7 +153,7 @@ export default defineComponent({
               <!-- <router-link to="/">Go to Home</router-link>
               <router-link to="/about">Go to About</router-link> -->
               <el-menu-item index="1-1"  @click="route2Main">测试页</el-menu-item>
-              <el-menu-item index="1-2" @click="route2Test">HelloWorld</el-menu-item>
+              <el-menu-item index="1-2" @click="route2Test">DragTest</el-menu-item>
             </el-menu-item-group>
           </el-sub-menu>
           <el-menu-item index="2">

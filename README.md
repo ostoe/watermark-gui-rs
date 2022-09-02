@@ -33,7 +33,8 @@ event.listen('tauri://file-drop-hover', (e) => {
 
 
 ## TODO [list]
- - 图片logo位置和比例优化下、
+ - 图片logo位置和比例优化下[v]
+ - 图片质量
  - 支持目录
  - 选择字体
  - 拖动文件
@@ -42,6 +43,7 @@ event.listen('tauri://file-drop-hover', (e) => {
  - 自定义后缀 防止覆盖文件
  - 集成其他工具，如计算景深 超焦距之类
  - 进度条
+ - 字体啊，logo位置、比例，还有日期格式，自定义显示光圈iso与否，放在高级设置里面了
 
 
 

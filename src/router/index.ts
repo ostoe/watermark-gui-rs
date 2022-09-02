@@ -2,7 +2,7 @@
 // https://router.vuejs.org/guide/essentials/history-mode.html#hash-mode
 import { createRouter, createWebHashHistory } from "vue-router";
 
-const helloworld = () => import("../components/HelloWorld.vue");
+const dragTest = () => import("../components/DragTest.vue");
 const textImageProcess = () => import("../components/TextImageProcess.vue");
 const wrapper = () => import("../components/Wrapper.vue");
 const base = () => import("../components/Base.vue");
@@ -20,9 +20,9 @@ const routes  = [
         component: textImageProcess,
       },
       {
-        path: "/helloWorld",
-        name: "helloWorld",
-        component: helloworld,
+        path: "/dragTest",
+        name: "dragTest",
+        component: dragTest,
       },
       {
         path: "/Base",
