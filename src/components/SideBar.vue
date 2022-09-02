@@ -64,7 +64,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 // import { Context } from "vm";
 import { sidebarReactives } from "../scripts/reactives";
 //dark mode
@@ -117,7 +117,7 @@ const route2Main = () => {
     router.push("/textImageProcess");
 };
 const route2Test = () => {
-    router.push("/DragTest");
+  router.push("/HelloWorld");
 };
 
 // 深色模式
@@ -132,6 +132,12 @@ const toggleDarkMode = () => {
 
 //侧栏聚焦
 const activeMenuId = ref("1-1");
+
+
+onMounted(() => {
+  router.push("/textImageProcess");
+});
+
 </script>
 
 <style scoped>
