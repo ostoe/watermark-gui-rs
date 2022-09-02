@@ -118,7 +118,9 @@ async function drag_event_handle() {
 
   const unlisten = await listen<string>("tauri://file-drop", (event) => {
     // 是一个循环函数
+    image_progress.dragFiles(eval(event.payload));
     console.log(event.payload);
+    
     message(
       `drap payload: ${event.payload}`
     );

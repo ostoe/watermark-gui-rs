@@ -97,6 +97,14 @@ const image_progress = reactive({
   },
 
   //
+  dragFiles(arr: Array<string>) {
+    this.image_paths = {
+      count: arr.length,
+      image_paths: arr,
+    } as ImageProps;
+    image_progress.update_progress(0, arr.length);
+    message("selected: " + this.image_paths);
+  },
 
   async selectFiles() {
     const selected = await open({
@@ -141,6 +149,8 @@ const image_progress = reactive({
     message("update output dir: " + res);
   },
   //
+
+
 
   async selectDirs() {
     const selected = await open({
