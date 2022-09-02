@@ -1,5 +1,4 @@
 import { reactive } from "vue";
-import { ElMessage, ElNotification } from "element-plus";
 import { open } from "@tauri-apps/api/dialog";
 import { invoke } from '@tauri-apps/api'
 
@@ -142,7 +141,7 @@ const image_progress = reactive({
   },
 
   async update_user_data2BD(key: string, value: string) {
-    let res = await invoke("handle_front_update_data", {
+    let res = await invoke("handle_front_update_key", {
       key: key,
       value: value,
     });

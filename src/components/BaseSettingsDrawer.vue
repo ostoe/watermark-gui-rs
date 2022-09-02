@@ -1,7 +1,7 @@
 
   <script lang="ts" setup>
   import { reactive, ref } from 'vue'
-  import { ElDrawer, ElMessageBox } from 'element-plus'
+//   import { ElDrawer, ElMessageBox } from 'unp'
   
   const formLabelWidth = '80px'
   //   let timer
@@ -21,10 +21,7 @@
   
   const autoSelect = ref(true);
   
-  const drawerRef = ref<InstanceType<typeof ElDrawer>>()
-  const onClick = () => {
-      drawerRef.value!.close()
-  }
+
   
   const saveSetting = () => {
       console.log("save setting.");
@@ -73,7 +70,7 @@
 
 <template>
     <div @mouseenter="menuShow" @mouseleave="menuHidden">
-        <el-button @click="settingsDrawer = true" type="primary" color="#3f8418" plain="true">
+        <el-button @click="settingsDrawer = true" type="primary" color="#3f8418" plain>
             <el-icon>
                 <i-ep-d-arrow-left />
             </el-icon>

@@ -1,7 +1,7 @@
 <template>
-    <el-drawer v-model="drawer" title="I am the title" :with-header="false">
+    <!-- <el-drawer v-model="drawer" title="I am the title" :with-header="false">
     <span>Hi there!</span>
-  </el-drawer>
+  </el-drawer> -->
     <el-container>
         <el-aside width="50px">
             <el-menu :default-active="activeMenuId" class="elmenu" :collapse="sidebarReactives.isCollapse"
@@ -64,7 +64,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+// import { onMounted, ref } from "vue";
 // import { Context } from "vm";
 import { sidebarReactives } from "../scripts/reactives";
 //dark mode

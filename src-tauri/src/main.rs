@@ -4,7 +4,7 @@
 )]
 #[macro_use]
 extern crate log;
-use app::banner_unit::{ImagesPathFromFront, Notification, UserOperation};
+use app::banner_unit::{ImagesPathFromFront, Notification, UserOperation, UserSettingsJson};
 use app::image_handle::control_center_thread;
 use app::image_processing;
 use app::notify_center::{ notification_thread, windows_send_msg};
@@ -57,7 +57,7 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             close_splashscreen,
             handle_front_select_files,
-            handle_front_update_data,
+            handle_front_update_key,
             greet,
             send_event
         ])
@@ -117,7 +117,7 @@ fn handle_front_select_files(
 }
 
 #[tauri::command]
-fn handle_front_update_data(
+fn handle_front_update_key(
     key: String,
     value: String,
     state: State<crossbeam_channel::Sender<UserOperation>>,
@@ -128,6 +128,30 @@ fn handle_front_update_data(
             .send(UserOperation::Update(String::from("output_dir"), value))
             .unwrap();
         return format!("updating user data");
+    }
+    return format!("error key.");
+}
+
+#[tauri::command]
+fn handle_front_update_user_data(
+    user_data: UserSettingsJson,
+    state: State<crossbeam_channel::Sender<UserOperation>>,
+) -> String {
+    let a = ["output_dir", "brand"];
+    if user_data.output_dir != "" {
+        state
+        .send(UserOperation::Update(String::from("output_dir"), user_data.output_dir))
+        .unwrap();
+    }
+    if user_data.qulity != 0 {
+        state
+        .send(UserOperation::Update(String::from("qulity"), user_data.qulity.to_string()))
+        .unwrap();
+    }
+    if user_data.auto_user_brand {
+        state
+        .send(UserOperation::Update(String::from("auto_user_brand"), "true".to_string()))
+        .unwrap();
     }
     return format!("error key.");
 }

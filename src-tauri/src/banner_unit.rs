@@ -38,3 +38,17 @@ pub struct ImagesPathFromFront {
     pub count: u32,
     pub image_paths: Vec<String>,
 }
+
+pub enum UserSettings {
+    OutputDir(String),
+    Qulity(u8),
+    AutoUseBrand(bool),
+
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct UserSettingsJson {
+    pub output_dir: String,
+    pub qulity: u8,
+    pub auto_user_brand: bool,
+}

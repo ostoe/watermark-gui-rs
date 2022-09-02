@@ -22,7 +22,7 @@ const changeThisCollapse = () => {
 </script>
 
 <template lang="">
-                <BaseSettingsDrawerVue />
+               
 
   <div class="common-layout index">
     <div class="elcontainer">

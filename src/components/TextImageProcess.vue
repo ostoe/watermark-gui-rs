@@ -223,8 +223,9 @@ onMounted(() => {
     <!-- </el-container> -->
     </div>
   </div>
+  <BaseSettingsDrawerVue />
   <!-- <div style="margin-right=10px margin:auto" >
-          <BaseSettingsDrawerVue/>
+          
   </div> -->
   </el-container>
 
