@@ -1,11 +1,11 @@
 <script lang="ts" setup>
-import HelloWorld from "./HelloWorld.vue";
+import dragTest from "./DragTest.vue";
 import TextImageProcess from "./TextImageProcess.vue";
 import SideBar from "./SideBar.vue";
 import TopBar from "./TopBar.vue";
 import picList from "./PicList.vue";
 
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 // import { Context } from "vm";
 import { sidebarReactives } from "../scripts/reactives"
 //获取鼠标点击消除遮罩
@@ -16,6 +16,8 @@ let t: NodeJS.Timeout | null = null;
 const changeThisCollapse = () => {
   sidebarReactives.changeThisCollapse()
 };
+
+
 </script>
 
 <template lang="">
@@ -45,7 +47,7 @@ const changeThisCollapse = () => {
           <el-container direction="vertical">
             <!-- <el-row > -->
             <!-- <HelloWorld msg="Vite + Vue" /> -->
-            <TextImageProcess />
+            <!-- <TextImageProcess /> -->
             <!-- </el-row> -->
           </el-container>
         </el-main>
@@ -56,7 +58,7 @@ const changeThisCollapse = () => {
   <router-view></router-view>
 </template>
 
-<style>
+<style scoped>
 .elmenu {
   z-index: 99;
   position: absolute;

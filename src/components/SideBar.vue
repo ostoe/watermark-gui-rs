@@ -31,7 +31,7 @@
                         <router-link to="/about">Go to About</router-link> -->
             <el-menu-item index="1-1" @click="route2Main">测试页</el-menu-item>
             <el-menu-item index="1-2" @click="route2Test"
-              >HelloWorld</el-menu-item
+              >DragTestPage</el-menu-item
             >
           </el-menu-item-group>
         </el-sub-menu>
@@ -76,7 +76,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 // import { Context } from "vm";
 import { sidebarReactives } from "../scripts/reactives";
 //dark mode
@@ -124,7 +124,7 @@ const route2Main = () => {
   router.push("/textImageProcess");
 };
 const route2Test = () => {
-  router.push("/HelloWorld");
+  router.push("/dragTest");
 };
 
 // 深色模式
@@ -139,6 +139,12 @@ const toggleDarkMode = () => {
 
 //侧栏聚焦
 const activeMenuId = ref("1-1");
+
+
+onMounted(() => {
+  router.push("/textImageProcess");
+});
+
 </script>
 
 <style scoped>
