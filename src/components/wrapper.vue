@@ -1,5 +1,5 @@
-<script lang="ts">
-import DragTest from "./DragTest.vue";
+<script lang="ts" setup>
+import HelloWorld from "./HelloWorld.vue";
 import TextImageProcess from "./TextImageProcess.vue";
 import SideBar from "./SideBar.vue";
 import TopBar from "./TopBar.vue";
@@ -7,121 +7,15 @@ import picList from "./PicList.vue";
 
 import { ref } from "vue";
 // import { Context } from "vm";
-
-//dark mode
-import { useDark, useToggle } from "@vueuse/core";
-//引入路由
-import { useRoute, useRouter } from "vue-router";
-
-export default defineComponent({
-  name: "index",
-  //自定义指令
-  directives: {
-    resize: {
-      mounted(el, binding) {
-        let ResizeObserver = window.ResizeObserver;
-        el._resizer = new ResizeObserver((entries) => {
-          for (const entry of entries) {
-            // console.log(entry.contentRect.width)
-            binding.value({ width: entry.contentRect.width });
-          }
-        });
-        el._resizer.observe(el);
-        // console.log(binding)
-      },
-      unmounted(el) {
-        el._resizer.disconnect();
-      },
-    },
-  },
-
-  setup() {
-    const route = useRoute();
-    const router = useRouter();
-    const isDark = ref(true);
-    const isCollapse = ref(true);
-    const delay = ref(200);
-    const tooltipEffect = ref("light");
-    const dynamicWidth = ref(false);
-    const extendPadding = ref("");
-    const count = ref(0);
-    const tableData = ref([]);
-    const text = ref("./tests/img/jpg/gps/DSCN0010.jpg");
-    let t: NodeJS.Timeout | null = null;
-
-    //获取鼠标点击消除遮罩
-    const changeThisCollapse = () => {
-      let firstClick = !t;
-      if (firstClick) {
-        isCollapse.value = isCollapse.value ? false : true;
-        extendPadding.value = isCollapse.value ? "" : "70";
-      }
-      if (t) {
-        clearTimeout(t);
-      }
-      t = setTimeout(() => {
-        t = null;
-        if (!firstClick) {
-          isCollapse.value = isCollapse.value ? false : true;
-          extendPadding.value = isCollapse.value ? "" : "70";
-        }
-      }, delay.value);
-    };
-
-    //监听dom变化
-    const resizeSideBar = (width: any) => {
-      let domWidth = width;
-      let initWidth = 63;
-      dynamicWidth.value = domWidth.width > 63 ? false : true;
-      // console.log(domWidth)
-    };
-
-    //路由
-    const route2Main = () => {
-      console.log("main");
-      router.push("/textImageProcess")
-    }
-    const route2Test = () =>{
-      router.push("/helloWorld")
-    }
-
-    const isDarkMode = useDark();
-    const toggleDark = useToggle(isDarkMode);
-    const toggleDarkMode = () => {
-      toggleDark;
-      isDark.value = isDark.value ? false : true;
-    };
-
-    return {
-      isCollapse,
-      delay,
-      tooltipEffect,
-      dynamicWidth,
-      extendPadding,
-      count,
-      tableData,
-      text,
-      isDark,
-      changeThisCollapse,
-      resizeSideBar,
-      toggleDarkMode,
-      route2Main,
-      route2Test
-    };
-  },
-
-  watch: {},
-
-  mounted() {
-    this.route2Main();
-    // 在其他方法或是生命周期中也可以调用方法
-    // this.test_event_recv();
-    // for (let i = 0; i < 5; i += 1) {
-    //   this.tableData.push({ id: i, msg: " " + i + " " + i + " " + i });
-    // }
-  },
-});
-
+import { sidebarReactives } from "../scripts/reactives"
+//获取鼠标点击消除遮罩
+let t: NodeJS.Timeout | null = null;
+// const isCollapse = ref(true);
+// const delay = ref(200);
+// const extendPadding = ref("");
+const changeThisCollapse = () => {
+  sidebarReactives.changeThisCollapse()
+};
 </script>
 
 <template lang="">
@@ -133,51 +27,10 @@ export default defineComponent({
             <el-icon>
               <i-ep-document />
             </el-icon>
-          </div>
-          <el-sub-menu index="1">
-            <template #title>
-              <el-icon><i-ep-menu /></el-icon>
-              <span>基本</span>
-            </template>
-            <el-menu-item-group>
-              <!-- <router-link to="/">Go to Home</router-link>
-              <router-link to="/about">Go to About</router-link> -->
-              <el-menu-item index="1-1"  @click="route2Main">测试页</el-menu-item>
-              <el-menu-item index="1-2" @click="route2Test">HelloWorld</el-menu-item>
-            </el-menu-item-group>
-          </el-sub-menu>
-          <el-menu-item index="2">
-            <el-icon><i-ep-add-location /></el-icon>
-            <template #title>高级</template>
+            <template #title>TODO2测试插槽</template>
           </el-menu-item>
-          <el-menu-item index="3">
-            <el-icon><i-ep-document /></el-icon>
-            <template #title>TODO</template>
-          </el-menu-item>
-          <el-footer>
-            <div class="footer-div">
-              <el-divider content-position="center">
-                <el-tooltip
-                  class="tooltip"
-                  :effect="tooltipEffect"
-                  content="gui测试"
-                  placement="right-start"
-                  v-if="dynamicWidth"
-                >
-                  <span>&copy;</span>
-                </el-tooltip>
-                <span v-else class="copyrightSpan">&copy;gui</span>
-              </el-divider>
-            </div>
-          </el-footer>
-          <div @click="toggleDarkMode" class="darkBtn">
-            <el-icon>
-              <i-ep-arrow-right v-if="isDark" />
-              <i-ep-arrow-left v-else />
-            </el-icon>
-          </div>
-        </el-menu>
-      </el-aside>
+        </template>
+      </SideBar>
       <div
         v-if="!sidebarReactives.isCollapse"
         class="shadowmask"
