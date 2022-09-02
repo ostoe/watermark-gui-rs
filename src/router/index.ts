@@ -8,7 +8,7 @@ const wrapper = () => import("../components/Wrapper.vue");
 const base = () => import("../components/Base.vue");
 const topbar = () => import("../components/TopBar.vue");
 
-const router = [
+const routes  = [
   {
     path: "/",
     name: "index",
@@ -19,26 +19,28 @@ const router = [
         name: "textImageProcess",
         component: textImageProcess,
       },
+      {
+        path: "/helloWorld",
+        name: "helloWorld",
+        component: helloworld,
+      },
+      {
+        path: "/Base",
+        name: "base",
+        component: base,
+      },
+      {
+        path: "/Topbar",
+        name: "topbar",
+        component: topbar,
+      },
     ],
   },
-  {
-    path: "/HelloWorld",
-    name: "helloworld",
-    component: helloworld,
-  },
-  {
-    path: "/Base",
-    name: "base",
-    component: base,
-  },
-  {
-    path: "/Topbar",
-    name: "topbar",
-    component: topbar,
-  },
+
+
 ];
 
-export const routers = createRouter({
+export const router = createRouter({
   history: createWebHashHistory(),
-  routes: router,
+  routes: routes,
 });

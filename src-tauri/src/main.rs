@@ -168,10 +168,10 @@ pub fn app_resources_dir(package_info: &PackageInfo) -> PathBuf {
         .unwrap()
         .join("resources");
 
-    #[cfg(windows)]
-    unsafe {
-        RESOURCE_DIR = Some(res_dir.clone());
-    }
+    // #[cfg(windows)]
+    // unsafe {
+    //     RESOURCE_DIR = Some(res_dir.clone());
+    // }
 
     res_dir
 }

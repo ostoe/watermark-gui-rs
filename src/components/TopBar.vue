@@ -2,9 +2,10 @@
 import { main } from '@popperjs/core';
 import { floor } from 'lodash';
 import { onMounted, ref, reactive } from 'vue';
-import { image_progress, tools } from '../main';
+import { image_progress} from '../scripts/reactives';
 import { invoke } from '@tauri-apps/api';
-import { appDir,configDir, homeDir, localDataDir, logDir, resourceDir, fontDir } from '@tauri-apps/api/path';
+import { appDir, configDir, homeDir, localDataDir, logDir, resourceDir, fontDir } from '@tauri-apps/api/path';
+import { ElMessage, ElNotification } from "element-plus";
 
 // const percentage = ref(90);
 // const progress_count = ref({ completed: 0, total: 0 });
@@ -14,20 +15,27 @@ const colors = [
   { color: '#5cb87a', percentage: 50 },
   { color: '#1989fa', percentage: 75 },
   { color: '#6f7ad3', percentage: 100 },
-]
+];
 
 async function test_some_f() {
 
-let a = [appDir,configDir, homeDir, localDataDir, logDir, resourceDir, fontDir];
-let b = ["appDir","configDir", "homeDir", "localDataDir", "logDir", "resourceDir", "fontDir"];
-for (let i=0; i<7; i++) {
+  let a = [appDir, configDir, homeDir, localDataDir, logDir, resourceDir, fontDir];
+  let b = ["appDir", "configDir", "homeDir", "localDataDir", "logDir", "resourceDir", "fontDir"];
+  for (let i = 0; i < 6; i++) {
     let r = await a[i]();
     console.log(b[i] + ": " + r);
+  }
 }
-}
-test_some_f();
 
 
+const message=(msg: string)=> {
+    ElNotification({
+      message: msg,
+      type: "success",
+      title: "🐮----🍺",
+      position: "bottom-left",
+    });
+  }
 
 function color() {
   const index = floor(image_progress.value / 25.01);
@@ -95,12 +103,16 @@ async function process_image() {
     let send_content = JSON.stringify(image_progress.image_paths);
     console.log(send_content);
     let res = await invoke("handle_front_select_files", { imagesObj: image_progress.image_paths });
-    tools.message("process_single_image result: " + res);
+    message("process_single_image result: " + res);
   } else {
-    tools.message("未选择文件或已完成");
+    message("未选择文件或已完成");
   }
 
 };
+
+onMounted(() => {
+  test_some_f();
+})
 
 defineExpose({
   image_progress
@@ -122,9 +134,9 @@ defineExpose({
           </div>
         </div>
         <div>
-          <el-button  @click="image_progress.selectFiles()">选择文件</el-button>
-          <el-button  @click="image_progress.selectDirs()">选择目录</el-button>
-          <el-button  @click="process_image" color="#de4781" size="" plain>开始处理</el-button>
+          <el-button @click="image_progress.selectFiles()">选择文件</el-button>
+          <el-button @click="image_progress.selectDirs()">输出目录</el-button>
+          <el-button @click="process_image" color="#de4781" size="" plain>开始处理</el-button>
 
         </div>
       </div>

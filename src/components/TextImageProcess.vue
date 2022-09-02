@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { nextTick, ref, onMounted } from "vue";
 // import { image_progress } from "../main";
-import { image_progress, tools } from '../main';
+import { image_progress } from '../scripts/reactives';
 import { emit, listen } from "@tauri-apps/api/event";
 import { event, invoke } from "@tauri-apps/api";
 import { ElMessage, ElNotification } from "element-plus";
@@ -25,6 +25,16 @@ interface ImageProps {
   image_paths: [string],
   count: number
 }
+
+
+const message=(msg: string)=> {
+    ElNotification({
+      message: msg,
+      type: "success",
+      title: "🐮----🍺",
+      position: "bottom-left",
+    });
+  }
 
 // {count: selected.length, image_paths: [selected]}
 
@@ -77,7 +87,7 @@ async function backend_event_recv() {
       default: console.log("unknown nofitication.: " + event.payload.message);
     }
     if (image_progress.count.completed == image_progress.count.total) {
-      tools.message(
+      message(
         `[r] : 已完成处理！`
       );
     }
@@ -108,7 +118,7 @@ async function drag_event_handle() {
   const unlisten = await listen<string>("tauri://file-drop", (event) => {
     // 是一个循环函数
     console.log(event.payload);
-    tools.message(
+    message(
       `drap payload: ${event.payload}`
     );
   });
@@ -211,19 +221,16 @@ onMounted(() => {
   </div>
   </el-container>
 
-  <div>
-    
-</div>
-
 </template>
 
 <style>
 .a-border {
   border: 1px solid rgb(8, 210, 255);
-  margin: 20px auto 20px auto;
+  margin: 20px 10% 20px 10%;
   text-align: center;
   box-shadow: 0 0 10px rgb(79, 223, 255);
   padding: 20px 25px 20px 25px;
+  align-items: center;
 }
 
 .b-border {

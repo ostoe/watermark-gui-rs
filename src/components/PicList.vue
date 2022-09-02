@@ -11,7 +11,7 @@
 <script setup lang="ts">
 //获取图片数据源
 import { watch } from "fs";
-import { image_progress, tools } from "../main";
+import { image_progress } from "../scripts/reactives";
 const src = image_progress.image_paths
 watch:{
     getPath:()=>{
