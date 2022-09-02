@@ -1,9 +1,11 @@
 <script lang="ts">
 import DragTest from "./DragTest.vue";
 import TextImageProcess from "./TextImageProcess.vue";
+import SideBar from "./SideBar.vue";
 import TopBar from "./TopBar.vue";
+import picList from "./PicList.vue";
 
-import { defineComponent, ref } from "vue";
+import { ref } from "vue";
 // import { Context } from "vm";
 
 //dark mode
@@ -80,7 +82,7 @@ export default defineComponent({
       router.push("/textImageProcess")
     }
     const route2Test = () =>{
-      router.push("/dragTest")
+      router.push("/helloWorld")
     }
 
     const isDarkMode = useDark();
@@ -125,23 +127,11 @@ export default defineComponent({
 <template lang="">
   <div class="common-layout index">
     <el-container>
-      <el-aside width="50px">
-        <el-menu
-          default-active="1-1"
-          class="elmenu"
-          :collapse="isCollapse"
-          :delay="delay"
-          v-resize:1="resizeSideBar"
-        >
-          <div style="margin-top: 30px"></div>
-          <div
-            @click="changeThisCollapse"
-            class="extend"
-            :style="{ 'padding-left': extendPadding + 'px' }"
-          >
+      <SideBar>
+        <template #elmenu>
+          <el-menu-item index="4">
             <el-icon>
-              <i-ep-arrow-right v-if="isCollapse" />
-              <i-ep-arrow-left v-else />
+              <i-ep-document />
             </el-icon>
           </div>
           <el-sub-menu index="1">
@@ -153,7 +143,7 @@ export default defineComponent({
               <!-- <router-link to="/">Go to Home</router-link>
               <router-link to="/about">Go to About</router-link> -->
               <el-menu-item index="1-1"  @click="route2Main">测试页</el-menu-item>
-              <el-menu-item index="1-2" @click="route2Test">DragTest</el-menu-item>
+              <el-menu-item index="1-2" @click="route2Test">HelloWorld</el-menu-item>
             </el-menu-item-group>
           </el-sub-menu>
           <el-menu-item index="2">
@@ -189,7 +179,7 @@ export default defineComponent({
         </el-menu>
       </el-aside>
       <div
-        v-if="!isCollapse"
+        v-if="!sidebarReactives.isCollapse"
         class="shadowmask"
         @click="changeThisCollapse"
       ></div>
@@ -202,10 +192,11 @@ export default defineComponent({
           <el-container direction="vertical">
             <!-- <el-row > -->
             <!-- <HelloWorld msg="Vite + Vue" /> -->
-            <!-- <TextImageProcess /> -->
+            <TextImageProcess />
             <!-- </el-row> -->
           </el-container>
         </el-main>
+        <PicList></PicList>
       </el-container>
     </el-container>
   </div>

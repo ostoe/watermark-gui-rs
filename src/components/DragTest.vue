@@ -3,7 +3,7 @@
 // @ is an alias to /src
 // import DropZone from "@/components/DropZone.vue";
 import { ref, onMounted, defineExpose } from "vue";
-import {image_progress} from "../main";
+import {image_progress} from "../scripts/reactives";
 import { event } from '@tauri-apps/api';
 //引入路由
 import { useRouter } from "vue-router";
@@ -26,7 +26,7 @@ function toggleActive() {
 //   components: {
 //     DropZone,
 //   },
-//   setup() {
+//   setup() {f
 const dropzoneFile = ref("");
 const dropzoneElement = document.querySelector("#drap-area-sq1");
 

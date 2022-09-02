@@ -2,9 +2,10 @@
 import { main } from '@popperjs/core';
 import { floor } from 'lodash';
 import { onMounted, ref, reactive } from 'vue';
-import { image_progress, tools } from '../main';
+import { image_progress} from '../scripts/reactives';
 import { invoke } from '@tauri-apps/api';
 import { appDir, configDir, homeDir, localDataDir, logDir, resourceDir, fontDir } from '@tauri-apps/api/path';
+import { ElMessage, ElNotification } from "element-plus";
 
 // const percentage = ref(90);
 // const progress_count = ref({ completed: 0, total: 0 });
@@ -27,7 +28,14 @@ async function test_some_f() {
 }
 
 
-
+const message=(msg: string)=> {
+    ElNotification({
+      message: msg,
+      type: "success",
+      title: "🐮----🍺",
+      position: "bottom-left",
+    });
+  }
 
 function color() {
   const index = floor(image_progress.value / 25.01);
@@ -95,9 +103,9 @@ async function process_image() {
     let send_content = JSON.stringify(image_progress.image_paths);
     console.log(send_content);
     let res = await invoke("handle_front_select_files", { imagesObj: image_progress.image_paths });
-    tools.message("process_single_image result: " + res);
+    message("process_single_image result: " + res);
   } else {
-    tools.message("未选择文件或已完成");
+    message("未选择文件或已完成");
   }
 
 };
@@ -116,7 +124,7 @@ defineExpose({
 <template>
   <!-- jindutiao -->
   <el-row class="row">
-    <el-col :span="20" class="left">
+    <el-col :span="18" class="left">
       <div class="photoSelector">
         <el-button class="btn">选择图片</el-button>
         <el-progress id="progress-bar" :percentage="image_progress.value" :format="format" :color="color"></el-progress>

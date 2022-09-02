@@ -1,13 +1,14 @@
 <script setup lang="ts">
-import { defineComponent, ref, onMounted } from "vue";
+import { nextTick, ref, onMounted } from "vue";
 // import { image_progress } from "../main";
-import { image_progress, tools } from '../main';
+import { image_progress } from '../scripts/reactives';
 import { emit, listen } from "@tauri-apps/api/event";
 import { event, invoke } from "@tauri-apps/api";
 import { ElMessage, ElNotification } from "element-plus";
 import { open } from "@tauri-apps/api/dialog";
 import { appDir } from "@tauri-apps/api/path";
 import { pictureDir } from '@tauri-apps/api/path';
+import { watch } from "fs";
 import BaseSettingsDrawerVue from "./BaseSettingsDrawer.vue";
 
 const isCollapse = ref(true);
@@ -15,6 +16,7 @@ const isCollapse = ref(true);
 const count = ref(0);
 const text = ref("./tests/img/jpg/gps/DSCN0010.jpg");
 const selectImage = ref("");
+const isPlain = ref(true)
 //  const      progress_count = ,
 interface MsgProps {
   message: string,
@@ -24,6 +26,16 @@ interface ImageProps {
   image_paths: [string],
   count: number
 }
+
+
+const message=(msg: string)=> {
+    ElNotification({
+      message: msg,
+      type: "success",
+      title: "🐮----🍺",
+      position: "bottom-left",
+    });
+  }
 
 // {count: selected.length, image_paths: [selected]}
 
@@ -76,7 +88,7 @@ async function backend_event_recv() {
       default: console.log("unknown nofitication.: " + event.payload.message);
     }
     if (image_progress.count.completed == image_progress.count.total) {
-      tools.message(
+      message(
         `[r] : 已完成处理！`
       );
     }
@@ -107,17 +119,19 @@ async function drag_event_handle() {
   const unlisten = await listen<string>("tauri://file-drop", (event) => {
     // 是一个循环函数
     console.log(event.payload);
-    tools.message(
+    message(
       `drap payload: ${event.payload}`
     );
   });
 };
-async function send_event_test() {
-  console.log("will send_event");
-  let res = await invoke("send_event");
-  console.log("send_event ok");
-};
 
+const send_event_test = async ()=>{
+  await nextTick(()=>{
+    console.log("will send_event");
+    let res = invoke("send_event");
+    console.log("send_event ok");
+  })
+}
 
 
 function handleFileChange(e: InputEvent) {
@@ -162,7 +176,7 @@ onMounted(() => {
         v-model="text"
         type="textarea"
         size="large"
-        autosize="{ minRows: 2, maxRows: 6 }"
+        :autosize="{ minRows: 2, maxRows: 6 }"
         placeholder="Please input"
       />
     </div>
@@ -171,10 +185,10 @@ onMounted(() => {
         <suspense>
           <!-- <el-col > -->
         <el-container direction="horizontal">
-          <el-button @click="send_event" color="#de4781" size="large" plain=true>[s]测试event</el-button>
+          <el-button @click="send_event" color="#de4781" size="large" :plain="isPlain">[s]测试event</el-button>
         <!-- </suspense>
         <suspense> -->
-         <el-button @click="greetTest"  color="#322aef"  size="large"  plain=true >[i]测试Rust </el-button>
+         <el-button @click="greetTest"  color="#322aef"  size="large"  :plain="isPlain" >[i]测试Rust </el-button>
         <!-- </el-col> -->
         </el-container>
         </suspense>
