@@ -1,6 +1,6 @@
-<template>
+<!-- <template>
   <div>
-    <el-image :src="src">
+    <el-image :src="">
       <template #placeholder>
         <div class="image-slot">Loading<span class="dot">...</span></div>
       </template>
@@ -20,4 +20,4 @@ watch:{
 }
 </script>
 
-<style></style>
+<style></style> -->

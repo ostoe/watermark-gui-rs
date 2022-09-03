@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
          <div class="widget"
     v-if="inputValue"
     :style="{
@@ -210,4 +210,4 @@
     
 <style>
     
-</style>
+</style> -->

@@ -56,10 +56,15 @@ pub fn read_exif(img_path: &str) -> Option<HashMap::<ExifTag, String>> {
 }
 
 
-pub fn process_single_image(img_path: &str, output_path: &str,  font: &Font, brand_image: &DynamicImage, 
-    exif_map: HashMap::<ExifTag, String>, qulity: u8) -> image::ImageResult<()> {
+pub fn process_single_image(img_path: &str, output_path: &str,  font: &Font, logo_image: &DynamicImage, 
+    exif_map: HashMap::<ExifTag, String>, 
+    qulity: u8, watermark_ratio: f32, watermark_scale: f32, logo_spacing_ratio: f32, 
+    position_ratio: f32,
+    logo_ratio: f32, split_line_spacing: u32
+        ) -> image::ImageResult<()> {
     // convert to BannerStruct to draw..
     //
+    
     let start_time = std::time::Instant::now();
     let exposure_time = match exif_map.get(&ExifTag::ExposureTime) {
         Some(v) => v,
@@ -88,72 +93,76 @@ pub fn process_single_image(img_path: &str, output_path: &str,  font: &Font, bra
     };
     // read images to vec
     let src_img =  image::open(img_path)?;
-    println!("read image---{:?}", start_time.elapsed());
+    // println!("read image---{:?}", start_time.elapsed());
 
     let focal_length  =  focal_length.split(" ").map(|x|String::from(x)).collect::<Vec<String>>().join("");
     let composit_text = format!("{} {} {} {}", focal_length, f_number, exposure_time, iso);
 
     let _zzz = "ℤ";
+    let  banner_h = src_img.width() as f32 * watermark_ratio;
+    
     let (w, h) = (src_img.width(), src_img.height());
+    let (ori_logo_w, ori_logo_h) = (logo_image.width(), logo_image.height());
+    let new_logo_h = banner_h * logo_ratio * logo_spacing_ratio;
+    let new_logo_w = new_logo_h * ori_logo_w as f32 / ori_logo_h as f32;
+    println!("banner_h: {} new_w: {} x {}",banner_h, new_logo_w, new_logo_h);
+    // clear png alpha
+    // resize logo image.
     
-    let mut banner_img: &DynamicImage = brand_image;
-    let (mut banner_w, mut banner_h) = (banner_img.width() as f32, banner_img.height() as f32);
-    let WATERMARK_SCALE = 1.3;
-    let mut background_heigth = banner_h as f32 * WATERMARK_SCALE;
-    let mut temp_banner_img = DynamicImage::new_rgba8(1, 1);
-    if h as f32 / 5.5 < background_heigth {
-        let bg_scale = h as f32 / 5.5 / background_heigth;
-        temp_banner_img =  banner_img.resize((banner_w * bg_scale) as u32 , (banner_h  * bg_scale) as u32, FilterType::Gaussian);
-        banner_img = &temp_banner_img;
-        background_heigth = h as f32 / 5.5;
-    }
-    println!("{} x {}", banner_w, banner_h);
-    println!("resize ---{:?}", start_time.elapsed());
-    
-    let mut newimg_buf = image::ImageBuffer::new(w as u32, background_heigth as u32 + h);
-
-    // place src image
+    let logo_img: DynamicImage = logo_image.resize(new_logo_w as u32, new_logo_h as u32, FilterType::Triangle);
+    let mut newimg_buf = image::ImageBuffer::new(w as u32, banner_h as u32 + h);
     newimg_buf.copy_from(&src_img, 0, 0)?;
-    // println!("copy 126---{:?}", start_time.elapsed());
-
-    // place white image that color control by user parameter.
+    // place white background image which color control by user parameter.
     let white_color: Rgba<u8> = Rgba([255u8, 255u8, 255u8, 0u8]);
-    for y in h..(background_heigth as u32 + h) {
+    for y in h..(banner_h as u32 + h) {
         for x in 0..w {
             newimg_buf.put_pixel(x, y, white_color);
         }
     }
-    // place banner
-    // println!("new image:size {} x {}", newimg_buf.width(), newimg_buf.height() );
-    // println!("{} {} {}x{}",background_heigth, h + (background_heigth/watermark_scale/2.0 ) as u32 ,banner_img.width(), banner_img.height());
-    newimg_buf.copy_from(banner_img, w/2, h + (background_heigth * ( 1.0 - 1.0 / WATERMARK_SCALE) / 2.0 ) as u32) ?;
-    // println!("copy 139---{:?}", start_time.elapsed());
-    // draw all text.
-    let first_text_y =     h + ((background_heigth as f32 * 0.25) as u32);
-    let second_text_y =     h + ((background_heigth as f32 * 0.55) as u32);
-    let second_text_x =     (w as f32 * 0.63) as u32;
-    let texts = vec![
-        ( camera_device, background_heigth * 0.25 ,((w as f32 * 0.03) as u32, first_text_y), 1.0, &font, Rgba([0u8, 0u8, 0u8, 0])),  // brand
-        ( &composit_text, background_heigth * 0.20 ,(second_text_x , first_text_y), 1.0, &font, Rgba([0u8, 0u8, 0u8, 0])), // 20mm f/1.8 1/100 iso 100
-        ( data_time, background_heigth * 0.20,(second_text_x , second_text_y), 1.0, &font, Rgba([168u8, 168u8, 168u8, 0])), // data
-    ];
-
-    for x in texts.iter() {
-        generator_draw_text(x.0, x.1, x.2, x.3, x.4, x.5, &mut newimg_buf);
-    }
-    // println!("draw 153---{:?}", start_time.elapsed());
 
     // place colume split line.
     let col_color: Rgba<u8> = Rgba([168u8, 168u8, 168u8, 0]);
-    for y in h + (background_heigth/WATERMARK_SCALE/2.0) as u32..(h + (background_heigth - background_heigth/WATERMARK_SCALE/2.0 ) as u32) {
-        for x in (w as f32 * 0.60) as u32..(w as f32 * 0.60 + 2.0) as u32 {
+    let line_shift_h = banner_h * (1.0 - watermark_scale) / 2.0;
+    for y in h + line_shift_h  as u32..(h + (banner_h - line_shift_h ) as u32) {
+        for x in (w as f32 * position_ratio) as u32..(w as f32 * position_ratio + 2.0) as u32 {
             newimg_buf.put_pixel(x, y, col_color);
         }
+    }   
+    
+    // place logo.png
+    newimg_buf.copy_from(&logo_img, (w as f32 * position_ratio - new_logo_w) as u32 - split_line_spacing - 2, 
+                    h + ((banner_h - new_logo_h) / 2.0) as u32) ?;
+
+    // text 
+    let first_text_y =  line_shift_h  as u32 + h;
+    let second_text_y =     h + ((banner_h as f32 * 0.55) as u32); // TODO ????
+    let second_text_x =     (w as f32 * position_ratio) as u32 + split_line_spacing;
+    let texts = vec![
+        ( camera_device, banner_h * 0.25 ,((w as f32 * 0.03) as u32, first_text_y), 1.0, &font, Rgba([0u8, 0u8, 0u8, 0])),  // brand
+        ( &composit_text, banner_h * 0.20 ,(second_text_x , first_text_y), 1.0, &font, Rgba([0u8, 0u8, 0u8, 0])), // 20mm f/1.8 1/100 iso 100
+        ( data_time, banner_h * 0.18,(second_text_x , second_text_y), 1.0, &font, Rgba([168u8, 168u8, 168u8, 0])), // data
+    ];
+    // text
+    for x in texts.iter() {
+        generator_draw_text(x.0, x.1, x.2, x.3, x.4, x.5, &mut newimg_buf);
     }
+    //-----------------------------------
+    // let (mut banner_w, mut banner_h) = (logo_img.width() as f32, logo_img.height() as f32);
+    // let mut banner_h = banner_h as f32 * watermark_scale;
+    // let mut temp_banner_img = DynamicImage::new_rgba8(1, 1);
+    // if h as f32 / 5.5 < banner_h {
+    //     let bg_scale = h as f32 / 5.5 / banner_h;
+    //     temp_banner_img =  logo_img.resize((banner_w * bg_scale) as u32 , (banner_h  * bg_scale) as u32, FilterType::Triangle);
+    //     logo_img = &temp_banner_img;
+    //     banner_h = h as f32 / 5.5;
+    // }
+    // println!("{} x {}", banner_w, banner_h);
+    // place src image
     // println!("draw 162---{:?}", start_time.elapsed());
     // draw text do--> generator_draw_text("f 1.8 1/0 ", 40.0, (banner_w/2, banner_h/3),
     //     1.0, &font, Rgba([179, 63u8, 60u8, 0]), &mut newimg_buf);
     // let img_path = "./tests/DSCN0010-99.jpg";
+    /* ======================output_file====================== */
     let output_filename = Path::new(&img_path);
     let output_dir = Path::new(output_path);
     let file_prefix = output_filename.file_name().unwrap();
