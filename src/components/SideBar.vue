@@ -54,8 +54,8 @@
                 </el-footer>
                 <div @click="toggleDarkMode" class="darkBtn">
                     <el-icon>
-                        <i-ep-arrow-right v-if="isDark" />
-                        <i-ep-arrow-left v-else />
+                        <i-ep-sunny v-if="isDark" />
+                        <i-ep-sunrise v-else />
                     </el-icon>
                 </div>
             </el-menu>
@@ -71,7 +71,6 @@ import { sidebarReactives } from "../scripts/reactives";
 import { useDark, useToggle } from "@vueuse/core";
 //引入路由
 import { useRoute, useRouter } from "vue-router";
-import { ElNotification } from "element-plus";
 
 //自定义指令
 const vResize = {
@@ -93,11 +92,6 @@ const vResize = {
 
 //获取鼠标点击消除遮罩
 const changeThisCollapse = () => {
-    ElNotification({
-    message: "tests",
-    type: "success",
-    title: "🐮----🍺"
-    })
     sidebarReactives.changeThisCollapse()
 };
 
@@ -142,7 +136,7 @@ onMounted(() => {
 
 <style scoped>
 .elmenu {
-    z-index: 99;
+    z-index: 101;
     position: absolute;
     left: 0;
     height: 100%;

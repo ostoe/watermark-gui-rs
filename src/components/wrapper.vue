@@ -5,6 +5,7 @@ import SideBar from "./SideBar.vue";
 import TopBar from "./TopBar.vue";
 import picList from "./PicList.vue";
 import BaseSettingsDrawerVue from "./BaseSettingsDrawer.vue";
+import PreviewWidget from "./PreviewWidget.vue";
 
 import { ref, onMounted } from "vue";
 // import { Context } from "vm";
@@ -18,12 +19,10 @@ const changeThisCollapse = () => {
   sidebarReactives.changeThisCollapse();
 };
 
-
+// const picSrc = ref("https://github.com/tauri-apps/tauri/blob/dev/.github/splash.png")
 </script>
 
 <template lang="">
-               
-
   <div class="common-layout index">
     <div class="elcontainer">
       <SideBar>
@@ -48,6 +47,9 @@ const changeThisCollapse = () => {
         <el-divider></el-divider>
         <el-main>
           <el-container direction="vertical">
+            <PreviewWidget>
+              <el-image src="https://fuss10.elemecdn.com/a/3f/3302e58f9a181d2509f3dc0fa68b0jpeg.jpeg"></el-image>
+            </PreviewWidget>
             <!-- <el-row > -->
             <!-- <HelloWorld msg="Vite + Vue" /> -->
             <!-- <TextImageProcess /> -->
@@ -89,7 +91,7 @@ const changeThisCollapse = () => {
   left: 0 auto;
   width: 100%;
   height: 100%;
-  z-index: 98;
+  z-index: 100;
   background-color: #000;
   opacity: 0.7;
 }
