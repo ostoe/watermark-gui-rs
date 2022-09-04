@@ -1,6 +1,7 @@
 
   <script lang="ts" setup>
  import { resolve, resourceDir } from '@tauri-apps/api/path';
+ import { convertFileSrc } from '@tauri-apps/api/tauri';
   import { reactive, ref } from 'vue'
   //   import { ElDrawer, ElMessageBox } from 'unp'
   import { invoke } from '@tauri-apps/api';
@@ -9,12 +10,12 @@
 
   
   
-  const settingsDrawer = ref(true);
+  const settingsDrawer = ref(false);
   const loading = ref(false);
   const qulity = ref(85);
   const form = reactive({
       brands: [{ value: 'canon', label: "佳能" }, { value: 'nikon', label: "尼康" }, { value: 'sony', label: "索尼" }, 
-                {value: "lumix", label: "松下"}, {value: "fujifilm", label: "富士"} ],
+                {value: "panasonic", label: "松下"}, {value: "fujifilm", label: "富士"} ],
       name: '',
       brand: '',
       delivery: false,
@@ -29,11 +30,16 @@
 
 function  get_image_url(value: string) {
         // const resource_dir = await resourceDir();
+        // \\?\G:\workspace\watermark-app\src-tauri\target\debug\
+        // return convertFileSrc("C:\\Users\\fly\\Pictures\\DSC0118.-w.jpg");
         console.log(resource_imge_patten.value);
         const p = resource_imge_patten.value.replace("---value---", value+".png");
-        console.log(p);
-        return p;
+        let ap = convertFileSrc(p);
+        console.log(ap);
+        return ap;
   }
+
+
   
   interface UserSettings {
       output_dir: string,
@@ -113,7 +119,7 @@ function  get_image_url(value: string) {
     <!-- <div @mouseenter="settingShow" @mouseleave="settingHidden">  -->
 
     <el-drawer v-model="settingsDrawer" title="基本设置" :before-close="handleClose" direction="rtl" size="30%">
-        <!-- <el-image style="width: 150px; height: 150px" src="../../src-tauri/resources/canon.png" fit="fill" loading="eager" /> -->
+        <!-- <el-image style="width: 150px; height: 150px" :src="get_image_url('a')" fit="contain" loading="eager" /> -->
         <el-scrollbar wrap-class="max-height:200px">
             <el-checkbox v-model="autoSelect" label="根据exif自动设置" size="large" border />
             <el-select v-model="form.brand" :placeholder="form.brands[1].label" :disabled="autoSelect" style="margin: 20px 0 20px 0">
@@ -121,10 +127,10 @@ function  get_image_url(value: string) {
                     <span style="float:left">{{ brand.label }}</span>
                     <span style="float: right;color: var(--el-text-color-secondary);font-size: 20px;">
                         <!-- <el-image style="width: 50px; height: 50px" :src="get_image_url(brand.value)" fit="fill" loading="eager" /> -->
-                        <el-image style="width: 50px; height: 50px" src="./resources/sony.png" fit="fill" loading="eager" />
-                        <el-icon>
+                        <el-image style="width: 35px; height: 35px" :src="get_image_url(brand.value)" fit="contain" loading="eager" />
+                        <!-- <el-icon>
                             <i-ep-picture />
-                        </el-icon>
+                        </el-icon> -->
                     </span>
                 </el-option>
             </el-select>

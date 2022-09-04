@@ -15,7 +15,7 @@ pub fn control_center_thread(
     operation_st: Receiver<UserOperation>,
     notify_front_st: Sender<Notification>,
 ) {
-    let BRANDS= ["nikon", "canon", "sony", "lumix", "fujifilm"];
+    let BRANDS= ["nikon", "canon", "sony", "panasonic", "fujifilm"];
     if let UserOperation::Init(resources_path) = operation_st.recv().unwrap() {
         let (mut font, mut brand_map) = _init(resources_path, &BRANDS);
         let mut is_pause = true;
@@ -97,6 +97,8 @@ pub fn control_center_thread(
                     let image_path = image_list.get(index).unwrap();
                     let start_time = std::time::Instant::now();
                     if let Some(exif_data) = image_processing::read_exif(image_path) {
+                        // ImageInfo { width: 1200, height: 800, pixel_format: RGB24, coding_process: DctSequential } 284 
+                        // exif_data.get(&rexif::ExifTag::Make). Option::unwrap()` on a `None` value
                         println!("read exif---{:?}", start_time.elapsed());
                         // todo let brand = exif_data.get(&rexif::ExifTag::Make).unwrap();
                         // 
