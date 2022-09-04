@@ -184,4 +184,10 @@ function message(msg: string) {
     position: "bottom-left",
   });
 }
-export { image_progress, sidebarReactives };
+
+//previewwidget 公共
+const previewwidget=reactive({
+  inputValue:false
+})
+
+export { image_progress, sidebarReactives, previewwidget };
