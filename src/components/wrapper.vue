@@ -22,8 +22,6 @@ const changeThisCollapse = () => {
 </script>
 
 <template lang="">
-                <BaseSettingsDrawerVue />
-
   <div class="common-layout index">
     <div class="elcontainer">
       <SideBar>
@@ -48,6 +46,7 @@ const changeThisCollapse = () => {
         <el-divider></el-divider>
         <el-main>
           <el-container direction="vertical">
+              <!-- <BaseSettingsDrawerVue /> -->
             <!-- <el-row > -->
             <!-- <HelloWorld msg="Vite + Vue" /> -->
             <!-- <TextImageProcess /> -->

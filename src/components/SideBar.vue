@@ -1,7 +1,4 @@
 <template>
-    <el-drawer v-model="drawer" title="I am the title" :with-header="false">
-    <span>Hi there!</span>
-  </el-drawer>
     <el-container>
         <el-aside width="50px">
             <el-menu :default-active="activeMenuId" class="elmenu" :collapse="sidebarReactives.isCollapse"

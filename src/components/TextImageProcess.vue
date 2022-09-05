@@ -9,7 +9,7 @@ import { open } from "@tauri-apps/api/dialog";
 import { appDir } from "@tauri-apps/api/path";
 import { pictureDir } from '@tauri-apps/api/path';
 import { watch } from "fs";
-import BaseSettingsDrawerVue from "./BaseSettingsDrawer.vue";
+// import BaseSettingsDrawerVue from "./BaseSettingsDrawer.vue";
 
 const isCollapse = ref(true);
 // const progress_count = ref({ completed: 0, total: 0 });
