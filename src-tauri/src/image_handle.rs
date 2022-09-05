@@ -1,6 +1,9 @@
 use std::{
+    collections::HashMap,
+    ffi::OsStr,
     io::{BufReader, Read},
-    path::{Path, PathBuf, self}, collections::HashMap,
+    path::{self, Path, PathBuf},
+    vec,
 };
 
 use crate::{
@@ -8,14 +11,14 @@ use crate::{
     image_processing,
 };
 use crossbeam_channel::{Receiver, Sender};
-use image::{DynamicImage, GenericImageView, GenericImage};
+use image::{DynamicImage, GenericImage, GenericImageView};
 use rusttype::Font;
 
 pub fn control_center_thread(
     operation_st: Receiver<UserOperation>,
     notify_front_st: Sender<Notification>,
 ) {
-    let BRANDS= ["nikon", "canon", "sony", "panasonic", "fujifilm"];
+    let BRANDS = ["nikon", "canon", "sony", "panasonic", "fujifilm"];
     if let UserOperation::Init(resources_path) = operation_st.recv().unwrap() {
         let (mut font, mut brand_map) = _init(resources_path, &BRANDS);
         let mut is_pause = true;
@@ -30,9 +33,9 @@ pub fn control_center_thread(
         let mut watermark_ratio = 0.1172f32 * 0.8;
         let mut WATERMARK_SCALE = 0.50;
         let mut logo_ratio = 0.70f32;
-        let mut logo_spacing_ratio = 0.35f32;  // if nokon logo should 1
+        let mut logo_spacing_ratio = 0.35f32; // if nokon logo should 1
         let mut position_ratio = 0.6267f32;
-        let mut split_line_spacing = 30u32; // px doubel = 10 
+        let mut split_line_spacing = 30u32; // px doubel = 10
 
         // user params: --------------------------------end
         loop {
@@ -50,9 +53,35 @@ pub fn control_center_thread(
                     index = 0;
                     is_pause ^= true
                 }
-                UserOperation::DirPath(path) => {
-                    // gen imagelist_  image_index = 0
-                    image_length = 10
+                UserOperation::DirPath(dir_path) => {
+                    // clear
+                    image_list = vec![];
+                    index = 0;
+                    image_length = 0;
+                    is_pause = true;
+                    if let Ok(entrys) = std::fs::read_dir(dir_path) {
+                        for entry in entrys {
+                            if let Ok(file) = entry {
+                                let p = file.path();
+                                match p.extension().unwrap_or(OsStr::new("")).to_str().unwrap() {
+                                    "jpg" | "JPEG" | "JPG" | "jpeg" => {
+                                        let pa = p.to_str().unwrap();
+                                        image_list.push(String::from(pa));
+                                        image_length += 1;
+                                        
+                                    }
+                                    _ => {}
+                                }
+                            }
+                            // println!("Name: {}", path.unwrap().path().display());
+                        }
+                        index = 0;
+                        is_pause ^= true;
+                        notify_front_st.send(Notification::Single(String::from("jpg_file_count"), image_length.to_string() ));
+                        // panic!("hekkl");
+                    } else {
+                        notify_front_st.send(Notification::Error(String::from("文件夹解析失败")));
+                    }
                 }
 
                 UserOperation::Pause => {
@@ -64,29 +93,29 @@ pub fn control_center_thread(
                     image_length = 0usize;
                     index = 0usize;
                 }
-                UserOperation::Update(user_setting) =>  match user_setting {
-                        UserSetting::OutputDir(path) => {
-                            output_path = path;
-                            println!("outputDir update --> {}", output_path);
-                        },
-                        UserSetting::Qulity(q) =>  {qulity = q;},
-                        UserSetting::AutoUseBrand(is, v) => {
-                            if !is {
-                                auto_user_brand = false;
-                                brand = v;
-                            } else {
-                                auto_user_brand = true;
-                            }
-                        },
-                        UserSetting::Font(path) => {
-                            // update font
+                UserOperation::Update(user_setting) => match user_setting {
+                    UserSetting::OutputDir(path) => {
+                        output_path = path;
+                        println!("outputDir update --> {}", output_path);
+                    }
+                    UserSetting::Qulity(q) => {
+                        qulity = q;
+                    }
+                    UserSetting::AutoUseBrand(is, v) => {
+                        if !is {
+                            auto_user_brand = false;
+                            brand = v;
+                        } else {
+                            auto_user_brand = true;
                         }
-
-                        _ => { }
-                    
+                    }
+                    UserSetting::Font(path) => {
+                        // update font
                     }
 
-                
+                    _ => {}
+                },
+
                 _ => {
                     println!("error option.")
                 }
@@ -97,15 +126,16 @@ pub fn control_center_thread(
                     let image_path = image_list.get(index).unwrap();
                     let start_time = std::time::Instant::now();
                     if let Some(exif_data) = image_processing::read_exif(image_path) {
-                        // ImageInfo { width: 1200, height: 800, pixel_format: RGB24, coding_process: DctSequential } 284 
+                        // ImageInfo { width: 1200, height: 800, pixel_format: RGB24, coding_process: DctSequential } 284
                         // exif_data.get(&rexif::ExifTag::Make). Option::unwrap()` on a `None` value
                         println!("read exif---{:?}", start_time.elapsed());
                         // todo let brand = exif_data.get(&rexif::ExifTag::Make).unwrap();
-                        // 
+                        //
                         let mut tmp_logo_spacing_ratio = logo_spacing_ratio;
                         if auto_user_brand {
                             let camera_make = exif_data.get(&rexif::ExifTag::Make).unwrap();
-                            let make_vec: Vec<String> = camera_make.split(" ").map(|x| String::from(x) ).collect();
+                            let make_vec: Vec<String> =
+                                camera_make.split(" ").map(|x| String::from(x)).collect();
                             // println!("{:?}", make_vec);
                             brand = make_vec[0].to_lowercase();
                             // *band --> str   &*brand --> &str :::::   String --> &str
@@ -117,7 +147,7 @@ pub fn control_center_thread(
                             image_path,
                             &output_path,
                             &font,
-                            brand_map.get(&*brand).expect("brand error..."),
+                            brand_map.get(&*brand).expect("brand error..."), // if "Samsung Techwin" panic...
                             exif_data,
                             qulity,
                             watermark_ratio,
@@ -170,7 +200,10 @@ pub fn control_center_thread(
     }
 }
 
-fn _init<'a>(path: PathBuf, brands: &'a [&str; 5]) -> (Font<'static>, HashMap<&'a str, DynamicImage>) {
+fn _init<'a>(
+    path: PathBuf,
+    brands: &'a [&str; 5],
+) -> (Font<'static>, HashMap<&'a str, DynamicImage>) {
     // read font
     let font_path = path.join("OPPOSans-H.ttf");
     let font_file = std::fs::File::open(font_path).expect("failed to open file");
@@ -179,7 +212,7 @@ fn _init<'a>(path: PathBuf, brands: &'a [&str; 5]) -> (Font<'static>, HashMap<&'
     let _read_result = font_read.read_to_end(&mut font);
     let font = Font::try_from_vec(font).unwrap();
     //read logo * 3
-    let mut map:  HashMap<&str, DynamicImage> = HashMap::new();
+    let mut map: HashMap<&str, DynamicImage> = HashMap::new();
     for brand in brands.iter() {
         let brand_with_ex = format!("{}.png", *brand);
         let mut img = image::open(path.join(brand_with_ex)).unwrap();
@@ -187,9 +220,11 @@ fn _init<'a>(path: PathBuf, brands: &'a [&str; 5]) -> (Font<'static>, HashMap<&'
             for y in 0..img.height() {
                 let mut p = img.get_pixel(x, y);
                 if p[3] == 0 {
-                    p[0] = 255; p[1]=255; p[2]=255;
+                    p[0] = 255;
+                    p[1] = 255;
+                    p[2] = 255;
                 }
-                p[3]=0;
+                p[3] = 0;
                 img.put_pixel(x, y, p)
             }
         }

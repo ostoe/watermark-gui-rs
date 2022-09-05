@@ -26,7 +26,8 @@
 				"removeDir": true,
 				"removeFile": true,
 				"renameFile": true,
-				"writeFile": true
+				"writeFile": true,
+        "scope":["*"]
 			},
 			"protocol": {
 				"all": true,

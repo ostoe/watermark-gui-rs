@@ -27,6 +27,9 @@ interface ImageProps {
   count: number
 }
 
+interface NotificationBackEnd {
+  jpg_file_count: number
+}
 
 const message=(msg: string)=> {
     ElNotification({
@@ -73,6 +76,11 @@ async function backend_event_recv() {
     // let state_code = Number(event.payload.message.substring(0, 4));
     // let data = event.payload.message.substring(4);
     switch (event.payload.state_code) {
+      case 100:
+        console.log(event.payload.message + "--- ");
+        let result: NotificationBackEnd = JSON.parse(event.payload.message);
+        image_progress.update_progress(0, result.jpg_file_count);
+        break;
       case 200:
         image_progress.increase_one();
         // progress.update_progress(progress.count.completed, progress.count.total);
@@ -88,6 +96,7 @@ async function backend_event_recv() {
       default: console.log("unknown nofitication.: " + event.payload.message);
     }
     if (image_progress.count.completed == image_progress.count.total) {
+      image_progress.status_toogle();
       message(
         `[r] : 已完成处理！`
       );

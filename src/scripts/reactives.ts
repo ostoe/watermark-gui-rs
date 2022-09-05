@@ -1,8 +1,8 @@
 // import { reactive } from "vue";
 import { open } from "@tauri-apps/api/dialog";
-import { invoke } from '@tauri-apps/api'
+import { fs, invoke } from '@tauri-apps/api'
+import { resolve, resourceDir } from '@tauri-apps/api/path';
 // import { ElNotification,ElMessage } from "element-plus/es/components";
-
 
 // sidebar公共方法/值
 const sidebarReactives = reactive({
@@ -37,6 +37,8 @@ interface ImageProps {
   count: number;
 }
 
+
+
 // const tools = reactive({
 //   message(msg: string) {
 //     ElNotification({
@@ -48,10 +50,79 @@ interface ImageProps {
 //   },
 // });
 
+const resource_dir = ref("");
+// resource_dir: "",
+type UserDataType = {
+  qulity: number,
+  latestSelectedDirPath: string,
+  latestSelectedOutputPath: string,
+  autoUseBrand: boolean,
+  brand: string,
+  font: string,
+  brands: [{value: string, label: string}],
+}
+
+const user_conf = reactive({
+  qulity: 85,
+  latestSelectedDirPath: "",
+  latestSelectedOutputPath: "",
+  autoUseBrand: true,
+  brand: "nikon",
+  font: "",
+  user_conf_path: "",
+  brands: [{ value: 'canon', label: "佳能" }, { value: 'nikon', label: "尼康" }, { value: 'sony', label: "索尼" }, 
+                {value: "panasonic", label: "松下"}, {value: "fujifilm", label: "富士"} ],
+
+  async init_user_conf() {
+    resource_dir.value = await resourceDir();
+    this.user_conf_path = await resolve(resource_dir.value, "resources", "user.conf");
+    const contents = await fs.readTextFile(this.user_conf_path);
+    console.log("ccc:" + contents);
+    if (contents == "") {
+      console.log("kong");
+    } else {
+      console.log("kong1");
+      let user_data: UserDataType = JSON.parse(contents);
+      // let entries = Object.entries(user_data);
+      // for (let i=0; i < entries.length; i++) {
+      //   let key = entries[i][0]
+      //   let k2 = "autoUseBrand"
+      //   user_conf[k2] = entries[i][1];
+      // }
+      this.A2BAndB2A(user_conf, user_data);
+
+    }
+
+  },
+  // A.* <-- B.*
+  A2BAndB2A(A: any, B: any) {
+    A.autoUseBrand = B.autoUseBrand;
+    A.brand = B.brand;
+    A.font = B.font;
+    A.latestSelectedDirPath = B.latestSelectedDirPath;
+    A.latestSelectedOutputPath = B.latestSelectedOutputPath;
+    A.qulity = B.qulity;
+    A.brands = B.brands;
+  },
+
+  async save_user_conf() {
+    let user_save: UserDataType = new Object as UserDataType;
+    this.A2BAndB2A(user_save, user_conf);
+    let json_contents = JSON.stringify(user_save, null, 4);
+    await fs.writeTextFile(this.user_conf_path, json_contents);
+  }
+
+
+})
+
+
+
 const image_progress = reactive({
+  status: false,
   value: 90,
   count: { completed: 0, total: 0 },
   image_paths: { count: 0, image_paths: [""] },
+  image_dir_path: "",
   increase() {
     if (this.value <= 98) {
       this.value += 2;
@@ -61,6 +132,12 @@ const image_progress = reactive({
     }
   },
   //
+
+  status_toogle() {
+    this.status = !this.status;
+    // console.log(this.status);
+  },
+
   reset_progress() {
     this.value = 0;
     this.count.completed = 0;
@@ -92,7 +169,6 @@ const image_progress = reactive({
       }
       this.value = Math.round((value + Number.EPSILON) * 10000) / 100;
     }
-
     // color();
   },
 
@@ -103,7 +179,7 @@ const image_progress = reactive({
       image_paths: arr,
     } as ImageProps;
     image_progress.update_progress(0, arr.length);
-    message("selected: " + this.image_paths);
+    elmessage("selected: " + this.image_paths);
   },
 
   async selectFiles() {
@@ -123,7 +199,7 @@ const image_progress = reactive({
         image_paths: selected,
       } as ImageProps;
       image_progress.update_progress(0, selected.length);
-      message("selected: " + this.image_paths);
+      elmessage("selected: " + this.image_paths);
       // user selected multiple files
     } else if (selected === null) {
       // user cancelled the selection
@@ -137,7 +213,7 @@ const image_progress = reactive({
       // this.message("handle_json: " + handle_json.count);
       //   await process_single_image(handle_json);
       image_progress.update_progress(0, 1);
-      message("selected: " + this.image_paths);
+      elmessage("selected: " + this.image_paths);
     }
   },
 
@@ -146,11 +222,9 @@ const image_progress = reactive({
       key: key,
       value: value,
     });
-    message("update output dir: " + res);
+    elmessage("update output dir: " + res);
   },
   //
-
-
 
   async selectDirs() {
     const selected = await open({
@@ -158,25 +232,62 @@ const image_progress = reactive({
       multiple: false,
       // defaultPath: await appDir(),
     });
-    if (Array.isArray(selected)) {
-      console.log("selected dirs" + selected);
-      message("selected dirs" + selected);
-      // user selected multiple files
-    } else if (selected === null) {
+    if (selected === null) {
       // user cancelled the selection
       ElMessage({
         message: "null dir selected.",
         type: "warning",
       });
-    } else {
+    } else if (typeof selected == "string") {
       console.log("selected single dir " + selected);
-      message("selected single dir " + selected);
+      elmessage("selected single dir " + selected);
+      // this.update_user_data2BD("output_dir", selected);
+      this.image_dir_path = selected;
+    }
+  },
+
+
+  async selectOutputDirs() {
+    const selected = await open({
+      directory: true,
+      multiple: false,
+      defaultPath: "/Users/fly/Downloads",
+    });
+    if (selected === null) {
+      // user cancelled the selection
+      ElMessage({
+        message: "null dir selected.",
+        type: "warning",
+      });
+    } else if (typeof selected == "string") {
+      console.log("selected single dir " + selected);
+      elmessage("selected single dir " + selected);
       this.update_user_data2BD("output_dir", selected);
     }
   },
+
+  async process_image() {
+    if ((this.count.total != 0) && (this.count.completed != this.count.total)) {
+      let send_content = JSON.stringify(this.image_paths);
+      console.log(send_content);
+      let res = await invoke("handle_front_select_files", { imagesObj: this.image_paths });
+      elmessage("处理文件: " + res);
+    } else if (this.image_dir_path != "") {
+      console.log(this.image_dir_path);
+      let res = await invoke("handle_front_select_dir", { imageDir: this.image_dir_path });
+      elmessage("处理目录: " + res);
+
+    } else {
+      elmessage("未选择文件或已完成");
+
+    }
+
+  },
+
+  //
 });
 
-function message(msg: string) {
+function elmessage(msg: string) {
   ElNotification({
     message: msg,
     type: "success",
@@ -186,8 +297,15 @@ function message(msg: string) {
 }
 
 //previewwidget 公共
-const previewwidget=reactive({
-  inputValue:false
+const previewwidget = reactive({
+  inputValue: false
+})
+user_conf.init_user_conf();
+
+
+onMounted(() => {
+  console.log("mounted init");
+  user_conf.init_user_conf();
 })
 
-export { image_progress, sidebarReactives, previewwidget };
+export { image_progress, sidebarReactives, previewwidget, elmessage, user_conf };

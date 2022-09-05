@@ -28,7 +28,7 @@ pub enum UserOperation {
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Notification {
-    Single(String),
+    Single(String, String),
     Complated,
     Error(String),
     SkipFile(String),
