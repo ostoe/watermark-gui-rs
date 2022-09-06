@@ -60,7 +60,7 @@ pub fn process_single_image(img_path: &str, output_path: &str,  font: &Font, log
     exif_map: HashMap::<ExifTag, String>, 
     qulity: u8, watermark_ratio: f32, watermark_scale: f32, logo_spacing_ratio: f32, 
     position_ratio: f32,
-    logo_ratio: f32, split_line_spacing: u32
+    logo_ratio: f32, split_line_spacing: u32, index: &str, file_pattern: &[String; 3]
         ) -> image::ImageResult<()> {
     // convert to BannerStruct to draw..
     //
@@ -164,17 +164,36 @@ pub fn process_single_image(img_path: &str, output_path: &str,  font: &Font, log
     // let img_path = "./tests/DSCN0010-99.jpg";
     /* ======================output_file====================== */
     let output_filename = Path::new(&img_path);
-    let output_dir = Path::new(output_path);
     let file_prefix = output_filename.file_name().unwrap();
     let mut file_name_arr = file_prefix.to_str().unwrap().split(".").collect::<Vec<&str>>();
-    file_name_arr.pop();
-    let filename_suffix = format!("{}.{}", "-w", "jpg");
-    file_name_arr.push(&filename_suffix);
-    let file_prefix = file_name_arr.join(".");
+    file_name_arr.pop();// get filename without suffix ".jpg"
+    let mut target_filename = [String::new(), String::new(), String::new(), String::from(".jpg")];
+    //  suffix and preffix
+    for i in [0, 2]{
+        if file_pattern[i] == "" {
+            // do nothing
+        } else if file_pattern[i].contains("__custom__") {
+            target_filename[i] = file_pattern[i].replace("__custom__", "");
+        } else if file_pattern[i].contains("__serial_number__") {
+            target_filename[i] = file_pattern[i].replace("__serial_number__", "").replace("$x", index);
+        }
+    }
+    if file_pattern[1].contains("__custom__") {
+        target_filename[1] = file_pattern[1].replace("__custom__", "");
+    } else if file_pattern[1] == "" {
+        target_filename[1] = file_name_arr.join("");
+    }
+    
+    // let filename_suffix = format!("{}.{}", "-w", "jpg");
+    // file_name_arr.push(&filename_suffix);
+    // let file_prefix = file_name_arr.join(".");
+
+    let output_dir = Path::new(output_path);
     // println!("output: {}-{}-{}",output_dir.display(), file_prefix, filename_suffix);
-    let output_dir = output_dir.join(file_prefix);
+    let output_path = output_dir.join(target_filename.join(""));
+    println!("output: {}", output_path.display());
     // println!("mululljf-->{}", output_dir.display());
-    let fout = &mut BufWriter::new(File::create(output_dir).unwrap());
+    let fout = &mut BufWriter::new(File::create(output_path).unwrap());
     // let mut fout = &mut File::create(output_dir).unwrap();
     newimg_buf
         .write_to( fout, ImageOutputFormat::Jpeg(qulity))

@@ -20,20 +20,20 @@ type RenameType = {
 const formLabelWidth = '80px'
 //   let timer
 const renamePreffix = ref({
-    SD: [{ id: 1, label: "空", value: "" }, { id: 2, label: "自定义", value: "" }, { id: 3, label: "自定义+【序号】", value: "[$x]" }],
+    SD: [{ id: 1, label: "空", value: "" }, { id: 2, label: "自定义", value: "__custom__" }, { id: 3, label: "自定义+【序号】", value: "__serial_number__" }],
     value: { id: 1, label: "空", value: "" },
     input: "",
     valid: true,
 });
 const renameCenter = ref({
-    SD: [{ id: 1, label: "原名称", value: "__keep__" }, { id: 2, label: "自定义", value: "2022" }],
-    value: { id: 1, label: "原名称", value: "__keep__" },
+    SD: [{ id: 1, label: "原名称", value: "" }, { id: 2, label: "自定义", value: "__custom__" }],
+    value: { id: 1, label: "原名称", value: "" },
     input: "",
     valid: true,
 });
 const renameSuffix = ref({
-    SD: [{ id: 1, label: "空", value: "" }, { id: 2, label: "自定义", value: "-w" }, { id: 3, label: "自定义+【序号】", value: "[$x]" }],
-    value: { id: 2, label: "自定义", value: "-w" },
+    SD: [{ id: 1, label: "空", value: "" }, { id: 2, label: "自定义", value: "__custom__" }, { id: 3, label: "自定义+【序号】", value: "__serial_number__" }],
+    value: { id: 2, label: "自定义", value: "__custom__" },
     input: "-w",
     valid: true,
 });
@@ -51,7 +51,7 @@ function check_input_suffix() {
 }
 
 function resetConfirmEvent() {
-
+ //#TODO
 }
 
 const preview_filename = ref(["", "", "", ".jpg"]);
@@ -153,11 +153,17 @@ interface UserSettings {
     qulity: number,
     auto_user_brand: boolean,
     brand: string,
+    filename_pattern: Array<string>,
 }
 
 async function saveSetting() {
     if (renamePreffix.value.valid && renameCenter.value.valid && renameSuffix.value.valid) {
-        let user_data: UserSettings = { output_dir: "", qulity: baseForm.value.qulity, auto_user_brand: baseForm.value.autoUseBrand, brand: baseForm.value.brand };
+        let filename_tmp = ["", "", ""];
+        if (renamePreffix.value.value.value != "") { filename_tmp[0] =  renamePreffix.value.value.value + renamePreffix.value.input;}
+        if (renameCenter.value.value.value != "") { filename_tmp[1] =  renameCenter.value.value.value + renameCenter.value.input;}
+        if (renameSuffix.value.value.value != "") { filename_tmp[2] =  renameSuffix.value.value.value + renameSuffix.value.input;}
+        console.log(filename_tmp);
+        let user_data: UserSettings = { output_dir: "", qulity: baseForm.value.qulity, auto_user_brand: baseForm.value.autoUseBrand, brand: baseForm.value.brand, filename_pattern: filename_tmp };
         //   console.log(user_data);
         user_conf.save_user_conf(baseForm.value);
         let res: string = await invoke("handle_front_update_user_data", { userData: user_data });
