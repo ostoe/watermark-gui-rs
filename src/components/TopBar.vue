@@ -7,7 +7,7 @@ import { image_progress,previewwidget } from '../scripts/reactives';
 import { invoke } from '@tauri-apps/api';
 import { appDir, configDir, homeDir, localDataDir, logDir, resourceDir, fontDir } from '@tauri-apps/api/path';
 import { ElMessage, ElNotification } from "element-plus";
-import BaseSettingsDrawerVue from "./BaseSettingsDrawer.vue";
+import BaseSettingsDrawer from "./BaseSettingsDrawer.vue";
 import {RotateSquare4, PingPong} from 'vue-loading-spinner';
 
 // const percentage = ref(90);
