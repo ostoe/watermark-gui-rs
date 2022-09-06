@@ -8,6 +8,7 @@ import { invoke } from '@tauri-apps/api';
 import { user_conf, UserDataType } from '../scripts/reactives'
 import { elmessage } from '../scripts/reactives';
 import { Ref } from 'vue';
+import {InfoFilled} from '@element-plus/icons-vue';
 
 type RenameType = {
     SD: Array<{ id: number, value: string, label: string }>,
@@ -39,28 +40,32 @@ const renameSuffix = ref({
 
 const reg = /^[a-zA-Z0-9\u4e00-\u9fa5_ ~!@#$%^&*()_+=～！@#¥%……&*–—‘’“”…、。〈〉《》「」『』【】〔〕！（），．：；？、\-\$\[\]]+$/;
 function check_input_prefix() {
-    check_input(renamePreffix);
+    check_input(renamePreffix, 0);
 }
 
 function check_input_center() {
-    check_input(renameCenter);
+    check_input(renameCenter, 1 );
 }
 function check_input_suffix() {
-    check_input(renameSuffix);
+    check_input(renameSuffix, 2);
 }
 
+function resetConfirmEvent() {
 
-function check_input(rename: Ref<RenameType>) {
+}
+
+const preview_filename = ref(["", "", "", ".jpg"]);
+
+function check_input(rename: Ref<RenameType>, preview_index: number) {
     console.log("-----" + "value");
 
     // let a = [renamePreffix, renameCenter, renameSuffix];
     // for (let i = 0; i < 3; i++) {
     let t = rename.value;
-    console.log(rename);
-    console.log(t);
     if (t.value.id == 2) {
         if (reg.test(t.input)) {
             t.valid = true;
+            preview_filename.value[preview_index] = t.input;
         }
         else {
             t.valid = false;
@@ -68,8 +73,14 @@ function check_input(rename: Ref<RenameType>) {
     } else if (t.value.id == 3) {
         if (t.input.includes("$x") && reg.test(t.input)) {
             t.valid = true;
+            preview_filename.value[preview_index] = t.input.replaceAll("$x", "1");
+        } else {
+            t.valid = false;
         }
     } else {
+        if (preview_index == 1) {
+            preview_filename.value[preview_index] = "basename";
+        }
         // == 1 ???
     }
     // }
@@ -79,16 +90,20 @@ function check_input(rename: Ref<RenameType>) {
 function check_select_prefix() {
     if (renamePreffix.value.value.id == 1) {
         renamePreffix.value.valid = true
+        preview_filename.value[0] = "";
     }
 }
 function check_select_center() {
     if (renameCenter.value.value.id == 1) {
         renameCenter.value.valid = true
+        preview_filename.value[1] = "basename";
     }
 }
+
 function check_select_suffix() {
     if (renameSuffix.value.value.id == 1) {
         renameSuffix.value.valid = true
+        preview_filename.value[2] = "";
     }
 }
 
@@ -228,7 +243,7 @@ onMounted(() => {
         <el-scrollbar wrap-class="max-height:200px">
             <el-checkbox v-model="baseForm.autoUseBrand" label="根据exif自动设置" size="large" border />
             <el-select v-model="baseForm.brand" :placeholder="baseForm.brands[1].label"
-                :disabled="baseForm.autoUseBrand" style="margin: 20px 0 20px 0" >
+                :disabled="baseForm.autoUseBrand" style="margin: 20px 0 20px 0">
                 <el-option v-for="brand in baseForm.brands" :key="brand.value" :label="brand.label"
                     :value="brand.value">
                     <span style="float:left">{{ brand.label }}</span>
@@ -260,16 +275,16 @@ onMounted(() => {
                 <el-col :span="8">
                     <div class="grid-content ep-bg-purple-light" />
                     <p style="margin-left: 10px">名称中间</p>
-                    <el-select v-model="renameCenter.value" class="m-2" placeholder="Select" value-key="id"
-                        size="large" :change="check_select_center()">
+                    <el-select v-model="renameCenter.value" class="m-2" placeholder="Select" value-key="id" size="large"
+                        :change="check_select_center()">
                         <el-option v-for="item in renameCenter.SD" :key="item.id" :label="item.label" :value="item" />
                     </el-select>
                 </el-col>
                 <el-col :span="8">
                     <div class="grid-content ep-bg-purple" />
                     <p style="margin-left: 10px">名称后缀</p>
-                    <el-select v-model="renameSuffix.value" class="m-2" placeholder="Select" value-key="id"
-                        size="large" :change="check_select_suffix()">
+                    <el-select v-model="renameSuffix.value" class="m-2" placeholder="Select" value-key="id" size="large"
+                        :change="check_select_suffix()">
                         <el-option v-for="item in renameSuffix.SD" :key="item.id" :label="item.label" :value="item" />
                     </el-select>
                 </el-col>
@@ -284,25 +299,38 @@ onMounted(() => {
                 </el-col>
                 <el-col :span="8">
                     <div class="grid-content ep-bg-purple-light" />
-                    <el-input v-model="renameCenter.input" :disabled="renameCenter.value.id == 1" :blur="check_input_center()">
+                    <el-input v-model="renameCenter.input" :disabled="renameCenter.value.id == 1"
+                        :blur="check_input_center()">
                         "自定义后缀" </el-input>
 
                 </el-col>
                 <el-col :span="8" id="invalidInputCss">
                     <div class="grid-content ep-bg-purple" />
-                    <el-input v-model="renameSuffix.input" :disabled="renameSuffix.value.id == 1" :blur="check_input_suffix()">
+                    <el-input v-model="renameSuffix.input" :disabled="renameSuffix.value.id == 1"
+                        :blur="check_input_suffix()">
                         "自定义后缀" </el-input>
                 </el-col>
             </el-row>
             <el-row>
-                preview filename
+                <el-button 
+      key="button.text"
+      type="primary"
+      text
+      > {{ preview_filename.join("") }} </el-button
+    >
+                
             </el-row>
 
         </el-scrollbar>
 
         <div style="margin: 10px 0 20% 0; border-bottom: 0%;">
             <el-row>
-                <el-button type="primary" size="small"> reset </el-button>
+                <el-popconfirm confirm-button-text="是" cancel-button-text="否" :icon="InfoFilled" icon-color="#626AEF"
+                    title="重置确认" @confirm="resetConfirmEvent" @cancel="">
+                    <template #reference>
+                        <el-button type="primary" size="small">reset</el-button>
+                    </template>
+                </el-popconfirm>
                 <el-button type="primary" size="large" @click="saveSetting"> 保存 </el-button>
             </el-row>
         </div>
