@@ -44,24 +44,33 @@ event.listen('tauri://file-drop-hover', (e) => {
  - 集成其他工具，如计算景深 超焦距之类
  - 进度条
  - 字体啊，logo位置、比例，还有日期格式，自定义显示光圈iso与否，放在高级设置里面了
+ - 记录用户数据，输出文件夹之类的。
+ - font size test...
+ - replace Dynamic with ImageBuffer<u8>....
 
 
 
 -------------------
 ```error
-image/tiff
-read exif ok
-read exif---2.4659ms
-read image---9.0118174s
-453 x 453
-resize ---9.5345489s
-copy 126---14.2708617s
-copy 139---14.6111246s
-draw 153---14.7396533s
-draw 162---14.739949s
-write image---42.3066473s
-write ok
+水印比例：
+
+0.13
+
+15000 1758
+
+16  9  0.28
+4   3  0.156
+相机直出4128 2735    3:2   0.1758
 ```
 
-
+unplugin autoimport 最佳实践
 ref: https://github.com/zzzgydi/clash-verge/blob/66ccbf70f8d51153ef097fb62deae833c683b26c/src-tauri/src/main.rs
+
+
+
+
+图像插值使用：[参考](https://stackoverflow.com/questions/23853632/which-kind-of-interpolation-best-for-resizing-image)
+
+如果要放大图像，您应该更喜欢使用INTER_LINEAR或INTER_CUBIC插值。如果要缩小图像，您应该更喜欢使用INTER_AREA插值。
+三次插值在计算上更复杂，因此比线性插值慢。但是，生成的图像的质量会更高。
+

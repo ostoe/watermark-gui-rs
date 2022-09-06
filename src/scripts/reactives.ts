@@ -1,7 +1,7 @@
-import { reactive } from "vue";
-import { ElMessage, ElNotification } from "element-plus";
+// import { reactive } from "vue";
 import { open } from "@tauri-apps/api/dialog";
 import { invoke } from '@tauri-apps/api'
+// import { ElNotification,ElMessage } from "element-plus/es/components";
 
 
 // sidebar公共方法/值
@@ -97,6 +97,14 @@ const image_progress = reactive({
   },
 
   //
+  dragFiles(arr: Array<string>) {
+    this.image_paths = {
+      count: arr.length,
+      image_paths: arr,
+    } as ImageProps;
+    image_progress.update_progress(0, arr.length);
+    message("selected: " + this.image_paths);
+  },
 
   async selectFiles() {
     const selected = await open({
@@ -134,13 +142,15 @@ const image_progress = reactive({
   },
 
   async update_user_data2BD(key: string, value: string) {
-    let res = await invoke("handle_front_update_data", {
+    let res = await invoke("handle_front_update_key", {
       key: key,
       value: value,
     });
     message("update output dir: " + res);
   },
   //
+
+
 
   async selectDirs() {
     const selected = await open({
@@ -174,4 +184,10 @@ function message(msg: string) {
     position: "bottom-left",
   });
 }
-export { image_progress, sidebarReactives };
+
+//previewwidget 公共
+const previewwidget=reactive({
+  inputValue:false
+})
+
+export { image_progress, sidebarReactives, previewwidget };

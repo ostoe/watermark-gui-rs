@@ -1,213 +1,352 @@
 <template>
-         <div class="widget"
-    v-if="inputValue"
-    :style="{
-      top : realTop + 'px',
-      right : realRight + 'px',
-      height : realHeight + 'px',
-      width : realWidth + 'px',
-      left : realLeft + 'px'
-    }"
-  >
-    <div class="mini-widget-handle"
-      @mousedown = "startMove"
-    >
+  <div class="widget" v-if="previewwidget.inputValue" :style="{
+    'top': realTop + 'px',
+    'right': realRight + 'px',
+    'height': realHeight + 'px',
+    'width': realWidth + 'px',
+    'left': realLeft + 'px'
+  }">
+    <div class="mini-widget-handle" @mousedown="startMove">
       <div></div>
-      <span class="mini-widget-close"
-        @click="close"
-      >×</span>
+      <span class="mini-widget-close" @click="close">×</span>
     </div>
     <div class="widget-body">
       <slot></slot>
     </div>
 
-    <div class="realTop-handle"
-      @mousedown = "startChangeHeightAndTop"
-    >
+    <div class="realTop-handle" @mousedown="startChangeHeightAndTop">
     </div>
-    <div class="bottom-handle"
-      @mousedown = 'startChangeHeightAndBottom'
-    >
+    <div class="bottom-handle" @mousedown='startChangeHeightAndBottom'>
     </div>
-    <div class="left-handle"
-      @mousedown = "startChangeWidthAndLeft"
-    >
+    <div class="left-handle" @mousedown="startChangeWidthAndLeft">
     </div>
-    <div class="realRight-handle"
-    @mousedown = "startChangeWidthAndRight"
-    >
+    <div class="realRight-handle" @mousedown="startChangeWidthAndRight">
     </div>
-    <div class="left-realTop-handle"
-      @mousedown = "startChangeLeftTop"
-    >
+    <div class="left-realTop-handle" @mousedown="startChangeLeftTop">
     </div>
-    <div class="realRight-realTop-handle"
-      @mousedown = "startChangeRightTop"
-    >
+    <div class="realRight-realTop-handle" @mousedown="startChangeRightTop">
     </div>
-    <div class="left-bottom-handle"
-      @mousedown = "startChangeLeftBottom"
-    >
+    <div class="left-bottom-handle" @mousedown="startChangeLeftBottom">
     </div>
-    <div class="realRight-bottom-handle"
-      @mousedown = "startChangeRightBottom"
-    >
+    <div class="realRight-bottom-handle" @mousedown="startChangeRightBottom">
     </div>
   </div>
 </template>
     
 <script setup lang='ts'>
-    close(){
-      this.inputValue = false
-    },
-    startMove(event){
-      document.addEventListener('mousemove', this.onMove)
-      //$rxbus.$on('canvasMouseMove', this.mouseMove)
-      this.lastX = event.screenX
-      this.lastY = event.screenY
-      this.forbidSelect()
-    },
-    startChangeHeightAndTop(event){
-      document.addEventListener('mousemove', this.onExpandTop)
-      this.lastX = event.screenX
-      this.lastY = event.screenY
-      this.forbidSelect()
-    },
-    startChangeHeightAndBottom(event){
-      document.addEventListener('mousemove', this.onExpandBottom)
-      this.lastX = event.screenX
-      this.lastY = event.screenY
-      this.forbidSelect()
-    },
-    startChangeWidthAndLeft(event){
-      document.addEventListener('mousemove', this.onExpandLeft)
-      this.lastX = event.screenX
-      this.forbidSelect()
-    },
-    startChangeWidthAndRight(event){
-      document.addEventListener('mousemove', this.onExpandRight)
-      this.lastX = event.screenX
-      this.forbidSelect()
-    },
-    startChangeLeftTop(event){
-      document.addEventListener('mousemove', this.onExpandLeftTop)
-      this.lastX = event.screenX
-      this.lastY = event.screenY
-      this.forbidSelect()
-    },
-    startChangeRightTop(event){
-      document.addEventListener('mousemove', this.onExpandRightTop)
-      this.lastX = event.screenX
-      this.lastY = event.screenY
-      this.forbidSelect()
-    },
-    startChangeLeftBottom(event){
-      document.addEventListener('mousemove', this.onExpandLeftBottom)
-      this.lastX = event.screenX
-      this.lastY = event.screenY
-      this.forbidSelect()
-    },
-    startChangeRightBottom(event){
-      document.addEventListener('mousemove', this.onExpandRightBottom)
-      this.lastX = event.screenX
-      this.lastY = event.screenY
-      this.forbidSelect()
-    },
-    onMove(event){
-      if(this.realLeft !== ''){
-        this.realLeft = this.realLeft + (event.screenX - this.lastX)
-      }
-      else{
-        this.realRight = this.realRight - (event.screenX - this.lastX)
-      }
-      this.realTop = this.realTop + (event.screenY - this.lastY)
-      this.lastX = event.screenX
-      this.lastY = event.screenY
-    },
-    onExpandTop(event){
-      this.realTop = this.realTop + (event.screenY - this.lastY)
-      this.realHeight = this.realHeight - (event.screenY - this.lastY)
-      this.lastY = event.screenY
-    },
-    onExpandBottom(event){
-      //this.bottom = this.bottom + (event.screenY - this.lastY)
-      this.realHeight = this.realHeight + (event.screenY - this.lastY)
-      this.lastY = event.screenY
-    },
-    onExpandLeft(event){
-      if(this.realLeft){
-        this.realLeft = this.realLeft + (event.screenX - this.lastX)
-        this.realWidth = this.realWidth - (event.screenX - this.lastX)
-      }
-      else{
-        this.realWidth = this.realWidth - (event.screenX - this.lastX)
-      }
-      this.lastX = event.screenX
-    },
-    onExpandRight(event){
-      this.realRight = this.realRight - (event.screenX - this.lastX)
-      this.realWidth = this.realWidth - (this.lastX - event.screenX)
-      this.lastX = event.screenX
-    },
-    onExpandLeftTop(event){
-      if(this.realLeft){
-        this.realLeft = this.realLeft + (event.screenX - this.lastX)
-        this.realWidth = this.realWidth - (event.screenX - this.lastX)
-      }
-      else{
-        this.realWidth = this.realWidth - (event.screenX - this.lastX)
-      }
-      this.realTop = this.realTop + (event.screenY - this.lastY)
-      this.realHeight = this.realHeight - (event.screenY - this.lastY)
-      this.lastX = event.screenX
-      this.lastY = event.screenY
-    },
-    onExpandRightTop(event){
-      this.realRight = this.realRight - (event.screenX - this.lastX)
-      this.realWidth = this.realWidth - (this.lastX - event.screenX)
-      this.realTop = this.realTop + (event.screenY - this.lastY)
-      this.realHeight = this.realHeight - (event.screenY - this.lastY)
-      this.lastX = event.screenX
-      this.lastY = event.screenY
-    },
-    onExpandLeftBottom(event){
-      if(this.realLeft){
-        this.realLeft = this.realLeft + (event.screenX - this.lastX)
-        this.realWidth = this.realWidth - (event.screenX - this.lastX)
-      }
-      else{
-        this.realWidth = this.realWidth - (event.screenX - this.lastX)
-      }
-      this.realHeight = this.realHeight + (event.screenY - this.lastY)
-      this.lastX = event.screenX
-      this.lastY = event.screenY
-    },
-    onExpandRightBottom(event){
-      this.realRight = this.realRight - (event.screenX - this.lastX)
-      this.realWidth = this.realWidth - (this.lastX - event.screenX)
-      this.realHeight = this.realHeight + (event.screenY - this.lastY)
-      this.lastX = event.screenX
-      this.lastY = event.screenY
-    },
-    onMouseUp(event){
-      this.lastX = ''
-      document.removeEventListener('mousemove', this.onMove)
-      document.removeEventListener('mousemove', this.onExpandTop)
-      document.removeEventListener('mousemove', this.onExpandBottom)
-      document.removeEventListener('mousemove', this.onExpandLeft)
-      document.removeEventListener('mousemove', this.onExpandRight)
-      document.removeEventListener('mousemove', this.onExpandLeftTop)
-      document.removeEventListener('mousemove', this.onExpandRightTop)
-      document.removeEventListener('mousemove', this.onExpandLeftBottom)
-      document.removeEventListener('mousemove', this.onExpandRightBottom)
-      document.body.classList.remove('can-not-be-selected')
-    },
-    forbidSelect(){
-      document.body.classList.add('can-not-be-selected')
-    }
-  },
+import { ref, onMounted ,reactive,computed} from "vue";
+import { previewwidget } from "../scripts/reactives"
+// const inputValue = computed({
+//   get:()=>{
+//     return value.value
+//   },
+//   set:(val)=>{
+//     console.log("val"+val)
+//   }
+// })
+
+onMounted(()=>{
+  document.addEventListener('mouseup', onMouseUp)
+})
+
+onBeforeUnmount(()=>{
+  document.removeEventListener('mouseup', onMouseUp)
+})
+const lastX = ref(0)
+const lastY = ref(0)
+const realTop = ref(50)
+const realHeight = ref(500)
+const realLeft = ref('')
+const realRight = ref(10)
+const realWidth = ref(500)
+const close = () => {
+  previewwidget.inputValue = false
+}
+const startMove = (event:any) => {
+  document.addEventListener('mousemove', onMove)
+  //$rxbus.$on('canvasMouseMove', mouseMove)
+  lastX.value = event.screenX
+  lastY.value = event.screenY
+  forbidSelect()
+}
+const startChangeHeightAndTop = (event:any) => {
+  document.addEventListener('mousemove', onExpandTop)
+  lastX.value = event.screenX
+  lastY.value = event.screenY
+  forbidSelect()
+}
+const startChangeHeightAndBottom = (event:any) => {
+  document.addEventListener('mousemove', onExpandBottom)
+  lastX.value = event.screenX
+  lastY.value = event.screenY
+  forbidSelect()
+}
+const startChangeWidthAndLeft = (event:any) => {
+  document.addEventListener('mousemove', onExpandLeft)
+  lastX.value = event.screenX
+  forbidSelect()
+}
+const startChangeWidthAndRight = (event:any) => {
+  document.addEventListener('mousemove', onExpandRight)
+  lastX.value = event.screenX
+  forbidSelect()
+}
+const startChangeLeftTop = (event:any) => {
+  document.addEventListener('mousemove', onExpandLeftTop)
+  lastX.value = event.screenX
+  lastY.value = event.screenY
+  forbidSelect()
+}
+const startChangeRightTop = (event:any) => {
+  document.addEventListener('mousemove', onExpandRightTop)
+  lastX.value = event.screenX
+  lastY.value = event.screenY
+  forbidSelect()
+}
+const startChangeLeftBottom = (event:any) => {
+  document.addEventListener('mousemove', onExpandLeftBottom)
+  lastX.value = event.screenX
+  lastY.value = event.screenY
+  forbidSelect()
+}
+const startChangeRightBottom = (event:any) => {
+  document.addEventListener('mousemove', onExpandRightBottom)
+  lastX.value = event.screenX
+  lastY.value = event.screenY
+  forbidSelect()
+}
+const onMove = (event:any) => {
+  if (realLeft.value !== '') {
+    realLeft.value = realLeft.value + (event.screenX - lastX.value)
+  }
+  else {
+    realRight.value = realRight.value - (event.screenX - lastX.value)
+  }
+  realTop.value = realTop.value + (event.screenY - lastY.value)
+  lastX.value = event.screenX
+  lastY.value = event.screenY
+}
+const onExpandTop = (event:any) => {
+  realTop.value = realTop.value + (event.screenY - lastY.value)
+  realHeight.value = realHeight.value - (event.screenY - lastY.value)
+  lastY.value = event.screenY
+}
+const onExpandBottom = (event:any) => {
+  //bottom = bottom + (event.screenY - lastY.value)
+  realHeight.value = realHeight.value + (event.screenY - lastY.value)
+  lastY.value = event.screenY
+}
+const onExpandLeft = (event:any) => {
+  if (realLeft.value) {
+    realLeft.value = realLeft.value + (event.screenX - lastX.value)
+    realWidth.value = realWidth.value - (event.screenX - lastX.value)
+  }
+  else {
+    realWidth.value = realWidth.value - (event.screenX - lastX.value)
+  }
+  lastX.value = event.screenX
+}
+const onExpandRight = (event:any) => {
+  realRight.value = realRight.value - (event.screenX - lastX.value)
+  realWidth.value = realWidth.value - (lastX.value - event.screenX)
+  lastX.value = event.screenX
+}
+const onExpandLeftTop = (event:any) => {
+  if (realLeft.value) {
+    realLeft.value = realLeft.value + (event.screenX - lastX.value)
+    realWidth.value = realWidth.value - (event.screenX - lastX.value)
+  }
+  else {
+    realWidth.value = realWidth.value - (event.screenX - lastX.value)
+  }
+  realTop.value = realTop.value + (event.screenY - lastY.value)
+  realHeight.value = realHeight.value - (event.screenY - lastY.value)
+  lastX.value = event.screenX
+  lastY.value = event.screenY
+}
+const onExpandRightTop = (event:any) => {
+  realRight.value = realRight.value - (event.screenX - lastX.value)
+  realWidth.value = realWidth.value - (lastX.value - event.screenX)
+  realTop.value = realTop.value + (event.screenY - lastY.value)
+  realHeight.value = realHeight.value - (event.screenY - lastY.value)
+  lastX.value = event.screenX
+  lastY.value = event.screenY
+}
+const onExpandLeftBottom = (event:any) => {
+  if (realLeft.value) {
+    realLeft.value = realLeft.value + (event.screenX - lastX.value)
+    realWidth.value = realWidth.value - (event.screenX - lastX.value)
+  }
+  else {
+    realWidth.value = realWidth.value - (event.screenX - lastX.value)
+  }
+  realHeight.value = realHeight.value + (event.screenY - lastY.value)
+  lastX.value = event.screenX
+  lastY.value = event.screenY
+}
+const onExpandRightBottom = (event:any) => {
+  realRight.value = realRight.value - (event.screenX - lastX.value)
+  realWidth.value = realWidth.value - (lastX.value - event.screenX)
+  realHeight.value = realHeight.value + (event.screenY - lastY.value)
+  lastX.value = event.screenX
+  lastY.value = event.screenY
+}
+const onMouseUp = (event:any) => {
+  lastX.value = 0
+  document.removeEventListener('mousemove', onMove)
+  document.removeEventListener('mousemove', onExpandTop)
+  document.removeEventListener('mousemove', onExpandBottom)
+  document.removeEventListener('mousemove', onExpandLeft)
+  document.removeEventListener('mousemove', onExpandRight)
+  document.removeEventListener('mousemove', onExpandLeftTop)
+  document.removeEventListener('mousemove', onExpandRightTop)
+  document.removeEventListener('mousemove', onExpandLeftBottom)
+  document.removeEventListener('mousemove', onExpandRightBottom)
+  document.body.classList.remove('can-not-be-selected')
+  console.log("close")
+}
+const forbidSelect = () => {
+  document.body.classList.add('can-not-be-selected')
+}
 </script>
     
-<style>
-    
+<style scoped>
+.widget ::-webkit-scrollbar {
+  width: 0.3rem;
+  height: 0.3rem;
+  background: #232323;
+}
+
+.widget ::-webkit-scrollbar-track {
+  border-radius: 0;
+}
+
+.widget ::-webkit-scrollbar-thumb {
+  border-radius: 0;
+  background: #535353;
+  transition: all .2s;
+}
+
+.widget ::-webkit-scrollbar-thumb:hover {
+  background-color: #606060;
+}
+
+.widget ::-webkit-scrollbar-corner {
+  background: #232323;
+}
+
+.widget {
+  position: fixed;
+  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+  font-size: 13px;
+  display: flex;
+  flex-flow: column;
+  z-index: 99;
+  padding: 5px;
+}
+
+.widget {
+  background: #26282a;
+  color: #c2c2c2;
+  border-radius: 3px;
+}
+
+.mini-widget-handle {
+  width: 100%;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: move;
+  font-size: 16px;
+  color: #999;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  border-bottom: #363636 solid 1px;
+}
+
+.mini-widget-close {
+  margin-right: -2px;
+  margin-top: -5px;
+  cursor: pointer;
+}
+
+.realTop-handle {
+  position: absolute;
+  left: 5px;
+  top: 0;
+  width: calc(100% - 10px);
+  height: 3px;
+  cursor: n-resize;
+}
+
+.bottom-handle {
+  position: absolute;
+  left: 5px;
+  bottom: 0;
+  width: calc(100% - 10px);
+  height: 5px;
+  cursor: s-resize;
+}
+
+.left-handle {
+  position: absolute;
+  left: 0;
+  top: 5px;
+  height: calc(100% - 10px);
+  width: 5px;
+  cursor: w-resize;
+}
+
+.realRight-handle {
+  position: absolute;
+  right: 0;
+  top: 5px;
+  height: calc(100% - 10px);
+  width: 5px;
+  cursor: e-resize;
+}
+
+.left-realTop-handle {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 6px;
+  width: 6px;
+  cursor: nw-resize;
+}
+
+.realRight-realTop-handle {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 6px;
+  width: 6px;
+  cursor: ne-resize;
+}
+
+.left-bottom-handle {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 6px;
+  width: 6px;
+  cursor: sw-resize;
+}
+
+.realRight-bottom-handle {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  height: 6px;
+  width: 6px;
+  cursor: se-resize;
+}
+
+.widget-body {
+  flex: 1;
+  display: flex;
+}
 </style>

@@ -2,10 +2,11 @@
 import { main } from '@popperjs/core';
 import { floor } from 'lodash';
 import { onMounted, ref, reactive } from 'vue';
-import { image_progress} from '../scripts/reactives';
+import { image_progress,previewwidget } from '../scripts/reactives';
 import { invoke } from '@tauri-apps/api';
 import { appDir, configDir, homeDir, localDataDir, logDir, resourceDir, fontDir } from '@tauri-apps/api/path';
 import { ElMessage, ElNotification } from "element-plus";
+import BaseSettingsDrawerVue from "./BaseSettingsDrawer.vue";
 
 // const percentage = ref(90);
 // const progress_count = ref({ completed: 0, total: 0 });
@@ -27,7 +28,38 @@ async function test_some_f() {
   }
 }
 
+//自定义指令
+const vResize = {
+    mounted: (el: any, binding: { value: (arg0: { width: number }) => void }) => {
+        let ResizeObserver = window.ResizeObserver;
+        el._resizer = new ResizeObserver((entries) => {
+            for (const entry of entries) {
+                // console.log(entry.contentRect.width)
+                binding.value({ width: entry.contentRect.width });
+            }
+        });
+        el._resizer.observe(el);
+        // console.log(binding)
+    },
+    unmounted: (el: { _resizer: { disconnect: () => void } }) => {
+        el._resizer.disconnect();
+    },
+};
 
+const bigIcon = ref(true)
+const isNotTinyIcon = ref(true)
+const ListenTopbarWidth = (width:any)=>{
+  bigIcon.value=(width.width>=960)?true:false
+  isNotTinyIcon.value=(width.width>=720)?true:false
+}
+
+const showDrawTable = ()=>{
+
+}
+
+const showPreviewWidget = ()=>{
+  previewwidget.inputValue=true
+}
 const message=(msg: string)=> {
     ElNotification({
       message: msg,
@@ -66,11 +98,10 @@ function gerColorOfWeight1(minNum: number, maxNum: number, colorStart: colorObj,
   const colorB =
     ((colorEnd.blue - colorStart.blue) * (number - minNum)) / (maxNum - minNum) +
     colorStart.blue;
-  console.log(typeof colorR);
   const color = `rgb(${floor(colorR).toString()},${floor(colorG).toString()},${floor(
     colorB
   ).toString()})`;
-  console.log(color);
+  // console.log(typeof colorR);
   // #color=getColorstr((int(colorR),int(colorG),int(colorB)))#转换为16进制颜色
   return color;
 }
@@ -122,36 +153,50 @@ defineExpose({
 
 
 <template>
-  <!-- jindutiao -->
-  <el-row class="row">
+  <el-row class="row" v-resize="ListenTopbarWidth">
     <el-col :span="18" class="left">
       <div class="photoSelector">
-        <el-button class="btn">选择图片</el-button>
-        <el-progress id="progress-bar" :percentage="image_progress.value" :format="format" :color="color"></el-progress>
+        <el-progress id="progress-bar" :percentage="image_progress.value" :format="format" :color="color"
+          v-if="isNotTinyIcon"></el-progress>
         <div>
-          <div>
+          <div v-if="bigIcon">
             <el-button @click="image_progress.increase()"> + </el-button>
           </div>
+          <div v-else class="increase">
+            <el-icon>
+              <i-ep-circle-plus @click="image_progress.increase()" />
+            </el-icon>
+          </div>
         </div>
-        <div>
+        <div v-if="bigIcon">
           <el-button @click="image_progress.selectFiles()">选择文件</el-button>
           <el-button @click="image_progress.selectDirs()">输出目录</el-button>
           <el-button @click="process_image" color="#de4781" size="" plain>开始处理</el-button>
-
+        </div>
+        <div v-else class="medium">
+          <el-icon style="margin-right:20px">
+            <i-ep-document-add @click="image_progress.selectFiles()" />
+          </el-icon>
+          <el-icon style="margin-right:20px">
+            <i-ep-folder-add @click="image_progress.selectDirs()" />
+          </el-icon>
+          <el-icon style="margin-right:20px">
+            <i-ep-full-screen @click="process_image" />
+          </el-icon>
         </div>
       </div>
     </el-col>
-    <!-- <el-col :span="18" class="right">
-
-    </el-col> -->
     <el-col :span="6" class="right">
-      <div class="previewer">
-        <el-button class="btn">预览图片</el-button>
+      <div class="previewer" v-if="bigIcon">
+        <el-button class="btn" @click="showPreviewWidget">预览图片</el-button>
       </div>
-      <div class="options">
-        <el-icon>
-          <i-ep-arrow-right />
+      <div v-else @click="showPreviewWidget" class="previewer-icon">
+        <el-icon style="margin-right:20px">
+          <i-ep-picture />
         </el-icon>
+      </div>
+      <div class="options" @click="showDrawTable">
+        <base-settings-drawer></base-settings-drawer>
       </div>
     </el-col>
   </el-row>
@@ -170,6 +215,7 @@ defineExpose({
 
 .row {
   padding-top: 15px;
+  z-index: 99;
 }
 
 .previewer {
@@ -194,5 +240,12 @@ defineExpose({
   flex-direction: column;
   justify-content: center;
   margin-left: 60px;
+}
+
+.increase,
+.medium,
+.previewer-icon {
+  font-size: 25px;
+  margin-right: 20px;
 }
 </style>
