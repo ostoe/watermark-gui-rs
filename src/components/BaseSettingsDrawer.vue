@@ -9,6 +9,12 @@ import { user_conf, UserDataType } from '../scripts/reactives'
 import { elmessage } from '../scripts/reactives';
 import { Ref } from 'vue';
 
+type RenameType = {
+    SD: Array<{ id: number, value: string, label: string }>,
+    value: { id: number, value: string, label: string },
+    input: string,
+    valid: boolean
+}
 
 const formLabelWidth = '80px'
 //   let timer
@@ -31,28 +37,59 @@ const renameSuffix = ref({
     valid: true,
 });
 
-function check_input() {
-    var reg = /^[a-zA-Z0-9\u4e00-\u9fa5_ ~!@#$%^&*()_+=～！@#¥%……&*–—‘’“”…、。〈〉《》「」『』【】〔〕！（），．：；？、\$]+$/;
+const reg = /^[a-zA-Z0-9\u4e00-\u9fa5_ ~!@#$%^&*()_+=～！@#¥%……&*–—‘’“”…、。〈〉《》「」『』【】〔〕！（），．：；？、\-\$\[\]]+$/;
+function check_input_prefix() {
+    check_input(renamePreffix);
+}
 
-    let a = [renamePreffix, renameCenter, renameSuffix];
-    for (let i = 0; i < 3; i++) {
-        let t = a[i].value;
-        if (t.value.id == 2) {
-            if (reg.test(t.input)) {
-                t.valid = true;
-            }
-            else {
-                t.valid = false;
-            }
-        } else if (t.value.id == 3) {
-            if (t.input.includes("$x") && reg.test(t.input)) {
-                t.valid = true;
-            }
-        } else {
-            // == 1 ???
+function check_input_center() {
+    check_input(renameCenter);
+}
+function check_input_suffix() {
+    check_input(renameSuffix);
+}
+
+
+function check_input(rename: Ref<RenameType>) {
+    console.log("-----" + "value");
+
+    // let a = [renamePreffix, renameCenter, renameSuffix];
+    // for (let i = 0; i < 3; i++) {
+    let t = rename.value;
+    console.log(rename);
+    console.log(t);
+    if (t.value.id == 2) {
+        if (reg.test(t.input)) {
+            t.valid = true;
         }
+        else {
+            t.valid = false;
+        }
+    } else if (t.value.id == 3) {
+        if (t.input.includes("$x") && reg.test(t.input)) {
+            t.valid = true;
+        }
+    } else {
+        // == 1 ???
     }
+    // }
     // 判断是否全空?
+}
+
+function check_select_prefix() {
+    if (renamePreffix.value.value.id == 1) {
+        renamePreffix.value.valid = true
+    }
+}
+function check_select_center() {
+    if (renameCenter.value.value.id == 1) {
+        renameCenter.value.valid = true
+    }
+}
+function check_select_suffix() {
+    if (renameSuffix.value.value.id == 1) {
+        renameSuffix.value.valid = true
+    }
 }
 
 
@@ -104,12 +141,20 @@ interface UserSettings {
 }
 
 async function saveSetting() {
-    //  invoke("handle_front_select_files", { imagesObj: image_progress.image_paths });
-    let user_data: UserSettings = { output_dir: "", qulity: baseForm.value.qulity, auto_user_brand: baseForm.value.autoUseBrand, brand: baseForm.value.brand };
-    //   console.log(user_data);
-    user_conf.save_user_conf(baseForm.value);
-    let res: string = await invoke("handle_front_update_user_data", { userData: user_data });
-    elmessage(res);
+    if (renamePreffix.value.valid && renameCenter.value.valid && renameSuffix.value.valid) {
+        let user_data: UserSettings = { output_dir: "", qulity: baseForm.value.qulity, auto_user_brand: baseForm.value.autoUseBrand, brand: baseForm.value.brand };
+        //   console.log(user_data);
+        user_conf.save_user_conf(baseForm.value);
+        let res: string = await invoke("handle_front_update_user_data", { userData: user_data });
+        elmessage(res);
+    } else {
+        ElMessage({
+            showClose: true,
+            message: '输入有误，保存失败，注意特殊字符',
+            type: 'error',
+        })
+    }
+
 }
 
 
@@ -183,7 +228,7 @@ onMounted(() => {
         <el-scrollbar wrap-class="max-height:200px">
             <el-checkbox v-model="baseForm.autoUseBrand" label="根据exif自动设置" size="large" border />
             <el-select v-model="baseForm.brand" :placeholder="baseForm.brands[1].label"
-                :disabled="baseForm.autoUseBrand" style="margin: 20px 0 20px 0">
+                :disabled="baseForm.autoUseBrand" style="margin: 20px 0 20px 0" >
                 <el-option v-for="brand in baseForm.brands" :key="brand.value" :label="brand.label"
                     :value="brand.value">
                     <span style="float:left">{{ brand.label }}</span>
@@ -207,7 +252,7 @@ onMounted(() => {
                     <div class="grid-content ep-bg-purple" />
                     <p style="margin-left: 10px">名称前缀</p>
                     <el-select v-model="renamePreffix.value" class="m-2" placeholder="Select" value-key="id"
-                        size="large">
+                        size="large" :change="check_select_prefix()">
                         <el-option v-for="item in renamePreffix.SD" :key="item.id" :label="item.label" :value="item" />
                     </el-select>
 
@@ -216,7 +261,7 @@ onMounted(() => {
                     <div class="grid-content ep-bg-purple-light" />
                     <p style="margin-left: 10px">名称中间</p>
                     <el-select v-model="renameCenter.value" class="m-2" placeholder="Select" value-key="id"
-                        size="large">
+                        size="large" :change="check_select_center()">
                         <el-option v-for="item in renameCenter.SD" :key="item.id" :label="item.label" :value="item" />
                     </el-select>
                 </el-col>
@@ -224,7 +269,7 @@ onMounted(() => {
                     <div class="grid-content ep-bg-purple" />
                     <p style="margin-left: 10px">名称后缀</p>
                     <el-select v-model="renameSuffix.value" class="m-2" placeholder="Select" value-key="id"
-                        size="large">
+                        size="large" :change="check_select_suffix()">
                         <el-option v-for="item in renameSuffix.SD" :key="item.id" :label="item.label" :value="item" />
                     </el-select>
                 </el-col>
@@ -232,18 +277,21 @@ onMounted(() => {
             <el-row>
                 <el-col :span="8">
                     <div class="grid-content ep-bg-purple" />
-                    <el-input v-model="renamePreffix.input" :disabled="renamePreffix.value.id == 1" change="check_input"> "自定义后缀"
+                    <el-input v-model="renamePreffix.input" :disabled="renamePreffix.value.id == 1"
+                        :blur="check_input_prefix()"> "自定义后缀"
                     </el-input>
 
                 </el-col>
                 <el-col :span="8">
                     <div class="grid-content ep-bg-purple-light" />
-                    <el-input v-model="renameCenter.input" :disabled="renameCenter.value.id == 1" change="check_input"> "自定义后缀" </el-input>
+                    <el-input v-model="renameCenter.input" :disabled="renameCenter.value.id == 1" :blur="check_input_center()">
+                        "自定义后缀" </el-input>
 
                 </el-col>
                 <el-col :span="8" id="invalidInputCss">
                     <div class="grid-content ep-bg-purple" />
-                    <el-input v-model="renameSuffix.input" :disabled="renameSuffix.value.id == 1" change="check_input"> "自定义后缀" </el-input>
+                    <el-input v-model="renameSuffix.input" :disabled="renameSuffix.value.id == 1" :blur="check_input_suffix()">
+                        "自定义后缀" </el-input>
                 </el-col>
             </el-row>
             <el-row>
@@ -289,9 +337,11 @@ onMounted(() => {
 #invalidInputCss .el-input {
     --el-input-border-color: #f70909;
 }
+
 #defaultInputCss .el-input {
     --el-input-border-color: #dcdfe6;
 }
+
 // .el-input__inner {
 //     --el-input-focus-border: #b24444;
 //     --el-input-text-color: #b24444;
