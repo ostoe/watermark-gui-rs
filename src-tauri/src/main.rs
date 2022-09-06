@@ -59,6 +59,7 @@ fn main() {
             handle_front_select_files,
             handle_front_update_key,
             handle_front_update_user_data,
+            handle_front_select_dir,
             greet,
             send_event
         ])
@@ -115,6 +116,17 @@ fn handle_front_select_files(
     }
 
     format!("handle_front_select_files, {}!", "handling...")
+}
+
+#[tauri::command]
+fn handle_front_select_dir(image_dir: String, state: State<crossbeam_channel::Sender<UserOperation>>,) ->  String{
+
+    if &image_dir != "" {
+        state
+            .send(UserOperation::DirPath(image_dir))
+            .unwrap();
+    }
+    format!("handle_front_select_dir, {}!", "handling...")
 }
 
 #[tauri::command]

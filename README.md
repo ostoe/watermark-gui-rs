@@ -33,12 +33,13 @@ event.listen('tauri://file-drop-hover', (e) => {
 
 
 ## TODO [list]
- - 图片logo位置和比例优化下[v]
- - 图片质量
- - 支持目录
- - 选择字体
- - 拖动文件
- - .....
+ - 图片logo位置和比例优化下 [v]
+ - 图片质量 [v]
+ - 支持目录 or 文件 做成开关 [v] 
+ - 支持自定义字体 [] 
+ - 拖动文件 [v]
+ - 显示输出文件夹
+ - 自定义后缀 or 自定义名称
  - 自定义布局
  - 自定义后缀 防止覆盖文件
  - 集成其他工具，如计算景深 超焦距之类
@@ -47,6 +48,8 @@ event.listen('tauri://file-drop-hover', (e) => {
  - 记录用户数据，输出文件夹之类的。
  - font size test...
  - replace Dynamic with ImageBuffer<u8>....
+ - 处理等待时，其他组件的控制
+ - reset 后强制提示
 
 
 
@@ -74,3 +77,6 @@ ref: https://github.com/zzzgydi/clash-verge/blob/66ccbf70f8d51153ef097fb62deae83
 如果要放大图像，您应该更喜欢使用INTER_LINEAR或INTER_CUBIC插值。如果要缩小图像，您应该更喜欢使用INTER_AREA插值。
 三次插值在计算上更复杂，因此比线性插值慢。但是，生成的图像的质量会更高。
 
+
+
+e

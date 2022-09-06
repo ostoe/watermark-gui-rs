@@ -5,6 +5,10 @@
   import { reactive, ref } from 'vue'
   //   import { ElDrawer, ElMessageBox } from 'unp'
   import { invoke } from '@tauri-apps/api';
+import {user_conf} from '../scripts/reactives'
+  import { elmessage } from '../scripts/reactives';
+  
+
   const formLabelWidth = '80px'
   //   let timer
 
@@ -12,19 +16,8 @@
   
   const settingsDrawer = ref(false);
   const loading = ref(false);
-  const qulity = ref(85);
-  const form = reactive({
-      brands: [{ value: 'canon', label: "佳能" }, { value: 'nikon', label: "尼康" }, { value: 'sony', label: "索尼" }, 
-                {value: "panasonic", label: "松下"}, {value: "fujifilm", label: "富士"} ],
-      name: '',
-      brand: '',
-      delivery: false,
-      type: [],
-      resource: '',
-      desc: '',
-  })
   
-  const autoSelect = ref(true);
+//   const autoSelect = ref(true);
  
   const resource_imge_patten = ref("");
 
@@ -32,10 +25,10 @@ function  get_image_url(value: string) {
         // const resource_dir = await resourceDir();
         // \\?\G:\workspace\watermark-app\src-tauri\target\debug\
         // return convertFileSrc("C:\\Users\\fly\\Pictures\\DSC0118.-w.jpg");
-        console.log(resource_imge_patten.value);
+        // console.log(resource_imge_patten.value);
         const p = resource_imge_patten.value.replace("---value---", value+".png");
         let ap = convertFileSrc(p);
-        console.log(ap);
+        // console.log(ap);
         return ap;
   }
 
@@ -50,11 +43,11 @@ function  get_image_url(value: string) {
   
   async function saveSetting() {
       //  invoke("handle_front_select_files", { imagesObj: image_progress.image_paths });
-      let user_data: UserSettings = { output_dir: "", qulity: qulity.value, auto_user_brand: autoSelect.value, brand: form.brand };
-      console.log(user_data);
-  
-      let res = await invoke("handle_front_update_user_data", { userData: user_data });
-      console.log(res);
+      let user_data: UserSettings = { output_dir: "", qulity: user_conf.qulity, auto_user_brand: user_conf.autoUseBrand, brand: user_conf.brand };
+    //   console.log(user_data);
+        user_conf.save_user_conf();
+      let res: string = await invoke("handle_front_update_user_data", { userData: user_data });
+      elmessage(res);
   }
   
   
@@ -121,9 +114,9 @@ function  get_image_url(value: string) {
     <el-drawer v-model="settingsDrawer" title="基本设置" :before-close="handleClose" direction="rtl" size="30%">
         <!-- <el-image style="width: 150px; height: 150px" :src="get_image_url('a')" fit="contain" loading="eager" /> -->
         <el-scrollbar wrap-class="max-height:200px">
-            <el-checkbox v-model="autoSelect" label="根据exif自动设置" size="large" border />
-            <el-select v-model="form.brand" :placeholder="form.brands[1].label" :disabled="autoSelect" style="margin: 20px 0 20px 0">
-                <el-option v-for="brand in form.brands" :key="brand.value" :label="brand.label" :value="brand.value">
+            <el-checkbox v-model="user_conf.autoUseBrand" label="根据exif自动设置" size="large" border />
+            <el-select v-model="user_conf.brand" :placeholder="user_conf.brands[1].label" :disabled="user_conf.autoUseBrand" style="margin: 20px 0 20px 0">
+                <el-option v-for="brand in user_conf.brands" :key="brand.value" :label="brand.label" :value="brand.value">
                     <span style="float:left">{{ brand.label }}</span>
                     <span style="float: right;color: var(--el-text-color-secondary);font-size: 20px;">
                         <!-- <el-image style="width: 50px; height: 50px" :src="get_image_url(brand.value)" fit="fill" loading="eager" /> -->
@@ -134,10 +127,11 @@ function  get_image_url(value: string) {
                     </span>
                 </el-option>
             </el-select>
-            <el-input-number v-model="qulity" :min="1" :max="100" controls-position="right" size="large" step-strictly
+            <el-input-number v-model="user_conf.qulity" :min="1" :max="100" controls-position="right" size="large" step-strictly
                 @change="handleChangeQulity" />
 
-            <el-slider v-model="qulity" vertical height="200px" />
+            <el-slider v-model="user_conf.qulity" vertical height="200px" />
+            <el-input> "自定义后缀" </el-input>
         </el-scrollbar>
 
         <div style="margin: 10px 0 20% 0; border-bottom: 0%;">

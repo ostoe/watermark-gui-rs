@@ -35,6 +35,7 @@ declare module '@vue/runtime-core' {
     ElSelect: typeof import('element-plus/es')['ElSelect']
     ElSlider: typeof import('element-plus/es')['ElSlider']
     ElSubMenu: typeof import('element-plus/es')['ElSubMenu']
+    ElSwitch: typeof import('element-plus/es')['ElSwitch']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
     IEpAddLocation: typeof import('~icons/ep/add-location')['default']
     IEpArrowLeft: typeof import('~icons/ep/arrow-left')['default']

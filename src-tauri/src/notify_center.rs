@@ -24,9 +24,9 @@ pub fn notification_thread(main_window: Window, notify_front_rt: Receiver<Notifi
 loop {
     let opt_result = notify_front_rt.recv().unwrap();
     match opt_result {
-        Notification::Single(fname) => {
-            println!("----{:?}", fname);
-            windows_send_msg(&main_window, "front-backend", &fname, 200);
+        Notification::Single(k, v) => {
+            // println!("----{:?}", fname);
+            windows_send_msg(&main_window, "front-backend", &format!("{{ \"{}\": {} }}", k, v), 100);
         }
         Notification::Complated => {
             windows_send_msg(&main_window, "front-backend", "", 200);

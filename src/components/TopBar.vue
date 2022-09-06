@@ -1,4 +1,5 @@
 <script setup lang="ts">
+  import { Files, FolderChecked } from '@element-plus/icons-vue'
 import { main } from '@popperjs/core';
 import { floor } from 'lodash';
 import { onMounted, ref, reactive } from 'vue';
@@ -7,6 +8,7 @@ import { invoke } from '@tauri-apps/api';
 import { appDir, configDir, homeDir, localDataDir, logDir, resourceDir, fontDir } from '@tauri-apps/api/path';
 import { ElMessage, ElNotification } from "element-plus";
 import BaseSettingsDrawerVue from "./BaseSettingsDrawer.vue";
+import {RotateSquare4, PingPong} from 'vue-loading-spinner';
 
 // const percentage = ref(90);
 // const progress_count = ref({ completed: 0, total: 0 });
@@ -17,6 +19,8 @@ const colors = [
   { color: '#1989fa', percentage: 75 },
   { color: '#6f7ad3', percentage: 100 },
 ];
+
+const selectType = ref(true);
 
 async function test_some_f() {
 
@@ -77,6 +81,7 @@ function color() {
   return gerColorOfWeight1(1, 25, startC, endC, image_progress.value % 25);
 }
 
+const format_vlue = "";
 
 
 function format(percentage: number) {
@@ -130,15 +135,9 @@ function colorRgb(color: string) {
 };
 
 async function process_image() {
-  if ((image_progress.count.total != 0) && (image_progress.count.completed != image_progress.count.total)) {
-    let send_content = JSON.stringify(image_progress.image_paths);
-    console.log(send_content);
-    let res = await invoke("handle_front_select_files", { imagesObj: image_progress.image_paths });
-    message("process_single_image result: " + res);
-  } else {
-    message("未选择文件或已完成");
-  }
-
+  // control other compo
+  image_progress.status_toogle();
+  image_progress.process_image();
 };
 
 onMounted(() => {
@@ -156,11 +155,19 @@ defineExpose({
   <el-row class="row" v-resize="ListenTopbarWidth">
     <el-col :span="18" class="left">
       <div class="photoSelector">
-        <el-progress id="progress-bar" :percentage="image_progress.value" :format="format" :color="color"
-          v-if="isNotTinyIcon"></el-progress>
+        <rotate-square4 v-if="image_progress.status"></rotate-square4>
+        <ping-pong v-else></ping-pong>
+        <el-button 
+      key="button.text"
+      :type="image_progress.status? 'success' : 'primary'"
+      text
+      > {{ `${image_progress.count.completed}/${image_progress.count.total}` }} </el-button
+    >
+        <!-- <el-progress id="progress-bar" :percentage="image_progress.value" :format="format" :color="color"
+          v-if="isNotTinyIcon"></el-progress> -->
         <div>
           <div v-if="bigIcon">
-            <el-button @click="image_progress.increase()"> + </el-button>
+            <!-- <el-button @click="image_progress.increase()"> + </el-button> -->
           </div>
           <div v-else class="increase">
             <el-icon>
@@ -169,16 +176,30 @@ defineExpose({
           </div>
         </div>
         <div v-if="bigIcon">
-          <el-button @click="image_progress.selectFiles()">选择文件</el-button>
-          <el-button @click="image_progress.selectDirs()">输出目录</el-button>
+        <el-tooltip  :content="'选择' + (selectType? '文件' : '文件夹') " placement="bottom-end" effect="light">
+          <el-button v-if="selectType" @click="image_progress.selectFiles()">选择</el-button>
+          <el-button v-else @click="image_progress.selectDirs()">选择</el-button>
+        </el-tooltip>
+        <el-tooltip :content="'输入模式：' + (selectType? '文件' : '文件夹') " placement="bottom-end" effect="light">
+         
+            <el-switch v-model="selectType"
+              style="--el-switch-on-color: #13ce66; --el-switch-off-color: #bababa"
+              inline-prompt
+              :active-icon="Files"
+              :inactive-icon="FolderChecked"
+            />
+        </el-tooltip>
+
+          <el-button @click="image_progress.selectOutputDirs()">输出目录</el-button>
           <el-button @click="process_image" color="#de4781" size="" plain>开始处理</el-button>
+
         </div>
         <div v-else class="medium">
           <el-icon style="margin-right:20px">
             <i-ep-document-add @click="image_progress.selectFiles()" />
           </el-icon>
           <el-icon style="margin-right:20px">
-            <i-ep-folder-add @click="image_progress.selectDirs()" />
+            <i-ep-folder-add @click="image_progress.selectOutputDirs()" />
           </el-icon>
           <el-icon style="margin-right:20px">
             <i-ep-full-screen @click="process_image" />
