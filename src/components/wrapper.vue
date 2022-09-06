@@ -7,7 +7,8 @@ import picList from "./PicList.vue";
 import BaseSettingsDrawerVue from "./BaseSettingsDrawer.vue";
 import PreviewWidget from "./PreviewWidget.vue";
 
-import { ref, onMounted } from "vue";
+// import { square } from "../scripts/wave-progress";
+import { ref, onMounted, nextTick } from "vue";
 // import { Context } from "vm";
 import { sidebarReactives } from "../scripts/reactives";
 //获取鼠标点击消除遮罩
@@ -18,7 +19,27 @@ let t: NodeJS.Timeout | null = null;
 const changeThisCollapse = () => {
   sidebarReactives.changeThisCollapse();
 };
-
+// const square = {
+//   hook: "beforeProgress",
+//   install({ ctx, configs, scopedData }, opts = {}) {
+//     ctx.beginPath();
+//     ctx.lineWidth = (opts && opts.lineWidth) || 2;
+//     ctx.strokeStyle =
+//       (opts && opts.lineColor) || `rgba(${configs.waveCharacter.color}, 1)`;
+//     const r = Math.min(configs.canvasWidth, configs.canvasHeight) / 2;
+//     ctx.arc(r, r, r + 1, 0, 2 * Math.PI);
+//     ctx.stroke();
+//     console.log(ctx);
+//     ctx.beginPath();
+//     ctx.lineWidth = 5;
+//     ctx.arc(100, 200, 80, 0, Math.PI * 2);
+//     // ctx.strokeStyle = '#1c86d1'
+//     ctx.stroke();
+//     // ctx.closePath()
+//     console.log(ctx);
+//   },
+// };
+nextTick(() => {});
 // const picSrc = ref("https://github.com/tauri-apps/tauri/blob/dev/.github/splash.png")
 </script>
 
@@ -48,7 +69,9 @@ const changeThisCollapse = () => {
         <el-main>
           <el-container direction="vertical">
             <PreviewWidget>
-              <el-image src="https://fuss10.elemecdn.com/a/3f/3302e58f9a181d2509f3dc0fa68b0jpeg.jpeg"></el-image>
+              <el-image
+                src="https://fuss10.elemecdn.com/a/3f/3302e58f9a181d2509f3dc0fa68b0jpeg.jpeg"
+              ></el-image>
             </PreviewWidget>
             <!-- <el-row > -->
             <!-- <HelloWorld msg="Vite + Vue" /> -->
@@ -64,13 +87,15 @@ const changeThisCollapse = () => {
 </template>
 
 <style scoped>
-  .common-layout{
-    height: 100%;
-    width: auto;
-  }
-  .elcontainer{
-    margin-left: 50px;
-  }
+.common-layout {
+  height: 100%;
+  width: auto;
+}
+
+.elcontainer {
+  margin-left: 50px;
+}
+
 .footer-div {
   background-color: rgb(255, 255, 255);
   display: flex;

@@ -8,7 +8,9 @@ import { invoke } from '@tauri-apps/api';
 import { appDir, configDir, homeDir, localDataDir, logDir, resourceDir, fontDir } from '@tauri-apps/api/path';
 import { ElMessage, ElNotification } from "element-plus";
 import BaseSettingsDrawer from "./BaseSettingsDrawer.vue";
-import {RotateSquare4, PingPong} from 'vue-loading-spinner';
+// 绘制进度条
+import WaveProgress from "@alanchenchen/waveprogress";
+import { drawCircle, drawText } from "@alanchenchen/waveprogress";
 
 // const percentage = ref(90);
 // const progress_count = ref({ completed: 0, total: 0 });
@@ -140,14 +142,43 @@ async function process_image() {
   image_progress.process_image();
 };
 
-onMounted(() => {
-  test_some_f();
-})
-
 defineExpose({
   image_progress
 })
 
+enum progressSettings {
+  progressSpeed=0.2,
+  characterNum=2,
+  characterWidth=0.01,
+  characterHeight=5,
+  lineWidth=4,
+  fontSize=10
+}
+const getProgress = ()=>{
+  return (image_progress.count.completed!=null)?(image_progress.count.completed/image_progress.count.total):(0)
+}
+onMounted(() => {
+  test_some_f();
+  // 绘制进度条
+  const waveRun = new WaveProgress({
+    dom: "#waveProgress",
+    progress: getProgress,
+    progressSpeed: progressSettings.progressSpeed,
+    waveCharacter: {
+      number: progressSettings.characterNum,
+      waveWidth: progressSettings.characterWidth,
+      waveHeight: progressSettings.characterHeight,
+    },
+  });
+  waveRun.usePlugin(drawCircle, { lineWidth: progressSettings.lineWidth });
+  waveRun.usePlugin(drawText, {fontSize:progressSettings.fontSize});
+  waveRun.setProgress({
+    to: image_progress.count.completed/image_progress.count.total*100
+  })
+  console.log(image_progress.count.completed)
+  console.log(waveRun);
+  waveRun.render();
+});
 </script>
 
 
@@ -155,8 +186,9 @@ defineExpose({
   <el-row class="row" v-resize="ListenTopbarWidth">
     <el-col :span="18" class="left">
       <div class="photoSelector">
-        <rotate-square4 v-if="image_progress.status"></rotate-square4>
-        <ping-pong v-else></ping-pong>
+        <!-- <rotate-square4 v-if="image_progress.status"></rotate-square4>
+        <ping-pong v-else></ping-pong> -->
+        <canvas id="waveProgress" style="width: 35px;border-radius: 48%;height: 35px;"></canvas>
         <el-button 
       key="button.text"
       :type="image_progress.status? 'success' : 'primary'"
