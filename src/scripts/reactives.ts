@@ -59,7 +59,10 @@ type UserDataType = {
   autoUseBrand: boolean,
   brand: string,
   font: string,
-  brands: [{value: string, label: string}],
+  brands: Array<{value: string, label: string}>,
+  renameSuffix: string,
+  renamePreffix: string,
+  renameCenter: string,
 }
 
 const user_conf = reactive({
@@ -69,6 +72,9 @@ const user_conf = reactive({
   autoUseBrand: true,
   brand: "nikon",
   font: "",
+  renameSuffix: "",
+  renamePreffix: "",
+  renameCenter: "",
   user_conf_path: "",
   brands: [{ value: 'canon', label: "佳能" }, { value: 'nikon', label: "尼康" }, { value: 'sony', label: "索尼" }, 
                 {value: "panasonic", label: "松下"}, {value: "fujifilm", label: "富士"} ],
@@ -89,13 +95,13 @@ const user_conf = reactive({
       //   let k2 = "autoUseBrand"
       //   user_conf[k2] = entries[i][1];
       // }
-      this.A2BAndB2A(user_conf, user_data);
+      this.B2A(user_conf, user_data);
 
     }
 
   },
   // A.* <-- B.*
-  A2BAndB2A(A: any, B: any) {
+  B2A(A: any, B: any) {
     A.autoUseBrand = B.autoUseBrand;
     A.brand = B.brand;
     A.font = B.font;
@@ -103,13 +109,21 @@ const user_conf = reactive({
     A.latestSelectedOutputPath = B.latestSelectedOutputPath;
     A.qulity = B.qulity;
     A.brands = B.brands;
+    A.renameSuffix = B.renameSuffix;
+    A.renamePreffix = B.renamePreffix;
+    A.renameCenter = B.renameCenter;
   },
 
-  async save_user_conf() {
+  async save_user_conf(baseForm: UserDataType) {
     let user_save: UserDataType = new Object as UserDataType;
-    this.A2BAndB2A(user_save, user_conf);
+    this.B2A(user_save, baseForm);
+    this.B2A(user_conf, baseForm);
     let json_contents = JSON.stringify(user_save, null, 4);
     await fs.writeTextFile(this.user_conf_path, json_contents);
+  },
+
+  load_conf(baseForm: UserDataType) {
+    this.B2A(baseForm, user_conf);
   }
 
 
@@ -308,4 +322,6 @@ onMounted(() => {
   user_conf.init_user_conf();
 })
 
-export { image_progress, sidebarReactives, previewwidget, elmessage, user_conf };
+export { image_progress, sidebarReactives, previewwidget, elmessage, user_conf }; 
+export type { UserDataType };
+
