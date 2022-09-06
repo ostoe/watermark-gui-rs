@@ -10,6 +10,7 @@ import PreviewWidget from "./PreviewWidget.vue";
 import { ref, onMounted } from "vue";
 // import { Context } from "vm";
 import { sidebarReactives } from "../scripts/reactives";
+import { convertFileSrc } from "@tauri-apps/api/tauri"
 //获取鼠标点击消除遮罩
 let t: NodeJS.Timeout | null = null;
 // const isCollapse = ref(true);
@@ -19,7 +20,11 @@ const changeThisCollapse = () => {
   sidebarReactives.changeThisCollapse();
 };
 
-// const picSrc = ref("https://github.com/tauri-apps/tauri/blob/dev/.github/splash.png")
+ const src = ()=>{
+  return convertFileSrc("/Users/dongyifan/Library/Mobile Documents/comappleCloudDocs/Desktop/pic/wallhaven-6od3px.jpeg")
+ }
+
+ const picSrc = ref(src())
 </script>
 
 <template lang="">
@@ -48,7 +53,7 @@ const changeThisCollapse = () => {
         <el-main>
           <el-container direction="vertical">
             <PreviewWidget>
-              <el-image src="https://fuss10.elemecdn.com/a/3f/3302e58f9a181d2509f3dc0fa68b0jpeg.jpeg"></el-image>
+              <el-image :src="picSrc"></el-image>
             </PreviewWidget>
             <!-- <el-row > -->
             <!-- <HelloWorld msg="Vite + Vue" /> -->

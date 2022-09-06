@@ -13,8 +13,7 @@ const locale = ref(zhCn)
 
 <template>
   <el-config-provider :locale="locale">
-    <!-- <router-view></router-view> -->
-    <base-settings-drawer></base-settings-drawer>
+    <router-view></router-view>
   </el-config-provider>
   
 </template>
