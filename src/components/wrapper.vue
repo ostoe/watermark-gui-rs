@@ -6,8 +6,9 @@ import TopBar from "./TopBar.vue";
 import picList from "./PicList.vue";
 import BaseSettingsDrawerVue from "./BaseSettingsDrawer.vue";
 import PreviewWidget from "./PreviewWidget.vue";
+import WaveProgress from '@alanchenchen/waveprogress'
 
-import { ref, onMounted } from "vue";
+import { ref, onMounted, nextTick } from "vue";
 // import { Context } from "vm";
 import { sidebarReactives } from "../scripts/reactives";
 import { convertFileSrc } from "@tauri-apps/api/tauri"
@@ -20,11 +21,26 @@ const changeThisCollapse = () => {
   sidebarReactives.changeThisCollapse();
 };
 
- const src = ()=>{
+const src = () => {
   return convertFileSrc("/Users/dongyifan/Library/Mobile Documents/comappleCloudDocs/Desktop/pic/wallhaven-6od3px.jpeg")
- }
+}
 
- const picSrc = ref(src())
+const picSrc = ref(src())
+
+nextTick(() => {
+  const waveIns = new WaveProgress({
+    dom: '#wavetest',
+    progress: 47.7,
+    progressSpeed: 0.3,
+    waveCharactor: {
+      number: 2,
+      waveWidth: 0.01,
+      waveHeight: 30
+    }
+  })
+  waveIns.render()
+
+})
 </script>
 
 <template lang="">
@@ -55,6 +71,7 @@ const changeThisCollapse = () => {
             <PreviewWidget>
               <el-image :src="picSrc"></el-image>
             </PreviewWidget>
+            <canvas id="wavetest"></canvas>
             <!-- <el-row > -->
             <!-- <HelloWorld msg="Vite + Vue" /> -->
             <!-- <TextImageProcess /> -->
@@ -69,13 +86,15 @@ const changeThisCollapse = () => {
 </template>
 
 <style scoped>
-  .common-layout{
-    height: 100%;
-    width: auto;
-  }
-  .elcontainer{
-    margin-left: 50px;
-  }
+.common-layout {
+  height: 100%;
+  width: auto;
+}
+
+.elcontainer {
+  margin-left: 50px;
+}
+
 .footer-div {
   background-color: rgb(255, 255, 255);
   display: flex;
