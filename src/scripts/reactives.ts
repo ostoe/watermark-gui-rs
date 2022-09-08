@@ -101,7 +101,7 @@ const user_conf = reactive({
 
   },
   // A.* <-- B.*
-  B2A(A: any, B: any) {
+  B2A(A: UserDataType, B: UserDataType) {
     A.autoUseBrand = B.autoUseBrand;
     A.brand = B.brand;
     A.font = B.font;

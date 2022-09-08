@@ -8,7 +8,7 @@
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
     "tauri": "tauri",
-    "postinstall": "patch-package"
+    "cache": "vite -force"
   },
   "dependencies": {
     "@alanchenchen/waveprogress": "^0.1.4",
