@@ -165,7 +165,7 @@ enum progressSettings {
   lineWidth = 4,
   fontSize = 10
 }
-const getProgress = (completed: number = image_progress.count.completed, total: number = image_progress.count.total) => {
+const getProgress = (completed: number, total: number) => {
   return (completed != null
     && total != 0
     && total != null) ? (completed / total * 100) : (0)
@@ -197,18 +197,28 @@ onMounted(() => {
     },
   });
   waveInit.value = waveRun
-  waveRun.usePlugin(drawCircle, { lineWidth: progressSettings.lineWidth });
-  waveRun.usePlugin(drawText, { fontSize: progressSettings.fontSize });
-  waveRun.setProgress({
+  waveInit.value!.usePlugin(drawCircle, { lineWidth: progressSettings.lineWidth });
+  waveInit.value!.usePlugin(drawText, { fontSize: progressSettings.fontSize });
+  waveInit.value!.setProgress({
     to: getProgress(image_progress.count.completed, image_progress.count.total)
   })
-  waveRun.render();
+  waveInit.value!.render();
 });
-watch(image_progress.count, (newValue, oldValue) => {
+watch(image_progress, (newValue, oldValue) => {
   console.log(`output->oldValue`, oldValue)
+  let fromData = getProgress(oldValue.count.completed, oldValue.count.total)
+  let toData = getProgress(image_progress.count.completed, image_progress.count.total)
+  console.log(`output->fromData`, fromData)
+  console.log(`output->toData`, toData)
+  console.log(`output->newValue`, newValue)
   waveInit.value!.setProgress({
-    from: getProgress(oldValue.completed, oldValue.total),
-    to: getProgress(image_progress.count.completed, image_progress.count.total)
+    // from: getProgress(oldValue.completed, oldValue.total),
+    // to: getProgress(image_progress.count.completed, image_progress.count.total)
+    from: fromData,
+    to: toData
+  }, {
+    immediate: true,
+    deep: true
   })
 
 })
