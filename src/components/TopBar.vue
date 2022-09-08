@@ -178,8 +178,9 @@ const setCanvasSize = (canvas: HTMLCanvasElement) => {
 }
 onMounted(() => {
   test_some_f();
-  const canvas = waveProgressRef.value = document.getElementById("waveProgress")!
+
   // 绘制进度条
+  const canvas = waveProgressRef.value = document.getElementById("waveProgress")!
   window.addEventListener('resize', () => {
     setCanvasSize(canvas!)
   })
@@ -189,6 +190,7 @@ onMounted(() => {
     progress: getProgress,
     progressSpeed: progressSettings.progressSpeed,
     waveCharacter: {
+      color: '197,140,19',
       number: progressSettings.characterNum,
       waveWidth: progressSettings.characterWidth,
       waveHeight: progressSettings.characterHeight,
@@ -200,20 +202,10 @@ onMounted(() => {
   waveRun.setProgress({
     to: getProgress(image_progress.count.completed, image_progress.count.total)
   })
-  setTimeout(() => {
-    waveRun.setProgress({
-      from: 10,
-      to: 88
-    })
-  }, 5000)
-  console.log(image_progress.count.completed)
-  console.log(waveRun);
   waveRun.render();
 });
 watch(image_progress.count, (newValue, oldValue) => {
   console.log(`output->oldValue`, oldValue)
-  // waveRun.usePlugin(drawCircle, { lineWidth: progressSettings.lineWidth });
-  // waveRun.usePlugin(drawText, { fontSize: progressSettings.fontSize });
   waveInit.value!.setProgress({
     from: getProgress(oldValue.completed, oldValue.total),
     to: getProgress(image_progress.count.completed, image_progress.count.total)
@@ -349,8 +341,8 @@ nextTick(() => {
 
 .goutou {
   /* background-image: v-bind(goutouUrl); */
-  -webkit-mask-image: url('../assets/star.png');
-  mask-image: url('../assets/star.png');
+  -webkit-mask-image: url('../assets/dog_eye.png');
+  mask-image: url('../assets/dog_eye.png');
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
   -webkit-mask-size: contain;
@@ -359,7 +351,7 @@ nextTick(() => {
   position: absolute;
   width: 35px;
   z-index: 1;
-  background-color: bisque;
+  background-color: white;
 }
 
 .goutou-wrapper {}
