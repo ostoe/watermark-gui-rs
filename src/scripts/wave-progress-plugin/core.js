@@ -312,20 +312,20 @@ export default class WaveProgress {
         const hooks = Object.keys(this.plugins)
         if (hooks.includes(plugin.hook)) {
             // 通过hooks数组内的函数string来对比新注册的插件install函数string，判断插件的逻辑是否重复
-            const pluginFnStrList = this.plugins[plugin.hook].map(item => {
-                if(item !== undefined && item.install instanceof Function) {
-                    return item.install.toString()
-                }
-            })
-            // 拦截同一个插件重估调用
-            if (!pluginFnStrList.includes(plugin.install.toString())) {
-                this.plugins[plugin.hook].push({
-                    id: Symbol(),
-                    install: plugin.install,
-                    params: opts,
-                    scopedData: null
-                })
-            }
+            // const pluginFnStrList = this.plugins[plugin.hook].map(item => {
+            //     if(item !== undefined && item.install instanceof Function) {
+            //         return item.install.toString()
+            //     }
+            // })
+            // // 拦截同一个插件重估调用
+            // if (!pluginFnStrList.includes(plugin.install.toString())) {
+            //     this.plugins[plugin.hook].push({
+            //         id: Symbol(),
+            //         install: plugin.install,
+            //         params: opts,
+            //         scopedData: null
+            //     })
+            // }
             return this
         }
         else {

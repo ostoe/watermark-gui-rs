@@ -149,6 +149,14 @@ defineExpose({
   image_progress
 })
 
+function get_image_url(value: string) {
+  let ap = convertFileSrc(value);
+  console.log(ap);
+  return ap;
+}
+// const goutouUrl = ref(get_image_url())
+const goutouUrl = ref(get_image_url('/Users/dongyifan/watermark-gui-rs/src/assets/goutou.jpeg'))
+
 enum progressSettings {
   progressSpeed = 0.2,
   characterNum = 2,
@@ -163,19 +171,7 @@ const getProgress = (completed: number = image_progress.count.completed, total: 
     && total != null) ? (completed / total * 100) : (0)
 }
 const waveProgressRef = ref<HTMLCanvasElement | null>(null)
-// if(canvas){
-//   const ctx = canvas!.getContext('2d')
-//   console.log(`output->ctx`, canvas)
-// }
-function get_image_url(value: string) {
-    let ap = convertFileSrc(value);
-    console.log(ap);
-    return ap;
-}
-// const goutouUrl = ref(get_image_url())
-const goutouUrl = ref(get_image_url('/Users/dongyifan/watermark-gui-rs/src/assets/goutou.jpeg'))
-const waveInit = () => {
-}
+const waveInit = ref<InstanceType<typeof WaveProgress>>()
 const setCanvasSize = (canvas: HTMLCanvasElement) => {
   canvas.width = 35;
   canvas.height = 35;
@@ -198,28 +194,27 @@ onMounted(() => {
       waveHeight: progressSettings.characterHeight,
     },
   });
+  waveInit.value = waveRun
   waveRun.usePlugin(drawCircle, { lineWidth: progressSettings.lineWidth });
   waveRun.usePlugin(drawText, { fontSize: progressSettings.fontSize });
   waveRun.setProgress({
     to: getProgress(image_progress.count.completed, image_progress.count.total)
   })
+  setTimeout(() => {
+    waveRun.setProgress({
+      from: 10,
+      to: 88
+    })
+  }, 5000)
   console.log(image_progress.count.completed)
   console.log(waveRun);
   waveRun.render();
 });
 watch(image_progress.count, (newValue, oldValue) => {
-  const canvas = waveProgressRef.value = document.getElementById("waveProgress")!
-  const waveRun = new WaveProgress({
-    canvas: canvas,
-    progress: getProgress(image_progress.count.completed, image_progress.count.total),
-    progressSpeed: progressSettings.progressSpeed,
-    waveCharacter: {
-      number: progressSettings.characterNum,
-      waveWidth: progressSettings.characterWidth,
-      waveHeight: progressSettings.characterHeight,
-    },
-  });
-  waveRun.setProgress({
+  console.log(`output->oldValue`, oldValue)
+  // waveRun.usePlugin(drawCircle, { lineWidth: progressSettings.lineWidth });
+  // waveRun.usePlugin(drawText, { fontSize: progressSettings.fontSize });
+  waveInit.value!.setProgress({
     from: getProgress(oldValue.completed, oldValue.total),
     to: getProgress(image_progress.count.completed, image_progress.count.total)
   })
@@ -243,7 +238,8 @@ nextTick(() => {
         <ping-pong v-else></ping-pong> -->
         <div class="goutou-wrapper">
           <div class="goutou"></div>
-          <canvas ref="waveProgress" width="35" height="35" id="waveProgress" style="border-radius: 48%;z-index: -1;"></canvas>
+          <canvas ref="waveProgress" width="35" height="35" id="waveProgress"
+            style="border-radius: 48%;z-index: -1;"></canvas>
         </div>
         <el-button key="button.text" :type="image_progress.status ? 'success' : 'primary'" text> {{
         `${image_progress.count.completed}/${image_progress.count.total}`
@@ -353,8 +349,8 @@ nextTick(() => {
 
 .goutou {
   /* background-image: v-bind(goutouUrl); */
-  -webkit-mask-image: url('../assets/goutou.jpeg');
-  mask-image: url('../assets/goutou.jpeg');
+  -webkit-mask-image: url('../assets/star.png');
+  mask-image: url('../assets/star.png');
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
   -webkit-mask-size: contain;
@@ -363,6 +359,7 @@ nextTick(() => {
   position: absolute;
   width: 35px;
   z-index: 1;
+  background-color: bisque;
 }
 
 .goutou-wrapper {}
