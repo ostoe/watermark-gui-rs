@@ -9,9 +9,11 @@
 import WaveProgress from './core'
 import drawText from './plugins/drawText'
 import drawCircle from './plugins/drawCircle'
+import drawCarbo  from './plugins/drawCarbo'
 
 export default WaveProgress
 export {
     drawText,
-    drawCircle
+    drawCircle,
+    drawCarbo,
 }

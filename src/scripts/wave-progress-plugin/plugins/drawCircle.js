@@ -12,9 +12,10 @@ export default {
         ctx.lineWidth = (opts && opts.lineWidth) || 2
         ctx.strokeStyle = (opts && opts.lineColor) || `rgba(${configs.waveCharacter.color}, 1)`
         const r = Math.min(configs.canvasWidth, configs.canvasHeight) / 2
-        ctx.arc(r, r, r + 1, 0, 2 * Math.PI)
+        ctx.arc(r, r, r-2, 0, 2 * Math.PI)
+        // const p = new Path2D("")
+        ctx.clip()
         ctx.stroke()
-        // ctx.beginPath()
-        // ctx.arc(r, r, r, 0, 2 * Math.PI)
+       
     }
 }
