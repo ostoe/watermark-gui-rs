@@ -207,13 +207,8 @@ onMounted(() => {
 watch([()=>image_progress.count.completed,()=>image_progress.count.total], (newValue, oldValue) => {
   console.log(`output->oldValue`, oldValue)
   let fromData = getProgress(oldValue[0], oldValue[1])
-  let toData = getProgress(image_progress.count.completed, image_progress.count.total)
-  console.log(`output->fromData`, fromData)
-  console.log(`output->toData`, toData)
-  console.log(`output->newValue`, newValue)
+  let toData = getProgress(newValue[0], newValue[1])
   waveInit.value!.setProgress({
-    // from: getProgress(oldValue.completed, oldValue.total),
-    // to: getProgress(image_progress.count.completed, image_progress.count.total)
     from: fromData,
     to: toData
   })
