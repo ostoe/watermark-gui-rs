@@ -11,8 +11,8 @@ import BaseSettingsDrawer from "./BaseSettingsDrawer.vue";
 // 绘制进度条
 // import WaveProgress from "@alanchenchen/waveprogress";
 // import { drawCircle, drawText } from "@alanchenchen/waveprogress";
-import WaveProgress from "../scripts/wave-progress-plugin"
-import { drawCircle, drawText } from "../scripts/wave-progress-plugin"
+import WaveProgress from "../scripts/wave-progress-plugin";
+import { drawCircle, drawText } from "../scripts/wave-progress-plugin";
 import { convertFileSrc } from '@tauri-apps/api/tauri';
 // import {WaveProgress} from "../scripts/WaveProgress"
 // const percentage = ref(90);

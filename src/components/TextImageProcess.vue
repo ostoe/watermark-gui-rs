@@ -9,6 +9,8 @@ import { open } from "@tauri-apps/api/dialog";
 import { appDir } from "@tauri-apps/api/path";
 import { pictureDir } from '@tauri-apps/api/path';
 import { watch } from "fs";
+import WaveProgress from "../scripts/wave-progress-plugin";
+import {  drawCarbo, drawText } from "../scripts/wave-progress-plugin";
 // import BaseSettingsDrawerVue from "./BaseSettingsDrawer.vue";
 
 const isCollapse = ref(true);
@@ -171,6 +173,43 @@ onMounted(() => {
   drag_event_handle();
   // this.set_drap_hover_evet(); // e.x e.y invalid.
   init_output_dir();
+  ///////------------------
+  const canvas = document.getElementById("waveProgress11")!
+  // 绘制进度条
+  // window.addEventListener('resize', () => {
+  //   setCanvasSize(canvas!)
+  // })
+  // console.log(`output->canvas`, canvas)
+  const waveRun = new WaveProgress({
+    canvas: canvas,
+    progress: 50.1,
+    progressSpeed: 0.2,
+    waveSpeed: 0.05,
+    waveCharacter: {
+      color: "189, 30, 70",
+      number: 2,
+      waveWidth: 0.05,
+      waveHeight: 10,
+    },
+  });
+  waveRun.usePlugin(drawCarbo, {lineColor: "#786198", lineWidth: 4});
+  waveRun.usePlugin(drawText, 120);
+  waveRun.render();
+  setInterval(() => {
+    waveRun.setProgress({
+                to: Math.random()*100,
+                from: 0,
+                animated: true,
+            })
+            // waveRun.update({
+            //   progressSpeed: number;
+            //    waveCharacter: object;
+            //     progressSpeed: 0.6
+            // })
+        }, 3000)
+
+  /////////----------------
+
 });
 
 // test event
@@ -179,7 +218,7 @@ onMounted(() => {
 <template lang="">
   
   <el-container  class="a-border">
-  
+  <canvas id="waveProgress11" width="150" height="150"></canvas>
   <div id="drap-area-sq1">
     <!-- <div style="margin: 20px 0" /> -->
     <div style="margin: 20px 5% 20px 5%">
