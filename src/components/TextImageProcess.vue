@@ -17,19 +17,7 @@ const count = ref(0);
 const text = ref("./tests/img/jpg/gps/DSCN0010.jpg");
 const selectImage = ref("");
 const isPlain = ref(true)
-//  const      progress_count = ,
-interface MsgProps {
-  message: string,
-  state_code: number
-}
-interface ImageProps {
-  image_paths: [string],
-  count: number
-}
 
-interface NotificationBackEnd {
-  jpg_file_count: number
-}
 
 const message=(msg: string)=> {
     ElNotification({
@@ -63,47 +51,6 @@ async function greetTest() {
 //   message("update output dir: " + res);
 // };
 
-async function backend_event_recv() {
-  // listen to the `click` event and get a function to remove the event listener
-  // there's also a `once` function that subscribes to an event and automatically unsubscribes the listener on the first event
-  // emits the `click` event with the object payload
-
-  const unlisten = await listen<MsgProps>("front-backend", (event) => {
-    // 是一个循环函数
-    // console.log(
-    //   `[r]: ${event.payload.stateCode, event.payload.message}`
-    // );
-    // let state_code = Number(event.payload.message.substring(0, 4));
-    // let data = event.payload.message.substring(4);
-    switch (event.payload.state_code) {
-      case 100:
-        console.log(event.payload.message + "--- ");
-        let result: NotificationBackEnd = JSON.parse(event.payload.message);
-        image_progress.update_progress(0, result.jpg_file_count);
-        break;
-      case 200:
-        image_progress.increase_one();
-        // progress.update_progress(progress.count.completed, progress.count.total);
-        break;
-      case 300:
-        console.log("skip file: " + event.payload.message);
-        image_progress.increase_one();
-        // progress.update_progress(progress.count.completed, progress.count.total);
-        break;
-      case 500:
-        console.log("500...");
-        break;
-      default: console.log("unknown nofitication.: " + event.payload.message);
-    }
-    if (image_progress.count.completed == image_progress.count.total) {
-      image_progress.status_toogle();
-      message(
-        `[r] : 已完成处理！`
-      );
-    }
-
-  });
-};
 
 async function drap_hover_event_handle() {
   const dropzoneElement = document.querySelector("#drap-area-sq1");
@@ -120,21 +67,6 @@ async function drap_hover_event_handle() {
 
 };
 
-async function drag_event_handle() {
-  // listen to the `click` event and get a function to remove the event listener
-  // there's also a `once` function that subscribes to an event and automatically unsubscribes the listener on the first event
-  // emits the `click` event with the object payload
-
-  const unlisten = await listen<string>("tauri://file-drop", (event) => {
-    // 是一个循环函数
-    image_progress.dragFiles(eval(event.payload));
-    console.log(event.payload);
-    
-    message(
-      `drap payload: ${event.payload}`
-    );
-  });
-};
 
 const send_event_test = async ()=>{
   await nextTick(()=>{
@@ -158,19 +90,16 @@ function handleFileChange(e: InputEvent) {
   selectImage.value = "./tests/img/jpg/gps/DSCN0010.jpg";
 };
 
-async function init_output_dir() {
-  const pictureDirPath = await pictureDir();
-  image_progress.update_user_data2BD("output_dir", pictureDirPath);
-};
+
 
 onMounted(() => {
-  backend_event_recv();
-  // for (let i = 0; i < 5; i += 1) {
-  //   tableData.value.push({ id: i, msg: " " + i + " " + i + " " + i });
-  // }
-  drag_event_handle();
-  // this.set_drap_hover_evet(); // e.x e.y invalid.
-  init_output_dir();
+  // backend_event_recv();
+  // // for (let i = 0; i < 5; i += 1) {
+  // //   tableData.value.push({ id: i, msg: " " + i + " " + i + " " + i });
+  // // }
+  // drag_event_handle();
+  // // this.set_drap_hover_evet(); // e.x e.y invalid.
+  // init_output_dir();
 });
 
 // test event

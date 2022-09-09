@@ -9,9 +9,7 @@ import { convertFileSrc } from '@tauri-apps/api/tauri';
 import { appDir, configDir, homeDir, localDataDir, logDir, resourceDir, fontDir } from '@tauri-apps/api/path';
 import { ElMessage, ElNotification } from "element-plus";
 import BaseSettingsDrawer from "./BaseSettingsDrawer.vue";
-import  WaveProgress  from "../scripts/wave-progress-plugin/index"
-import  drawCarbo  from "../scripts/wave-progress-plugin/index"
-import  drawText  from "../scripts/wave-progress-plugin/index"
+import WaveProgress,{drawCircle,drawText} from "../scripts/wave-progress-plugin";
 
 
 // const percentage = ref(90);
@@ -195,7 +193,7 @@ onMounted(() => {
       waveHeight: progressSettings.characterHeight,
     },
   });
-  waveInit.value = waveRun
+  waveInit.value = waveRun;
   waveInit.value!.usePlugin(drawCircle, { lineWidth: progressSettings.lineWidth });
   waveInit.value!.usePlugin(drawText, { fontSize: progressSettings.fontSize });
   waveInit.value!.setProgress({

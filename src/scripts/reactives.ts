@@ -1,9 +1,9 @@
 // import { reactive } from "vue";
 import { open } from "@tauri-apps/api/dialog";
 import { fs, invoke } from '@tauri-apps/api'
-import { resolve, resourceDir } from '@tauri-apps/api/path';
+import { pictureDir, resolve, resourceDir } from '@tauri-apps/api/path';
 // import { ElNotification,ElMessage } from "element-plus/es/components";
-
+import { emit, listen } from "@tauri-apps/api/event";
 // sidebar公共方法/值
 const sidebarReactives = reactive({
   isCollapse: true,
@@ -37,6 +37,20 @@ interface ImageProps {
   count: number;
 }
 
+interface UserSettings {
+  output_dir: string,
+  qulity: number,
+  auto_user_brand: boolean,
+  brand: string,
+  filename_pattern: Array<string>,
+}
+
+type RenameType = {
+  SD: Array<{ id: number, value: string, label: string }>,
+  value: { id: number, value: string, label: string },
+  input: string,
+  valid: boolean
+}
 
 
 // const tools = reactive({
@@ -59,7 +73,7 @@ type UserDataType = {
   autoUseBrand: boolean,
   brand: string,
   font: string,
-  brands: Array<{value: string, label: string}>,
+  brands: Array<{ value: string, label: string }>,
   renameSuffix: string,
   renamePreffix: string,
   renameCenter: string,
@@ -76,38 +90,58 @@ const user_conf = reactive({
   renamePreffix: "",
   renameCenter: "",
   user_conf_path: "",
-  brands: [{ value: 'canon', label: "佳能" }, { value: 'nikon', label: "尼康" }, { value: 'sony', label: "索尼" }, 
-                {value: "panasonic", label: "松下"}, {value: "fujifilm", label: "富士"} ],
+  brands: [{ value: 'canon', label: "佳能" }, { value: 'nikon', label: "尼康" }, { value: 'sony', label: "索尼" },
+  { value: "panasonic", label: "松下" }, { value: "fujifilm", label: "富士" }],
 
   async init_user_conf() {
+    // TODO: check resources file ...如果不存在提示警告。
     resource_dir.value = await resourceDir();
     this.user_conf_path = await resolve(resource_dir.value, "resources", "user.conf");
     const contents = await fs.readTextFile(this.user_conf_path);
-    console.log("ccc:" + contents);
+    // console.log("ccc:" + contents);
     if (contents == "") {
-      // console.log("kong");
+      // 初始化数据：=== reset 
+      // load 默认路径 为：const pictureDirPath = await pictureDir();
+      // console.log("105")
+
     } else {
       // console.log("kong1");
-      let user_data: UserDataType = JSON.parse(contents);
+      let user_data_load: UserDataType = JSON.parse(contents);
       // let entries = Object.entries(user_data);
       // for (let i=0; i < entries.length; i++) {
       //   let key = entries[i][0]
       //   let k2 = "autoUseBrand"
       //   user_conf[k2] = entries[i][1];
       // }
-      this.B2A(user_conf, user_data);
+      if (user_data_load.latestSelectedOutputPath == ""){
+        user_data_load.latestSelectedOutputPath = await pictureDir();
+      }
+      this.B2A(user_conf, user_data_load);
       // TODO 前后端初始化 并且发送数据给后端；
+      // user_conf.update_user_data2BD("output_dir", pictureDirPath);
+      let update_data_send: UserSettings = {
+        output_dir: this.latestSelectedOutputPath,
+        qulity: this.qulity,
+        auto_user_brand: this.autoUseBrand,
+        brand: this.brand,
+        filename_pattern: [this.renamePreffix, this.renameCenter, this.renameSuffix]
+      };
+      console.log("init send data:" );
+      console.log(update_data_send);
+      // send to backend.
+      let res: string = await invoke("handle_front_update_user_data", { userData: update_data_send });
+
 
     }
 
   },
   // A.* <-- B.*
   B2A(A: UserDataType, B: UserDataType) {
-    const properties = ["autoUseBrand", "brand", "font", "latestSelectedDirPath", 
-    "latestSelectedOutputPath", "qulity", "brands", "renameSuffix", "renamePreffix",  "renameCenter"]
+    const properties = ["autoUseBrand", "brand", "font", "latestSelectedDirPath",
+      "latestSelectedOutputPath", "qulity", "brands", "renameSuffix", "renamePreffix", "renameCenter"]
     properties.forEach((ele) => {
       if (B[ele] != null || B[ele] == "") {
-          A[ele] = B[ele];
+        A[ele] = B[ele];
       }
     });
   },
@@ -125,10 +159,11 @@ const user_conf = reactive({
   },
 
   async selectOutputDirs() {
+    
     const selected = await open({
       directory: true,
       multiple: false,
-      defaultPath: "/Users/fly/Downloads",
+      defaultPath: this.latestSelectedOutputPath,
     });
     if (selected === null) {
       // user cancelled the selection
@@ -277,7 +312,6 @@ const image_progress = reactive({
     } else if (typeof selected == "string") {
       console.log("selected single dir " + selected);
       elmessage("selected single dir " + selected);
-      // this.update_user_data2BD("output_dir", selected);
       this.image_dir_path = selected;
     }
   },
@@ -318,14 +352,83 @@ function elmessage(msg: string) {
 const previewwidget = reactive({
   inputValue: false
 })
+
+/// init begin------------------------------
+interface MsgProps {
+  message: string,
+  state_code: number
+}
+
+interface NotificationBackEnd {
+  jpg_file_count: number
+}
+
+// 启动坚挺后端的事件。
+async function backend_event_recv() {
+  // listen to the `click` event and get a function to remove the event listener
+  // there's also a `once` function that subscribes to an event and automatically unsubscribes the listener on the first event
+  // emits the `click` event with the object payload
+
+  const unlisten = await listen<MsgProps>("front-backend", (event) => {
+    // 是一个循环函数
+    // console.log(
+    //   `[r]: ${event.payload.stateCode, event.payload.message}`
+    // );
+    // let state_code = Number(event.payload.message.substring(0, 4));
+    // let data = event.payload.message.substring(4);
+    switch (event.payload.state_code) {
+      case 100:
+        console.log(event.payload.message + "--- ");
+        let result: NotificationBackEnd = JSON.parse(event.payload.message);
+        image_progress.update_progress(0, result.jpg_file_count);
+        break;
+      case 200:
+        image_progress.increase_one();
+        // progress.update_progress(progress.count.completed, progress.count.total);
+        break;
+      case 300:
+        console.log("skip file: " + event.payload.message);
+        image_progress.increase_one();
+        // progress.update_progress(progress.count.completed, progress.count.total);
+        break;
+      case 500:
+        console.log("500...");
+        break;
+      default: console.log("unknown nofitication.: " + event.payload.message);
+    }
+    if (image_progress.count.completed == image_progress.count.total) {
+      image_progress.status_toogle();
+      elmessage(
+        `[r] : 已完成处理！`
+      );
+    }
+
+  });
+};
+
+// 监听 drap事件
+async function drag_event_handle() {
+  const unlisten = await listen<string>("tauri://file-drop", (event) => {
+    // 是一个循环函数
+    image_progress.dragFiles(eval(event.payload));
+    console.log(event.payload);
+    elmessage(
+      `drap payload: ${event.payload}`
+    );
+  });
+};
+
+
+
+// run init function
 user_conf.init_user_conf();
+backend_event_recv();
+drag_event_handle();
 
 
-// onMounted(() => {
-  console.log("mounted init");
-  user_conf.init_user_conf();
+// onMounted(() => { // invalid 
 // })
 
-export { image_progress, sidebarReactives, previewwidget, elmessage, user_conf }; 
-export type { UserDataType };
+export { image_progress, sidebarReactives, previewwidget, elmessage, user_conf };
+export type { UserDataType, UserSettings, RenameType };
 

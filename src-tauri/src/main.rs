@@ -150,7 +150,7 @@ fn handle_front_update_user_data(
     user_data: UserSettingsJson,
     state: State<crossbeam_channel::Sender<UserOperation>>,
 ) -> String {
-    let a = ["output_dir", "brand"];
+    // let a = ["output_dir", "brand"];
     println!("{:?}", user_data);
     if user_data.output_dir != "" {
         state
