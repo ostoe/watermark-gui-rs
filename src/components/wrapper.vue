@@ -9,7 +9,8 @@ import PreviewWidget from "./PreviewWidget.vue";
 
 import { ref, onMounted } from "vue";
 // import { Context } from "vm";
-import { sidebarReactives } from "../scripts/reactives";
+import { sidebarReactives, image_progress } from "../scripts/reactives";
+import { convertFileSrc } from "@tauri-apps/api/tauri";
 //获取鼠标点击消除遮罩
 let t: NodeJS.Timeout | null = null;
 // const isCollapse = ref(true);
@@ -18,11 +19,74 @@ let t: NodeJS.Timeout | null = null;
 const changeThisCollapse = () => {
   sidebarReactives.changeThisCollapse();
 };
+// 输出路径面包屑
+// const selectedPath = ref<Array<string>>();
+// const transferPath2Array = () => {
+//   // if(image_progress.image_dir_path.indexOf("\")){
+//   // }
+// };
+const fontOps = [{
+  fontFamily: 'Aleo-Bold-2',
+  fontWeight: 1000,
+  fontSize: '150px'
+},{
+  fontFamily: 'Aleo-Italic-4',
+  fontWeight: 1000,
+  fontSize: '150px'
+},{
+  fontFamily: 'Aleo-Light-5',
+  fontWeight: 1000,
+  fontSize: '150px'
+},{
+  fontFamily: 'Aleo-LightItalic-6',
+  fontWeight: 1000,
+  fontSize: '150px'
+},{
+  fontFamily: 'Aleo-Regular-7',
+  fontWeight: 1000,
+  fontSize: '150px'
+},{
+  fontFamily: 'FiraCode-Bold',
+  fontWeight: 1000,
+  fontSize: '150px'
+},{
+  fontFamily: 'FiraCode-Medium',
+  fontWeight: 1000,
+  fontSize: '150px'
+},{
+  fontFamily: 'FiraCode-Regular',
+  fontWeight: 1000,
+  fontSize: '150px'
+},{
+  fontFamily: 'FiraCode-Retina',
+  fontWeight: 1000,
+  fontSize: '150px'
+},{
+  fontFamily: 'FiraCode-SemiBold',
+  fontWeight: 1000,
+  fontSize: '150px'
+},{
+  fontFamily: 'DejaVuSans',
+  fontWeight: 1000,
+  fontSize: '150px'
+}]
 
+const fontFamilyValue = ref("")
+console.log(`output->fontFamilyValue`,fontFamilyValue)
+nextTick(() => {});
 // const picSrc = ref("https://github.com/tauri-apps/tauri/blob/dev/.github/splash.png")
 </script>
 
 <template lang="">
+  <span class="spantest">fonttest1</span>
+  <span class="spantest2">fonttest2</span>
+  <el-select v-model="fontFamilyValue" class="select" placeholder="选择文字">
+    <el-option
+      v-for="item in fontOps"
+      :key="item.fontFamily"
+      :value="item.fontFamily"
+    />
+  </el-select>
   <div class="common-layout index">
     <div class="elcontainer">
       <SideBar>
@@ -64,13 +128,25 @@ const changeThisCollapse = () => {
 </template>
 
 <style scoped>
-  .common-layout{
-    height: 100%;
-    width: auto;
-  }
-  .elcontainer{
-    margin-left: 50px;
-  }
+@import "../assets/style/font.css";
+
+.spantest {
+  font-family: v-bind("fontFamilyValue");
+}
+
+.spantest2 {
+  font-family: "FiraCode-Bold";
+}
+
+.common-layout {
+  height: 100%;
+  width: auto;
+}
+
+.elcontainer {
+  margin-left: 50px;
+}
+
 .footer-div {
   background-color: rgb(255, 255, 255);
   display: flex;

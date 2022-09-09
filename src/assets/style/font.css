@@ -1,0 +1,65 @@
+@font-face {
+    font-family: 'Aleo-Bold-2';
+    src: url('../Aleo-Bold-2.otf') format('truetype');
+    font-weight: 800;
+}
+
+@font-face {
+    font-family: 'Aleo-BoldItalic-3.otf';
+    src: url('../Aleo-BoldItalic-3.otf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Aleo-Italic-4.otf';
+    src: url('../Aleo-Italic-4.otf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Aleo-Light-5.otf';
+    src: url('../Aleo-Light-5.otf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Aleo-LightItalic-6.otf';
+    src: url('../Aleo-LightItalic-6.otf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Aleo-Regular-7.otf';
+    src: url('../Aleo-Regular-7.otf') format('truetype');
+}
+
+@font-face {
+    font-family: 'FiraCode-Bold';
+    src: url('../FiraCode-Bold.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'FiraCode-Light';
+    src: url('../FiraCode-Light.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'FiraCode-Medium';
+    src: url('../FiraCode-Medium.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'FiraCode-Regular';
+    src: url('../FiraCode-Regular.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'FiraCode-Retina';
+    src: url('../FiraCode-Retina.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'FiraCode-SemiBold';
+    src: url('../FiraCode-SemiBold.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'DejaVuSans';
+    src: url('../DejaVuSans.ttf') format('truetype');
+}

@@ -38,20 +38,20 @@ async function test_some_f() {
 
 //自定义指令
 const vResize = {
-  mounted: (el: any, binding: { value: (arg0: { width: number }) => void }) => {
-    let ResizeObserver = window.ResizeObserver;
-    el._resizer = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        // console.log(entry.contentRect.width)
-        binding.value({ width: entry.contentRect.width });
-      }
-    });
-    el._resizer.observe(el);
-    // console.log(binding)
-  },
-  unmounted: (el: { _resizer: { disconnect: () => void } }) => {
-    el._resizer.disconnect();
-  },
+      mounted: (el: any, binding: { value: (arg0: { width: number }) => void }) => {
+            let ResizeObserver = window.ResizeObserver;
+            el._resizer = new ResizeObserver((entries) => {
+                  for (const entry of entries) {
+                        // console.log(entry.contentRect.width)
+                        binding.value({ width: entry.contentRect.width });
+                  }
+            });
+            el._resizer.observe(el);
+            // console.log(binding)
+      },
+      unmounted: (el: { _resizer: { disconnect: () => void } }) => {
+            el._resizer.disconnect();
+      },
 };
 
 const bigIcon = ref(true)
@@ -161,7 +161,7 @@ enum progressSettings {
   lineWidth = 4,
   fontSize = 10
 }
-const getProgress = (completed: number = image_progress.count.completed, total: number = image_progress.count.total) => {
+const getProgress = (completed: number=image_progress.count.completed, total: number=image_progress.count.total) => {
   return (completed != null
     && total != 0
     && total != null) ? (completed / total * 100) : (0)
@@ -203,7 +203,7 @@ onMounted(() => {
   })
   waveInit.value!.render();
 });
-watch([() => image_progress.count.completed, () => image_progress.count.total], (newValue, oldValue) => {
+watch([()=>image_progress.count.completed,()=>image_progress.count.total], (newValue, oldValue) => {
   console.log(`output->oldValue`, oldValue)
   let fromData = getProgress(oldValue[0], oldValue[1])
   let toData = getProgress(newValue[0], newValue[1])
@@ -227,10 +227,15 @@ nextTick(() => {
   <el-row class="row" v-resize="ListenTopbarWidth">
     <el-col :span="18" class="left">
       <div class="photoSelector">
-        <rotate-square4 v-if="image_progress.status"></rotate-square4>
-        <ping-pong v-else></ping-pong>
+        <!-- <rotate-square4 v-if="image_progress.status"></rotate-square4>
+        <ping-pong v-else></ping-pong> -->
+        <div class="goutou-wrapper">
+          <div class="goutou"></div>
+          <canvas ref="waveProgress" width="35" height="35" id="waveProgress"
+            style="border-radius: 48%;z-index: -1;"></canvas>
+        </div>
         <el-button key="button.text" :type="image_progress.status ? 'success' : 'primary'" text> {{
-            `${image_progress.count.completed}/${image_progress.count.total}`
+        `${image_progress.count.completed}/${image_progress.count.total}`
         }} </el-button>
         <!-- <el-progress id="progress-bar" :percentage="image_progress.value" :format="format" :color="color"
           v-if="isNotTinyIcon"></el-progress> -->
@@ -335,4 +340,21 @@ nextTick(() => {
   font-size: 25px;
   margin-right: 20px;
 }
+
+.goutou {
+  /* background-image: v-bind(goutouUrl); */
+  -webkit-mask-image: url('../assets/dog_eye.png');
+  mask-image: url('../assets/dog_eye.png');
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  height: 35px;
+  position: absolute;
+  width: 35px;
+  z-index: 1;
+  background-color: white;
+}
+
+.goutou-wrapper {}
 </style>
