@@ -1,13 +1,18 @@
 <script setup lang="ts">
-  import { Files, FolderChecked } from '@element-plus/icons-vue'
+import { Files, FolderChecked } from '@element-plus/icons-vue'
 import { main } from '@popperjs/core';
 import { floor } from 'lodash';
 import { onMounted, ref, reactive } from 'vue';
-import { image_progress,previewwidget } from '../scripts/reactives';
+import { image_progress, previewwidget, user_conf } from '../scripts/reactives';
 import { invoke } from '@tauri-apps/api';
+import { convertFileSrc } from '@tauri-apps/api/tauri';
 import { appDir, configDir, homeDir, localDataDir, logDir, resourceDir, fontDir } from '@tauri-apps/api/path';
 import { ElMessage, ElNotification } from "element-plus";
 import BaseSettingsDrawer from "./BaseSettingsDrawer.vue";
+import  WaveProgress  from "../scripts/wave-progress-plugin/index"
+import  drawCarbo  from "../scripts/wave-progress-plugin/index"
+import  drawText  from "../scripts/wave-progress-plugin/index"
+
 
 // const percentage = ref(90);
 // const progress_count = ref({ completed: 0, total: 0 });
@@ -33,44 +38,44 @@ async function test_some_f() {
 
 //自定义指令
 const vResize = {
-    mounted: (el: any, binding: { value: (arg0: { width: number }) => void }) => {
-        let ResizeObserver = window.ResizeObserver;
-        el._resizer = new ResizeObserver((entries) => {
-            for (const entry of entries) {
-                // console.log(entry.contentRect.width)
-                binding.value({ width: entry.contentRect.width });
-            }
-        });
-        el._resizer.observe(el);
-        // console.log(binding)
-    },
-    unmounted: (el: { _resizer: { disconnect: () => void } }) => {
-        el._resizer.disconnect();
-    },
+  mounted: (el: any, binding: { value: (arg0: { width: number }) => void }) => {
+    let ResizeObserver = window.ResizeObserver;
+    el._resizer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        // console.log(entry.contentRect.width)
+        binding.value({ width: entry.contentRect.width });
+      }
+    });
+    el._resizer.observe(el);
+    // console.log(binding)
+  },
+  unmounted: (el: { _resizer: { disconnect: () => void } }) => {
+    el._resizer.disconnect();
+  },
 };
 
 const bigIcon = ref(true)
 const isNotTinyIcon = ref(true)
-const ListenTopbarWidth = (width:any)=>{
-  bigIcon.value=(width.width>=960)?true:false
-  isNotTinyIcon.value=(width.width>=720)?true:false
+const ListenTopbarWidth = (width: any) => {
+  bigIcon.value = (width.width >= 960) ? true : false
+  isNotTinyIcon.value = (width.width >= 720) ? true : false
 }
 
-const showDrawTable = ()=>{
+const showDrawTable = () => {
 
 }
 
-const showPreviewWidget = ()=>{
-  previewwidget.inputValue=true
+const showPreviewWidget = () => {
+  previewwidget.inputValue = true
 }
-const message=(msg: string)=> {
-    ElNotification({
-      message: msg,
-      type: "success",
-      title: "🐮----🍺",
-      position: "bottom-left",
-    });
-  }
+const message = (msg: string) => {
+  ElNotification({
+    message: msg,
+    type: "success",
+    title: "🐮----🍺",
+    position: "bottom-left",
+  });
+}
 
 function color() {
   const index = floor(image_progress.value / 25.01);
@@ -170,6 +175,9 @@ const setCanvasSize = (canvas: HTMLCanvasElement) => {
 onMounted(() => {
   test_some_f();
 
+  // init user_conf
+
+
   // 绘制进度条
   const canvas = waveProgressRef.value = document.getElementById("waveProgress")!
   window.addEventListener('resize', () => {
@@ -195,7 +203,7 @@ onMounted(() => {
   })
   waveInit.value!.render();
 });
-watch([()=>image_progress.count.completed,()=>image_progress.count.total], (newValue, oldValue) => {
+watch([() => image_progress.count.completed, () => image_progress.count.total], (newValue, oldValue) => {
   console.log(`output->oldValue`, oldValue)
   let fromData = getProgress(oldValue[0], oldValue[1])
   let toData = getProgress(newValue[0], newValue[1])
@@ -221,12 +229,9 @@ nextTick(() => {
       <div class="photoSelector">
         <rotate-square4 v-if="image_progress.status"></rotate-square4>
         <ping-pong v-else></ping-pong>
-        <el-button 
-      key="button.text"
-      :type="image_progress.status? 'success' : 'primary'"
-      text
-      > {{ `${image_progress.count.completed}/${image_progress.count.total}` }} </el-button
-    >
+        <el-button key="button.text" :type="image_progress.status ? 'success' : 'primary'" text> {{
+            `${image_progress.count.completed}/${image_progress.count.total}`
+        }} </el-button>
         <!-- <el-progress id="progress-bar" :percentage="image_progress.value" :format="format" :color="color"
           v-if="isNotTinyIcon"></el-progress> -->
         <div>
@@ -240,21 +245,18 @@ nextTick(() => {
           </div>
         </div>
         <div v-if="bigIcon">
-        <el-tooltip  :content="'选择' + (selectType? '文件' : '文件夹') " placement="bottom-end" effect="light">
-          <el-button v-if="selectType" @click="image_progress.selectFiles()">选择</el-button>
-          <el-button v-else @click="image_progress.selectDirs()">选择</el-button>
-        </el-tooltip>
-        <el-tooltip :content="'输入模式：' + (selectType? '文件' : '文件夹') " placement="bottom-end" effect="light">
-         
-            <el-switch v-model="selectType"
-              style="--el-switch-on-color: #13ce66; --el-switch-off-color: #bababa"
-              inline-prompt
-              :active-icon="Files"
-              :inactive-icon="FolderChecked"
-            />
-        </el-tooltip>
+          <el-tooltip :content="'选择' + (selectType ? '文件' : '文件夹')" placement="bottom-end" effect="light">
+            <el-button v-if="selectType" @click="image_progress.selectFiles()">选择</el-button>
+            <el-button v-else @click="image_progress.selectDirs()">选择</el-button>
+          </el-tooltip>
+          <el-tooltip :content="'输入模式：' + (selectType ? '文件' : '文件夹')" placement="bottom-end" effect="light">
 
-          <el-button @click="image_progress.selectOutputDirs()">输出目录</el-button>
+            <el-switch v-model="selectType" style="--el-switch-on-color: #13ce66; --el-switch-off-color: #bababa"
+              inline-prompt :active-icon="Files" :inactive-icon="FolderChecked" />
+          </el-tooltip>
+
+          <el-button @click="user_conf.selectOutputDirs()">输出目录</el-button>
+          <el-input v-model="user_conf.latestSelectedOutputPath" class="w-50 m-2" size="small" placeholder="Please Input" />
           <el-button @click="process_image" color="#de4781" size="" plain>开始处理</el-button>
 
         </div>
@@ -263,7 +265,7 @@ nextTick(() => {
             <i-ep-document-add @click="image_progress.selectFiles()" />
           </el-icon>
           <el-icon style="margin-right:20px">
-            <i-ep-folder-add @click="image_progress.selectOutputDirs()" />
+            <i-ep-folder-add @click="user_conf.selectOutputDirs()" />
           </el-icon>
           <el-icon style="margin-right:20px">
             <i-ep-full-screen @click="process_image" />

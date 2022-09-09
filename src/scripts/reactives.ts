@@ -85,9 +85,9 @@ const user_conf = reactive({
     const contents = await fs.readTextFile(this.user_conf_path);
     console.log("ccc:" + contents);
     if (contents == "") {
-      console.log("kong");
+      // console.log("kong");
     } else {
-      console.log("kong1");
+      // console.log("kong1");
       let user_data: UserDataType = JSON.parse(contents);
       // let entries = Object.entries(user_data);
       // for (let i=0; i < entries.length; i++) {
@@ -96,22 +96,20 @@ const user_conf = reactive({
       //   user_conf[k2] = entries[i][1];
       // }
       this.B2A(user_conf, user_data);
+      // TODO 前后端初始化 并且发送数据给后端；
 
     }
 
   },
   // A.* <-- B.*
-  B2A(A: any, B: any) {
-    A.autoUseBrand = B.autoUseBrand;
-    A.brand = B.brand;
-    A.font = B.font;
-    A.latestSelectedDirPath = B.latestSelectedDirPath;
-    A.latestSelectedOutputPath = B.latestSelectedOutputPath;
-    A.qulity = B.qulity;
-    A.brands = B.brands;
-    A.renameSuffix = B.renameSuffix;
-    A.renamePreffix = B.renamePreffix;
-    A.renameCenter = B.renameCenter;
+  B2A(A: UserDataType, B: UserDataType) {
+    const properties = ["autoUseBrand", "brand", "font", "latestSelectedDirPath", 
+    "latestSelectedOutputPath", "qulity", "brands", "renameSuffix", "renamePreffix",  "renameCenter"]
+    properties.forEach((ele) => {
+      if (B[ele] != null || B[ele] == "") {
+          A[ele] = B[ele];
+      }
+    });
   },
 
   async save_user_conf(baseForm: UserDataType) {
@@ -323,10 +321,10 @@ const previewwidget = reactive({
 user_conf.init_user_conf();
 
 
-onMounted(() => {
+// onMounted(() => {
   console.log("mounted init");
   user_conf.init_user_conf();
-})
+// })
 
 export { image_progress, sidebarReactives, previewwidget, elmessage, user_conf }; 
 export type { UserDataType };
