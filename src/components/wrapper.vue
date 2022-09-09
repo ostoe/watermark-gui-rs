@@ -10,8 +10,8 @@ import PreviewWidget from "./PreviewWidget.vue";
 // import { square } from "../scripts/wave-progress";
 import { ref, onMounted, nextTick } from "vue";
 // import { Context } from "vm";
-import { sidebarReactives } from "../scripts/reactives";
-import { convertFileSrc } from "@tauri-apps/api/tauri"
+import { sidebarReactives, image_progress } from "../scripts/reactives";
+import { convertFileSrc } from "@tauri-apps/api/tauri";
 //获取鼠标点击消除遮罩
 let t: NodeJS.Timeout | null = null;
 // const isCollapse = ref(true);
@@ -20,31 +20,74 @@ let t: NodeJS.Timeout | null = null;
 const changeThisCollapse = () => {
   sidebarReactives.changeThisCollapse();
 };
-// const square = {
-//   hook: "beforeProgress",
-//   install({ ctx, configs, scopedData }, opts = {}) {
-//     ctx.beginPath();
-//     ctx.lineWidth = (opts && opts.lineWidth) || 2;
-//     ctx.strokeStyle =
-//       (opts && opts.lineColor) || `rgba(${configs.waveCharacter.color}, 1)`;
-//     const r = Math.min(configs.canvasWidth, configs.canvasHeight) / 2;
-//     ctx.arc(r, r, r + 1, 0, 2 * Math.PI);
-//     ctx.stroke();
-//     console.log(ctx);
-//     ctx.beginPath();
-//     ctx.lineWidth = 5;
-//     ctx.arc(100, 200, 80, 0, Math.PI * 2);
-//     // ctx.strokeStyle = '#1c86d1'
-//     ctx.stroke();
-//     // ctx.closePath()
-//     console.log(ctx);
-//   },
+// 输出路径面包屑
+// const selectedPath = ref<Array<string>>();
+// const transferPath2Array = () => {
+//   // if(image_progress.image_dir_path.indexOf("\")){
+//   // }
 // };
+const fontOps = [{
+  fontFamily: 'Aleo-Bold-2',
+  fontWeight: 1000,
+  fontSize: '150px'
+},{
+  fontFamily: 'Aleo-Italic-4',
+  fontWeight: 1000,
+  fontSize: '150px'
+},{
+  fontFamily: 'Aleo-Light-5',
+  fontWeight: 1000,
+  fontSize: '150px'
+},{
+  fontFamily: 'Aleo-LightItalic-6',
+  fontWeight: 1000,
+  fontSize: '150px'
+},{
+  fontFamily: 'Aleo-Regular-7',
+  fontWeight: 1000,
+  fontSize: '150px'
+},{
+  fontFamily: 'FiraCode-Bold',
+  fontWeight: 1000,
+  fontSize: '150px'
+},{
+  fontFamily: 'FiraCode-Medium',
+  fontWeight: 1000,
+  fontSize: '150px'
+},{
+  fontFamily: 'FiraCode-Regular',
+  fontWeight: 1000,
+  fontSize: '150px'
+},{
+  fontFamily: 'FiraCode-Retina',
+  fontWeight: 1000,
+  fontSize: '150px'
+},{
+  fontFamily: 'FiraCode-SemiBold',
+  fontWeight: 1000,
+  fontSize: '150px'
+},{
+  fontFamily: 'DejaVuSans',
+  fontWeight: 1000,
+  fontSize: '150px'
+}]
+
+const fontFamilyValue = ref("")
+console.log(`output->fontFamilyValue`,fontFamilyValue)
 nextTick(() => {});
 // const picSrc = ref("https://github.com/tauri-apps/tauri/blob/dev/.github/splash.png")
 </script>
 
 <template lang="">
+  <span class="spantest">fonttest1</span>
+  <span class="spantest2">fonttest2</span>
+  <el-select v-model="fontFamilyValue" class="select" placeholder="选择文字">
+    <el-option
+      v-for="item in fontOps"
+      :key="item.fontFamily"
+      :value="item.fontFamily"
+    />
+  </el-select>
   <div class="common-layout index">
     <div class="elcontainer">
       <SideBar>
@@ -74,7 +117,6 @@ nextTick(() => {});
                 src="https://fuss10.elemecdn.com/a/3f/3302e58f9a181d2509f3dc0fa68b0jpeg.jpeg"
               ></el-image>
             </PreviewWidget>
-            <canvas id="wavetest"></canvas>
             <!-- <el-row > -->
             <!-- <HelloWorld msg="Vite + Vue" /> -->
             <!-- <TextImageProcess /> -->
@@ -89,6 +131,16 @@ nextTick(() => {});
 </template>
 
 <style scoped>
+@import "../assets/style/font.css";
+
+.spantest {
+  font-family: v-bind("fontFamilyValue");
+}
+
+.spantest2 {
+  font-family: "FiraCode-Bold";
+}
+
 .common-layout {
   height: 100%;
   width: auto;

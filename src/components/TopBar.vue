@@ -165,7 +165,7 @@ enum progressSettings {
   lineWidth = 4,
   fontSize = 10
 }
-const getProgress = (completed: number, total: number) => {
+const getProgress = (completed: number=image_progress.count.completed, total: number=image_progress.count.total) => {
   return (completed != null
     && total != 0
     && total != null) ? (completed / total * 100) : (0)
@@ -204,6 +204,7 @@ onMounted(() => {
   })
   waveInit.value!.render();
 });
+// 监听图片完成情况
 watch([()=>image_progress.count.completed,()=>image_progress.count.total], (newValue, oldValue) => {
   console.log(`output->oldValue`, oldValue)
   let fromData = getProgress(oldValue[0], oldValue[1])
