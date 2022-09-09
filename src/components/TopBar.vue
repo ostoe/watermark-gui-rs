@@ -8,13 +8,7 @@ import { invoke } from '@tauri-apps/api';
 import { appDir, configDir, homeDir, localDataDir, logDir, resourceDir, fontDir } from '@tauri-apps/api/path';
 import { ElMessage, ElNotification } from "element-plus";
 import BaseSettingsDrawer from "./BaseSettingsDrawer.vue";
-// 绘制进度条
-// import WaveProgress from "@alanchenchen/waveprogress";
-// import { drawCircle, drawText } from "@alanchenchen/waveprogress";
-import WaveProgress from "../scripts/wave-progress-plugin";
-import { drawCircle, drawText } from "../scripts/wave-progress-plugin";
-import { convertFileSrc } from '@tauri-apps/api/tauri';
-// import {WaveProgress} from "../scripts/WaveProgress"
+
 // const percentage = ref(90);
 // const progress_count = ref({ completed: 0, total: 0 });
 const colors = [
@@ -39,20 +33,20 @@ async function test_some_f() {
 
 //自定义指令
 const vResize = {
-    mounted: (el: any, binding: { value: (arg0: { width: number }) => void }) => {
-        let ResizeObserver = window.ResizeObserver;
-        el._resizer = new ResizeObserver((entries) => {
-            for (const entry of entries) {
-                // console.log(entry.contentRect.width)
-                binding.value({ width: entry.contentRect.width });
-            }
-        });
-        el._resizer.observe(el);
-        // console.log(binding)
-    },
-    unmounted: (el: { _resizer: { disconnect: () => void } }) => {
-        el._resizer.disconnect();
-    },
+      mounted: (el: any, binding: { value: (arg0: { width: number }) => void }) => {
+            let ResizeObserver = window.ResizeObserver;
+            el._resizer = new ResizeObserver((entries) => {
+                  for (const entry of entries) {
+                        // console.log(entry.contentRect.width)
+                        binding.value({ width: entry.contentRect.width });
+                  }
+            });
+            el._resizer.observe(el);
+            // console.log(binding)
+      },
+      unmounted: (el: { _resizer: { disconnect: () => void } }) => {
+            el._resizer.disconnect();
+      },
 };
 
 const bigIcon = ref(true)
@@ -62,21 +56,21 @@ const ListenTopbarWidth = (width:any)=>{
   isNotTinyIcon.value=(width.width>=720)?true:false
 }
 
-const showDrawTable = () => {
+const showDrawTable = ()=>{
 
 }
 
-const showPreviewWidget = () => {
-  previewwidget.inputValue = true
+const showPreviewWidget = ()=>{
+  previewwidget.inputValue=true
 }
-const message = (msg: string) => {
-  ElNotification({
-    message: msg,
-    type: "success",
-    title: "🐮----🍺",
-    position: "bottom-left",
-  });
-}
+const message=(msg: string)=> {
+    ElNotification({
+      message: msg,
+      type: "success",
+      title: "🐮----🍺",
+      position: "bottom-left",
+    });
+  }
 
 function color() {
   const index = floor(image_progress.value / 25.01);
