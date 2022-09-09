@@ -6,7 +6,7 @@
  * @param {number} opts.fontSize 文本大小，默认是26
  * @param {string} opts.color 文本颜色，默认当进度小于50%时为WaveLoading实例的波浪背景色 ，大于50%时是#fff
  */
-export default {
+ export default {
     hook: 'duringProgress',
     install({ ctx, configs }, opts = {}) {
         ctx.save()

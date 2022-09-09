@@ -6,7 +6,6 @@ import { ref } from 'vue'
 // 设置ui语言
 // import { ElConfigProvider } from "element-plus"
 import zhCn from "element-plus/lib/locale/lang/zh-cn"
-import BaseSettingsDrawer from './components/BaseSettingsDrawer.vue';
 const locale = ref(zhCn)
 
 </script>

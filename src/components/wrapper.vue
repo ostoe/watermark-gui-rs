@@ -7,8 +7,7 @@ import picList from "./PicList.vue";
 import BaseSettingsDrawerVue from "./BaseSettingsDrawer.vue";
 import PreviewWidget from "./PreviewWidget.vue";
 
-// import { square } from "../scripts/wave-progress";
-import { ref, onMounted, nextTick } from "vue";
+import { ref, onMounted } from "vue";
 // import { Context } from "vm";
 import { sidebarReactives, image_progress } from "../scripts/reactives";
 import { convertFileSrc } from "@tauri-apps/api/tauri";
@@ -113,9 +112,7 @@ nextTick(() => {});
         <el-main>
           <el-container direction="vertical">
             <PreviewWidget>
-              <el-image
-                src="https://fuss10.elemecdn.com/a/3f/3302e58f9a181d2509f3dc0fa68b0jpeg.jpeg"
-              ></el-image>
+              <el-image src="https://fuss10.elemecdn.com/a/3f/3302e58f9a181d2509f3dc0fa68b0jpeg.jpeg"></el-image>
             </PreviewWidget>
             <!-- <el-row > -->
             <!-- <HelloWorld msg="Vite + Vue" /> -->

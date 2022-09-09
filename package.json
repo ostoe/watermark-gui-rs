@@ -7,18 +7,16 @@
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
-    "tauri": "tauri",
-    "cache": "vite -force"
+    "tauri": "tauri"
   },
   "dependencies": {
-    "@alanchenchen/waveprogress": "^0.1.4",
     "@tauri-apps/api": "^1.0.2",
     "element-plus": "^2.2.14",
-    "patch-package": "^6.4.7",
     "path": "^0.12.7",
     "unplugin-icons": "^0.14.8",
     "vite-plugin-style-import": "^2.0.0",
     "vue": "^3.2.37",
+    "vue-loading-spinner": "^1.0.11",
     "vue-router": "^4.1.4"
   },
   "devDependencies": {

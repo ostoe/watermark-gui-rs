@@ -101,7 +101,7 @@ const user_conf = reactive({
 
   },
   // A.* <-- B.*
-  B2A(A: UserDataType, B: UserDataType) {
+  B2A(A: any, B: any) {
     A.autoUseBrand = B.autoUseBrand;
     A.brand = B.brand;
     A.font = B.font;
@@ -124,7 +124,37 @@ const user_conf = reactive({
 
   load_conf(baseForm: UserDataType) {
     this.B2A(baseForm, user_conf);
-  }
+  },
+
+  async selectOutputDirs() {
+    const selected = await open({
+      directory: true,
+      multiple: false,
+      defaultPath: "/Users/fly/Downloads",
+    });
+    if (selected === null) {
+      // user cancelled the selection
+      ElMessage({
+        message: "null dir selected.",
+        type: "warning",
+      });
+    } else if (typeof selected == "string") {
+      this.latestSelectedOutputPath = selected;
+      // console.log("selected single dir " + selected);
+      elmessage("selected single dir " + selected);
+      this.update_user_data2BD("output_dir", selected);
+    }
+  },
+
+  async update_user_data2BD(key: string, value: string) {
+    let res = await invoke("handle_front_update_key", {
+      key: key,
+      value: value,
+    });
+    elmessage("update output dir: " + res);
+  },
+
+  ///
 
 
 })
@@ -231,13 +261,7 @@ const image_progress = reactive({
     }
   },
 
-  async update_user_data2BD(key: string, value: string) {
-    let res = await invoke("handle_front_update_key", {
-      key: key,
-      value: value,
-    });
-    elmessage("update output dir: " + res);
-  },
+
   //
 
   async selectDirs() {
@@ -261,24 +285,6 @@ const image_progress = reactive({
   },
 
 
-  async selectOutputDirs() {
-    const selected = await open({
-      directory: true,
-      multiple: false,
-      defaultPath: "/Users/fly/Downloads",
-    });
-    if (selected === null) {
-      // user cancelled the selection
-      ElMessage({
-        message: "null dir selected.",
-        type: "warning",
-      });
-    } else if (typeof selected == "string") {
-      console.log("selected single dir " + selected);
-      elmessage("selected single dir " + selected);
-      this.update_user_data2BD("output_dir", selected);
-    }
-  },
 
   async process_image() {
     if ((this.count.total != 0) && (this.count.completed != this.count.total)) {

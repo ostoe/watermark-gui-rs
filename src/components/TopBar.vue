@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { Files, FolderChecked } from '@element-plus/icons-vue'
+  import { Files, FolderChecked } from '@element-plus/icons-vue'
 import { main } from '@popperjs/core';
 import { floor } from 'lodash';
-import { onMounted, ref, reactive, unref } from 'vue';
-import { image_progress, previewwidget } from '../scripts/reactives';
+import { onMounted, ref, reactive } from 'vue';
+import { image_progress,previewwidget } from '../scripts/reactives';
 import { invoke } from '@tauri-apps/api';
 import { appDir, configDir, homeDir, localDataDir, logDir, resourceDir, fontDir } from '@tauri-apps/api/path';
 import { ElMessage, ElNotification } from "element-plus";
@@ -39,27 +39,27 @@ async function test_some_f() {
 
 //自定义指令
 const vResize = {
-  mounted: (el: any, binding: { value: (arg0: { width: number }) => void }) => {
-    let ResizeObserver = window.ResizeObserver;
-    el._resizer = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        // console.log(entry.contentRect.width)
-        binding.value({ width: entry.contentRect.width });
-      }
-    });
-    el._resizer.observe(el);
-    // console.log(binding)
-  },
-  unmounted: (el: { _resizer: { disconnect: () => void } }) => {
-    el._resizer.disconnect();
-  },
+    mounted: (el: any, binding: { value: (arg0: { width: number }) => void }) => {
+        let ResizeObserver = window.ResizeObserver;
+        el._resizer = new ResizeObserver((entries) => {
+            for (const entry of entries) {
+                // console.log(entry.contentRect.width)
+                binding.value({ width: entry.contentRect.width });
+            }
+        });
+        el._resizer.observe(el);
+        // console.log(binding)
+    },
+    unmounted: (el: { _resizer: { disconnect: () => void } }) => {
+        el._resizer.disconnect();
+    },
 };
 
 const bigIcon = ref(true)
 const isNotTinyIcon = ref(true)
-const ListenTopbarWidth = (width: any) => {
-  bigIcon.value = (width.width >= 960) ? true : false
-  isNotTinyIcon.value = (width.width >= 720) ? true : false
+const ListenTopbarWidth = (width:any)=>{
+  bigIcon.value=(width.width>=960)?true:false
+  isNotTinyIcon.value=(width.width>=720)?true:false
 }
 
 const showDrawTable = () => {
@@ -145,9 +145,6 @@ async function process_image() {
   image_progress.process_image();
 };
 
-defineExpose({
-  image_progress
-})
 
 function get_image_url(value: string) {
   let ap = convertFileSrc(value);
@@ -252,15 +249,19 @@ nextTick(() => {
           </div>
         </div>
         <div v-if="bigIcon">
-          <el-tooltip :content="'选择' + (selectType ? '文件' : '文件夹')" placement="bottom-end" effect="light">
-            <el-button v-if="selectType" @click="image_progress.selectFiles()">选择</el-button>
-            <el-button v-else @click="image_progress.selectDirs()">选择</el-button>
-          </el-tooltip>
-          <el-tooltip :content="'输入模式：' + (selectType ? '文件' : '文件夹')" placement="bottom-end" effect="light">
-
-            <el-switch v-model="selectType" style="--el-switch-on-color: #13ce66; --el-switch-off-color: #bababa"
-              inline-prompt :active-icon="Files" :inactive-icon="FolderChecked" />
-          </el-tooltip>
+        <el-tooltip  :content="'选择' + (selectType? '文件' : '文件夹') " placement="bottom-end" effect="light">
+          <el-button v-if="selectType" @click="image_progress.selectFiles()">选择</el-button>
+          <el-button v-else @click="image_progress.selectDirs()">选择</el-button>
+        </el-tooltip>
+        <el-tooltip :content="'输入模式：' + (selectType? '文件' : '文件夹') " placement="bottom-end" effect="light">
+         
+            <el-switch v-model="selectType"
+              style="--el-switch-on-color: #13ce66; --el-switch-off-color: #bababa"
+              inline-prompt
+              :active-icon="Files"
+              :inactive-icon="FolderChecked"
+            />
+        </el-tooltip>
 
           <el-button @click="image_progress.selectOutputDirs()">输出目录</el-button>
           <el-button @click="process_image" color="#de4781" size="" plain>开始处理</el-button>

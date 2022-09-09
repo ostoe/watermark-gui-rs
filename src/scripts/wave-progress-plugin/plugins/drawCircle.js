@@ -5,7 +5,7 @@
  * @param {number} opts.lineWidth 边框线条宽度，默认是2
  * @param {string} opts.lineColor 边框线条颜色，默认是WaveLoading实例的波浪背景色 
  */
-export default {
+ export default {
     hook: 'duringProgress',
     install({ ctx, configs }, opts={}) {
         ctx.beginPath()
