@@ -160,11 +160,13 @@ nextTick(() => { });
             class="shadowmask"
             @click="changeThisCollapse"
           ></div>
+      <el-container>
         <el-main>
             <transition name="el-fade-in-linear" mode="out-in">
-                <router-view></router-view>
+                <router-view/>
             </transition>
         </el-main>
+      </el-container>
     </el-container>
 
 

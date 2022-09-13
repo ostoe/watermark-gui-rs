@@ -19,40 +19,34 @@ const routes = [
   {
     path: "/",
     name: "基础",
-    component: home,
+    component: base,
     iconid: 1,
-    children: [
-      {
-        path: "base",
-        name: "base",
-        component: base,
-      },
-      {
-        path: "textImageProcess",
-        name: "textImageProcess",
-        component: textImageProcess,
-        
-      },
-    ],
+    
+  },
+  {
+    path: "/textImageProcess",
+    name: "textImageProcess",
+    component: textImageProcess,
+    iconid: 1,
   },
   // { path: 'cus/:id', component: cusIcon }// solve icon ...
   {
-    path: "/",
-    name: "hello",
-    component: home,
+    path: "/dragTest",
+    name: "dragTest",
+    component: dragTest,
     iconid: 2,
-    children: [
-      {
-        path: "dragTest",
-        name: "dragTest",
-        component: dragTest,
-      },
-      {
-        path: "dragTest1",
-        name: "dragTest1",
-        component: textImageProcess,
-      }
-    ]
+    // children: [
+    //   {
+    //     path: "dragTest",
+    //     name: "dragTest",
+    //     component: dragTest,
+    //   },
+    //   {
+    //     path: "dragTest1",
+    //     name: "dragTest1",
+    //     component: textImageProcess,
+    //   }
+    // ]
   },
 
 

@@ -7,9 +7,9 @@ export {}
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
-    Base: typeof import('./components/base.vue')['default']
-    BaseSettingsDrawer: typeof import('./components/baseSettingsDrawer.vue')['default']
-    DragTest: typeof import('./components/dragTest.vue')['default']
+    Base: typeof import('./components/Base.vue')['default']
+    BaseSettingsDrawer: typeof import('./components/BaseSettingsDrawer.vue')['default']
+    DragTest: typeof import('./components/DragTest.vue')['default']
     ElAside: typeof import('element-plus/es')['ElAside']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCheckbox: typeof import('element-plus/es')['ElCheckbox']
@@ -33,7 +33,6 @@ declare module '@vue/runtime-core' {
     ElScrollbar: typeof import('element-plus/es')['ElScrollbar']
     ElSelect: typeof import('element-plus/es')['ElSelect']
     ElSlider: typeof import('element-plus/es')['ElSlider']
-    ElSubmenu: typeof import('element-plus/es')['ElSubmenu']
     ElSubMenu: typeof import('element-plus/es')['ElSubMenu']
     ElSwitch: typeof import('element-plus/es')['ElSwitch']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
@@ -48,14 +47,14 @@ declare module '@vue/runtime-core' {
     IEpFullScreen: typeof import('~icons/ep/full-screen')['default']
     IEpMenu: typeof import('~icons/ep/menu')['default']
     IEpPicture: typeof import('~icons/ep/picture')['default']
-    PicList: typeof import('./components/picList.vue')['default']
-    PreviewWidget: typeof import('./components/previewWidget.vue')['default']
+    PicList: typeof import('./components/PicList.vue')['default']
+    PreviewWidget: typeof import('./components/PreviewWidget.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    SeniorSettings: typeof import('./components/seniorSettings.vue')['default']
-    SideBar: typeof import('./components/sideBar.vue')['default']
-    TextImageProcess: typeof import('./components/textImageProcess.vue')['default']
-    TopBar: typeof import('./components/topBar.vue')['default']
+    SeniorSettings: typeof import('./components/SeniorSettings.vue')['default']
+    SideBar: typeof import('./components/SideBar.vue')['default']
+    TextImageProcess: typeof import('./components/TextImageProcess.vue')['default']
+    TopBar: typeof import('./components/TopBar.vue')['default']
     Wrapper: typeof import('./components/wrapper.vue')['default']
   }
 }
