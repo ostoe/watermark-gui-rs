@@ -4,12 +4,12 @@ import { nextTick, ref, onMounted } from "vue";
 import { image_progress } from '../scripts/reactives';
 import { emit, listen } from "@tauri-apps/api/event";
 import { event, invoke } from "@tauri-apps/api";
-import { ElMessage, ElNotification } from "element-plus";
+// import { ElMessage, ElNotification } from "element-plus";
 import { open } from "@tauri-apps/api/dialog";
 import { appDir } from "@tauri-apps/api/path";
 import { pictureDir } from '@tauri-apps/api/path';
 import { watch } from "fs";
-import BaseSettingsDrawerVue from "./BaseSettingsDrawer.vue";
+import baseSettingsDrawerVue from "./baseSettingsDrawer.vue";
 
 const isCollapse = ref(true);
 // const progress_count = ref({ completed: 0, total: 0 });
@@ -19,14 +19,14 @@ const selectImage = ref("");
 const isPlain = ref(true)
 
 
-const message=(msg: string)=> {
-    ElNotification({
-      message: msg,
-      type: "success",
-      title: "🐮----🍺",
-      position: "bottom-left",
-    });
-  }
+// const message=(msg: string)=> {
+//     ElNotification({
+//       message: msg,
+//       type: "success",
+//       title: "🐮----🍺",
+//       position: "bottom-left",
+//     });
+//   }
 
 // {count: selected.length, image_paths: [selected]}
 

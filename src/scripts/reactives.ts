@@ -8,7 +8,7 @@ import { emit, listen } from "@tauri-apps/api/event";
 const sidebarReactives = reactive({
   isCollapse: true,
   activeMenuId: "1-1",
-  delay: 200,
+  delay: 0,
   extendPadding: "",
   //获取鼠标点击消除遮罩
   changeThisCollapse() {
