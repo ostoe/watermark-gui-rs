@@ -9,7 +9,8 @@ import { convertFileSrc } from '@tauri-apps/api/tauri';
 import { appDir, configDir, homeDir, localDataDir, logDir, resourceDir, fontDir } from '@tauri-apps/api/path';
 import { ElMessage, ElNotification } from "element-plus";
 import BaseSettingsDrawer from "./BaseSettingsDrawer.vue";
-import WaveProgress,{drawCircle,drawText} from "../scripts/wave-progress-plugin";
+import WaveProgress,{drawCarbo, drawCircle,drawText} from "../scripts/wave-progress-plugin";
+import { objectPick } from '@vueuse/shared';
 
 
 // const percentage = ref(90);
@@ -152,7 +153,7 @@ function get_image_url(value: string) {
 const goutouUrl = ref(get_image_url('/Users/dongyifan/watermark-gui-rs/src/assets/goutou.jpeg'))
 
 enum progressSettings {
-  progressSpeed = 0.2,
+  progressSpeed = 2.0,
   characterNum = 2,
   characterWidth = 0.01,
   characterHeight = 5,
@@ -160,12 +161,16 @@ enum progressSettings {
   fontSize = 10
 }
 const getProgress = (completed: number=image_progress.count.completed, total: number=image_progress.count.total) => {
-  return (completed != null
-    && total != 0
-    && total != null) ? (completed / total * 100) : (0)
+
+  if (completed != null && total != 0 && total != null) {
+    return Math.round((completed / total + Number.EPSILON) * 10000) / 100
+  } else {
+    return 0;
+  }
 }
-const waveProgressRef = ref<HTMLCanvasElement | null>(null)
-const waveInit = ref<InstanceType<typeof WaveProgress>>()
+// const waveProgressRef = ref<HTMLCanvasElement>(new Object as HTMLCanvasElement);
+const waveInit = ref<WaveProgress>(new Object as WaveProgress);
+  const waveInit11 = ref<WaveProgress>(new Object as WaveProgress);
 const setCanvasSize = (canvas: HTMLCanvasElement) => {
   canvas.width = 35;
   canvas.height = 35;
@@ -175,16 +180,16 @@ onMounted(() => {
 
   // init user_conf
 
-
   // 绘制进度条
-  const canvas = waveProgressRef.value = document.getElementById("waveProgress")!
+  const canvas =  document.getElementById("waveProgress")! as HTMLCanvasElement
   window.addEventListener('resize', () => {
-    setCanvasSize(canvas!)
+    setCanvasSize(canvas)
   })
   console.log(`output->canvas`, canvas)
   const waveRun = new WaveProgress({
     canvas: canvas,
-    progress: getProgress,
+    progress: getProgress(),
+    waveSpeed: 0.05,
     progressSpeed: progressSettings.progressSpeed,
     waveCharacter: {
       color: '197,140,19',
@@ -192,24 +197,58 @@ onMounted(() => {
       waveWidth: progressSettings.characterWidth,
       waveHeight: progressSettings.characterHeight,
     },
-  });
+  })!;
   waveInit.value = waveRun;
-  waveInit.value!.usePlugin(drawCircle, { lineWidth: progressSettings.lineWidth });
-  waveInit.value!.usePlugin(drawText, { fontSize: progressSettings.fontSize });
-  waveInit.value!.setProgress({
-    to: getProgress(image_progress.count.completed, image_progress.count.total)
+  // waveInit.value.usePlugin(drawCircle, { lineWidth: progressSettings.lineWidth });
+  // waveInit.value.usePlugin(drawText, { fontSize: progressSettings.fontSize });
+  waveInit.value.setProgress({
+    to:  0,// getProgress(image_progress.count.completed, image_progress.count.total),
+    from: 0, animated: false,
   })
-  waveInit.value!.render();
+  waveInit.value.render();
+
+
+  // another icon
+  // 绘制进度条
+  const canvas11 = document.getElementById("waveProgress11")! as HTMLCanvasElement
+  console.log(`output->canvas`, canvas11)
+  const waveRun11 = new WaveProgress({
+    canvas: canvas11,
+    progress: getProgress(),
+    waveSpeed: 0.05,
+    progressSpeed: progressSettings.progressSpeed,
+    waveCharacter: {
+      color: '197,140,19',
+      number: progressSettings.characterNum,
+      waveWidth: progressSettings.characterWidth,
+      waveHeight: progressSettings.characterHeight,
+    },
+  })!;
+  waveRun11.usePlugin(drawCarbo, { lineWidth: progressSettings.lineWidth });
+  waveInit11.value = waveRun11;
+  // waveInit.value.usePlugin(drawCircle, { lineWidth: progressSettings.lineWidth });
+  // waveInit.value.usePlugin(drawText, { fontSize: progressSettings.fontSize });
+  waveRun11.setProgress({
+    to:  0,// getProgress(image_progress.count.completed, image_progress.count.total),
+    from: 0, animated: false,
+  })
+  waveRun11.render();
 });
 watch([()=>image_progress.count.completed,()=>image_progress.count.total], (newValue, oldValue) => {
-  console.log(`output->oldValue`, oldValue)
-  let fromData = getProgress(oldValue[0], oldValue[1])
-  let toData = getProgress(newValue[0], newValue[1])
-  waveInit.value!.setProgress({
+  console.log(`output->oldValue`, oldValue);
+  let fromData = getProgress(oldValue[0], oldValue[1]);
+  let toData = getProgress(newValue[0], newValue[1]);
+  waveInit.value.setProgress({
     from: fromData,
-    to: toData
+    to: toData,
+    animated: true,
+  });
+  // test
+  waveInit11.value.setProgress({
+    from: fromData,
+    to: toData,
+    animated: true,
   })
-
 })
 
 nextTick(() => {
@@ -231,7 +270,10 @@ nextTick(() => {
           <div class="goutou"></div>
           <canvas ref="waveProgress" width="35" height="35" id="waveProgress"
             style="border-radius: 48%;z-index: -1;"></canvas>
+
         </div>
+        <canvas width="90" height="90" id="waveProgress11"></canvas>
+
         <el-button key="button.text" :type="image_progress.status ? 'success' : 'primary'" text> {{
         `${image_progress.count.completed}/${image_progress.count.total}`
         }} </el-button>

@@ -305,7 +305,7 @@ export default class WaveProgress {
      * @param {object} plugin
      * @param {string} plugin.hook 生命周期名称，只能是beforeProgress,progressing,afterProgress,duringProgress,update其中之一，否则报错
      * @param {function} plugin.install 插件的执行函数，返回2个形参
-     * @param {number} opts 传入插件执行函数的参数
+     * @param {object} opts 传入插件执行函数的参数
      * @returns {WaveProgress} 返回实例本身
      */
     usePlugin(plugin, opts) {
@@ -329,7 +329,7 @@ export default class WaveProgress {
             return this
         }
         else {
-            throw new Error('hook name is ivalid，expected with beforeProgress or progressing or afterProgress')
+            throw new Error('hook name is ivalid, expected with beforeProgress or progressing or afterProgress')
         }
     }
 }
