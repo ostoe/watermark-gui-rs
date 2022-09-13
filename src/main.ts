@@ -1,9 +1,10 @@
-import { createApp } from 'vue'
-import './style.css'
-import App from './App.vue'
+import { createApp } from 'vue';
+import './style.css';
+import App from './App.vue';
+// import home from "./components/home.vue";
 // 全局引入elementui
 // import zhCn from 'element-plus/es/locale/lang/zh-cn'
-import { router } from './router'
+import  router from './router/router'
 
 const app = createApp(App)
 

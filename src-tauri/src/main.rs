@@ -150,7 +150,7 @@ fn handle_front_update_user_data(
     user_data: UserSettingsJson,
     state: State<crossbeam_channel::Sender<UserOperation>>,
 ) -> String {
-    let a = ["output_dir", "brand"];
+    // let a = ["output_dir", "brand"];
     println!("{:?}", user_data);
     if user_data.output_dir != "" {
         state
@@ -169,6 +169,9 @@ fn handle_front_update_user_data(
         state.send(UserOperation::Update(UserSetting::AutoUseBrand(false, user_data.brand)))
         .unwrap();
     }
+    // #TODO 初次启动批量初始化配置
+    state.send(UserOperation::Update(UserSetting::FileNamePattern(user_data.filename_pattern))).unwrap();
+    
     return format!("updating..");
 }
 

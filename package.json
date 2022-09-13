@@ -7,16 +7,13 @@
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
-    "tauri": "tauri",
-    "cache": "vite -force"
+    "tauri": "tauri"
   },
   "dependencies": {
-    "@alanchenchen/waveprogress": "^0.1.4",
+    "@element-plus/icons-vue": "^2.0.9",
     "@tauri-apps/api": "^1.0.2",
-    "element-plus": "^2.2.14",
-    "patch-package": "^6.4.7",
+    "element-plus": "^2.2.16",
     "path": "^0.12.7",
-    "unplugin-icons": "^0.14.8",
     "vite-plugin-style-import": "^2.0.0",
     "vue": "^3.2.37",
     "vue-router": "^4.1.4"
@@ -29,6 +26,7 @@
     "three": "^0.143.0",
     "typescript": "^4.6.4",
     "unplugin-auto-import": "^0.11.2",
+    "unplugin-icons": "^0.14.9",
     "unplugin-vue-components": "^0.22.4",
     "vite": "^3.0.7",
     "vite-plugin-inspect": "^0.6.1",

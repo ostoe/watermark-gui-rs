@@ -37,6 +37,7 @@ pub fn control_center_thread(
         let mut position_ratio = 0.6267f32;
         let mut split_line_spacing = 30u32; // px doubel = 10
 
+        let mut filename_pattern = [String::new(), String::new(), String::new()];
         // user params: --------------------------------end
         loop {
             let opt = operation_st.recv().unwrap();
@@ -112,6 +113,9 @@ pub fn control_center_thread(
                     UserSetting::Font(path) => {
                         // update font
                     }
+                    UserSetting::FileNamePattern(pattern) => {
+                        filename_pattern = pattern;
+                    }
 
                     _ => {}
                 },
@@ -143,6 +147,7 @@ pub fn control_center_thread(
                                 tmp_logo_spacing_ratio = 1.0;
                             }
                         }
+                        // let index = index.to_string();
                         match image_processing::process_single_image(
                             image_path,
                             &output_path,
@@ -156,6 +161,8 @@ pub fn control_center_thread(
                             position_ratio,
                             logo_ratio,
                             split_line_spacing,
+                            &index.to_string(),
+                            &filename_pattern,
                         ) {
                             Ok(_) => {
                                 notify_front_st.send(Notification::Complated).unwrap();

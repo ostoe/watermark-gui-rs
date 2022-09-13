@@ -1,39 +1,34 @@
 
-  <script lang="ts" setup>
+<script lang="ts" setup>
 import { resolve, resourceDir } from '@tauri-apps/api/path';
 import { convertFileSrc } from '@tauri-apps/api/tauri';
 // import { reactive, ref } from 'vue'
 //   import { ElDrawer, ElMessageBox } from 'unp'
 import { invoke } from '@tauri-apps/api';
-import { user_conf, UserDataType } from '../scripts/reactives'
+import { user_conf, UserDataType, UserSettings, RenameType } from '../scripts/reactives'
 import { elmessage } from '../scripts/reactives';
 import { Ref } from 'vue';
-import {InfoFilled} from '@element-plus/icons-vue';
+import { InfoFilled } from '@element-plus/icons-vue';
 
-type RenameType = {
-    SD: Array<{ id: number, value: string, label: string }>,
-    value: { id: number, value: string, label: string },
-    input: string,
-    valid: boolean
-}
+
 
 const formLabelWidth = '80px'
 //   let timer
 const renamePreffix = ref({
-    SD: [{ id: 1, label: "空", value: "" }, { id: 2, label: "自定义", value: "" }, { id: 3, label: "自定义+【序号】", value: "[$x]" }],
+    SD: [{ id: 1, label: "空", value: "" }, { id: 2, label: "自定义", value: "__custom__" }, { id: 3, label: "自定义+【序号】", value: "__serial_number__" }],
     value: { id: 1, label: "空", value: "" },
     input: "",
     valid: true,
 });
 const renameCenter = ref({
-    SD: [{ id: 1, label: "原名称", value: "__keep__" }, { id: 2, label: "自定义", value: "2022" }],
-    value: { id: 1, label: "原名称", value: "__keep__" },
+    SD: [{ id: 1, label: "原名称", value: "" }, { id: 2, label: "自定义", value: "__custom__" }],
+    value: { id: 1, label: "原名称", value: "" },
     input: "",
     valid: true,
 });
 const renameSuffix = ref({
-    SD: [{ id: 1, label: "空", value: "" }, { id: 2, label: "自定义", value: "-w" }, { id: 3, label: "自定义+【序号】", value: "[$x]" }],
-    value: { id: 2, label: "自定义", value: "-w" },
+    SD: [{ id: 1, label: "空", value: "" }, { id: 2, label: "自定义", value: "__custom__" }, { id: 3, label: "自定义+【序号】", value: "__serial_number__" }],
+    value: { id: 2, label: "自定义", value: "__custom__" },
     input: "-w",
     valid: true,
 });
@@ -44,14 +39,14 @@ function check_input_prefix() {
 }
 
 function check_input_center() {
-    check_input(renameCenter, 1 );
+    check_input(renameCenter, 1);
 }
 function check_input_suffix() {
     check_input(renameSuffix, 2);
 }
 
 function resetConfirmEvent() {
-
+    //#TODO
 }
 
 const preview_filename = ref(["", "", "", ".jpg"]);
@@ -122,25 +117,23 @@ function get_image_url(value: string) {
     // \\?\G:\workspace\watermark-app\src-tauri\target\debug\
     // return convertFileSrc("C:\\Users\\fly\\Pictures\\DSC0118.-w.jpg");
     // console.log(resource_imge_patten.value);
-    const p = resource_imge_patten.value.replace("---value---", value + ".png");
+    const p = resource_imge_patten.value.replace("__value__", value + ".png");
     let ap = convertFileSrc(p);
     // console.log(ap);
     return ap;
 }
 
 const baseForm: Ref<UserDataType> = ref({
-    qulity: 85,
+    qulity: 0,
     latestSelectedDirPath: "",
     latestSelectedOutputPath: "",
-    autoUseBrand: true,
-    brand: "nikon",
+    autoUseBrand: false,
+    brand: "",
     font: "",
     renameSuffix: "",
     renamePreffix: "",
     renameCenter: "",
-    brands: [{ value: 'canon', label: "佳能" }, { value: 'nikon', label: "尼康" }, { value: 'sony', label: "索尼" },
-    { value: "panasonic", label: "松下" }, { value: "fujifilm", label: "富士" }],
-
+    brands: [],
 
 })
 
@@ -148,19 +141,29 @@ const baseForm: Ref<UserDataType> = ref({
 
 
 
-interface UserSettings {
-    output_dir: string,
-    qulity: number,
-    auto_user_brand: boolean,
-    brand: string,
-}
+// interface UserSettings {
+//     output_dir: string,
+//     qulity: number,
+//     auto_user_brand: boolean,
+//     brand: string,
+//     filename_pattern: Array<string>,
+// }
 
 async function saveSetting() {
     if (renamePreffix.value.valid && renameCenter.value.valid && renameSuffix.value.valid) {
-        let user_data: UserSettings = { output_dir: "", qulity: baseForm.value.qulity, auto_user_brand: baseForm.value.autoUseBrand, brand: baseForm.value.brand };
+        // send backend
+        let filename_tmp = ["", "", ""];
+        // TODO user_conf存储 __custom 前端解析 转换为 renamePreffix模式；然后配置加载初始化程序
+        if (renamePreffix.value.value.value != "") { filename_tmp[0] = baseForm.value.renamePreffix = renamePreffix.value.value.value + renamePreffix.value.input; }
+        if (renameCenter.value.value.value != "") { filename_tmp[1] = baseForm.value.renameCenter = renameCenter.value.value.value + renameCenter.value.input; }
+        if (renameSuffix.value.value.value != "") { filename_tmp[2] = baseForm.value.renameSuffix = renameSuffix.value.value.value + renameSuffix.value.input; }
+        // console.log(filename_tmp);
+        // output_dir: "" means backend not update "output_dir" key.
+        let user_data: UserSettings = { output_dir: "", qulity: baseForm.value.qulity, auto_user_brand: baseForm.value.autoUseBrand, brand: baseForm.value.brand, filename_pattern: filename_tmp };
         //   console.log(user_data);
-        user_conf.save_user_conf(baseForm.value);
         let res: string = await invoke("handle_front_update_user_data", { userData: user_data });
+        user_conf.save_user_conf(baseForm.value);
+
         elmessage(res);
     } else {
         ElMessage({
@@ -169,6 +172,45 @@ async function saveSetting() {
             type: 'error',
         })
     }
+
+}
+
+function init_saved_conf() {
+    user_conf.B2A(baseForm.value, user_conf);
+    // parse __custom__
+    // prefix
+    if (baseForm.value.renamePreffix == "") {
+        renamePreffix.value.value = renamePreffix.value.SD[0];
+    } else if (baseForm.value.renamePreffix.startsWith("__custom__")) {
+        renamePreffix.value.value = renamePreffix.value.SD[1];
+        renamePreffix.value.input = baseForm.value.renamePreffix.replace("__custom__", "");
+    } else if (baseForm.value.renamePreffix.startsWith("__serial_number__")) {
+        renamePreffix.value.value = renamePreffix.value.SD[2];
+        renamePreffix.value.input = baseForm.value.renamePreffix.replace("__serial_number__", "");
+    }
+    // center
+    if (baseForm.value.renameCenter == "") {
+        renameCenter.value.value = renameCenter.value.SD[0];
+
+    } else if (baseForm.value.renameCenter.startsWith("__custom__")) {
+        renameCenter.value.value = renameCenter.value.SD[1];
+        renameCenter.value.input = baseForm.value.renameCenter.replace("__custom__", "");
+    }
+    // suffix
+    if (baseForm.value.renameSuffix == "") {
+        renameSuffix.value.value = renameSuffix.value.SD[0];
+    } else if (baseForm.value.renameSuffix.startsWith("__custom__")) {
+        renameSuffix.value.value = renameSuffix.value.SD[1];
+        renameSuffix.value.input = baseForm.value.renameSuffix.replace("__custom__", "");
+    } else if (baseForm.value.renameSuffix.startsWith("__serial_number__")) {
+        renameSuffix.value.value = renameSuffix.value.SD[2];
+        renameSuffix.value.input = baseForm.value.renameSuffix.replace("__serial_number__", "");
+    }
+
+    check_input(renamePreffix, 0);
+    check_input(renameCenter, 1);
+    check_input(renameSuffix, 2);
+
 
 }
 
@@ -217,11 +259,12 @@ function handleChangeQulity() { }
 
 async function get_image_src_patten() {
     const r1 = await resourceDir();
-    const _r2 = await resolve(r1, "resources", "---value---").then(value => resource_imge_patten.value = value);
+    const _r2 = await resolve(r1, "resources", "__value__").then(value => resource_imge_patten.value = value);
 }
 
 onMounted(() => {
     get_image_src_patten();
+    init_saved_conf();
 })
 
 </script>
@@ -312,13 +355,8 @@ onMounted(() => {
                 </el-col>
             </el-row>
             <el-row>
-                <el-button 
-      key="button.text"
-      type="primary"
-      text
-      > {{ preview_filename.join("") }} </el-button
-    >
-                
+                <el-button key="button.text" type="primary" text> {{ preview_filename.join("") }} </el-button>
+
             </el-row>
 
         </el-scrollbar>

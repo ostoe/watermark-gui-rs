@@ -44,6 +44,7 @@ pub enum UserSetting {
     Qulity(u8),
     AutoUseBrand(bool, String),
     Font(String),
+    FileNamePattern([String;3]),
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
@@ -52,4 +53,5 @@ pub struct UserSettingsJson {
     pub qulity: u8,
     pub auto_user_brand: bool,
     pub brand: String,
+    pub filename_pattern: [String; 3],
 }

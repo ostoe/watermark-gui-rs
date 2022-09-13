@@ -1,16 +1,86 @@
+
+<script setup lang="ts">
+    // import { onMounted, ref } from "vue";
+    // import { Context } from "vm";
+    import { sidebarReactives } from "../scripts/reactives";
+    //dark mode
+    import { useDark, useToggle } from "@vueuse/core";
+    //引入路由
+    import { useRoute, useRouter } from "vue-router";
+    
+    //自定义指令
+    const vResize = {
+        mounted: (el: any, binding: { value: (arg0: { width: number }) => void }) => {
+            let ResizeObserver = window.ResizeObserver;
+            el._resizer = new ResizeObserver((entries) => {
+                for (const entry of entries) {
+                    // console.log(entry.contentRect.width)
+                    binding.value({ width: entry.contentRect.width });
+                }
+            });
+            el._resizer.observe(el);
+            // console.log(binding)
+        },
+        unmounted: (el: { _resizer: { disconnect: () => void } }) => {
+            el._resizer.disconnect();
+        },
+    };
+    
+    //获取鼠标点击消除遮罩
+    const changeThisCollapse = () => {
+        sidebarReactives.changeThisCollapse()
+    };
+    
+    //监听dom变化
+    const dynamicWidth = ref(false);
+    const resizeSideBar = (width: any) => {
+        let domWidth = width;
+        let initWidth = 63;
+        dynamicWidth.value = domWidth.width > initWidth ? false : true;
+        // console.log(domWidth)
+    };
+    
+    //路由
+    const route = useRoute();
+    const router = useRouter();
+    const route2Main = () => {
+        router.push("/textImageProcess");
+    };
+    const route2Test = () => {
+      router.push("/HelloWorld");
+    };
+    
+    // 深色模式
+    const isDark = ref(true);
+    const isDarkMode = useDark();
+    const toggleDark = useToggle(isDarkMode);
+    const tooltipEffect = ref("light");
+    const toggleDarkMode = () => {
+        toggleDark;
+        isDark.value = isDark.value ? false : true;
+    };
+    
+    //侧栏聚焦
+    const activeMenuId = ref("1-1");
+    
+    
+    onMounted(() => {
+    //   router.push("/textImageProcess");
+    });
+    
+    </script>
+    
+
 <template>
-    <el-container>
+    <!-- <el-drawer v-model="drawer" title="I am the title" :with-header="false">
+    <span>Hi there!</span>
+  </el-drawer> -->
+    <!-- <el-container> -->
         <el-aside width="50px">
             <el-menu :default-active="activeMenuId" class="elmenu" :collapse="sidebarReactives.isCollapse"
                 :delay="sidebarReactives.delay" v-resize:1="resizeSideBar">
                 <div style="margin-top: 30px"></div>
-                <div @click="changeThisCollapse" class="extend"
-                    :style="{ 'padding-left': sidebarReactives.extendPadding + 'px' }">
-                    <el-icon>
-                        <i-ep-arrow-right v-if="sidebarReactives.isCollapse" />
-                        <i-ep-arrow-left v-else />
-                    </el-icon>
-                </div>
+                
                 <el-sub-menu index="1">
                     <template #title>
                         <el-icon>
@@ -57,79 +127,8 @@
                 </div>
             </el-menu>
         </el-aside>
-    </el-container>
+    <!-- </el-container> -->
 </template>
-
-<script setup lang="ts">
-// import { onMounted, ref } from "vue";
-// import { Context } from "vm";
-import { sidebarReactives } from "../scripts/reactives";
-//dark mode
-import { useDark, useToggle } from "@vueuse/core";
-//引入路由
-import { useRoute, useRouter } from "vue-router";
-
-//自定义指令
-const vResize = {
-    mounted: (el: any, binding: { value: (arg0: { width: number }) => void }) => {
-        let ResizeObserver = window.ResizeObserver;
-        el._resizer = new ResizeObserver((entries) => {
-            for (const entry of entries) {
-                // console.log(entry.contentRect.width)
-                binding.value({ width: entry.contentRect.width });
-            }
-        });
-        el._resizer.observe(el);
-        // console.log(binding)
-    },
-    unmounted: (el: { _resizer: { disconnect: () => void } }) => {
-        el._resizer.disconnect();
-    },
-};
-
-//获取鼠标点击消除遮罩
-const changeThisCollapse = () => {
-    sidebarReactives.changeThisCollapse()
-};
-
-//监听dom变化
-const dynamicWidth = ref(false);
-const resizeSideBar = (width: any) => {
-    let domWidth = width;
-    let initWidth = 63;
-    dynamicWidth.value = domWidth.width > initWidth ? false : true;
-    // console.log(domWidth)
-};
-
-//路由
-const route = useRoute();
-const router = useRouter();
-const route2Main = () => {
-    router.push("/textImageProcess");
-};
-const route2Test = () => {
-  router.push("/HelloWorld");
-};
-
-// 深色模式
-const isDark = ref(true);
-const isDarkMode = useDark();
-const toggleDark = useToggle(isDarkMode);
-const tooltipEffect = ref("light");
-const toggleDarkMode = () => {
-    toggleDark;
-    isDark.value = isDark.value ? false : true;
-};
-
-//侧栏聚焦
-const activeMenuId = ref("1-1");
-
-
-onMounted(() => {
-  router.push("/textImageProcess");
-});
-
-</script>
 
 <style scoped>
 .elmenu {

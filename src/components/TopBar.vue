@@ -2,17 +2,17 @@
 import { Files, FolderChecked } from '@element-plus/icons-vue'
 import { main } from '@popperjs/core';
 import { floor } from 'lodash';
-import { onMounted, ref, reactive,unref } from 'vue';
-import { image_progress, previewwidget } from '../scripts/reactives';
+import { onMounted, ref, reactive } from 'vue';
+import { image_progress, previewwidget, user_conf } from '../scripts/reactives';
 import { invoke } from '@tauri-apps/api';
+import { convertFileSrc } from '@tauri-apps/api/tauri';
 import { appDir, configDir, homeDir, localDataDir, logDir, resourceDir, fontDir } from '@tauri-apps/api/path';
 import { ElMessage, ElNotification } from "element-plus";
 import BaseSettingsDrawer from "./BaseSettingsDrawer.vue";
-// 绘制进度条
-import WaveProgress from "@alanchenchen/waveprogress";
-import { drawCircle, drawText } from "@alanchenchen/waveprogress";
-import { convertFileSrc } from '@tauri-apps/api/tauri';
-// import {WaveProgress} from "../scripts/WaveProgress"
+import WaveProgress,{drawCarbo, drawCircle,drawText} from "../scripts/wave-progress-plugin";
+import { objectPick } from '@vueuse/shared';
+
+
 // const percentage = ref(90);
 // const progress_count = ref({ completed: 0, total: 0 });
 const colors = [
@@ -37,20 +37,20 @@ async function test_some_f() {
 
 //自定义指令
 const vResize = {
-  mounted: (el: any, binding: { value: (arg0: { width: number }) => void }) => {
-    let ResizeObserver = window.ResizeObserver;
-    el._resizer = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        // console.log(entry.contentRect.width)
-        binding.value({ width: entry.contentRect.width });
-      }
-    });
-    el._resizer.observe(el);
-    // console.log(binding)
-  },
-  unmounted: (el: { _resizer: { disconnect: () => void } }) => {
-    el._resizer.disconnect();
-  },
+      mounted: (el: any, binding: { value: (arg0: { width: number }) => void }) => {
+            let ResizeObserver = window.ResizeObserver;
+            el._resizer = new ResizeObserver((entries) => {
+                  for (const entry of entries) {
+                        // console.log(entry.contentRect.width)
+                        binding.value({ width: entry.contentRect.width });
+                  }
+            });
+            el._resizer.observe(el);
+            // console.log(binding)
+      },
+      unmounted: (el: { _resizer: { disconnect: () => void } }) => {
+            el._resizer.disconnect();
+      },
 };
 
 const bigIcon = ref(true)
@@ -143,86 +143,112 @@ async function process_image() {
   image_progress.process_image();
 };
 
-defineExpose({
-  image_progress
-})
+
+function get_image_url(value: string) {
+  let ap = convertFileSrc(value);
+  console.log(ap);
+  return ap;
+}
+// const goutouUrl = ref(get_image_url())
+const goutouUrl = ref(get_image_url('/Users/dongyifan/watermark-gui-rs/src/assets/goutou.jpeg'))
 
 enum progressSettings {
-  progressSpeed = 0.2,
+  progressSpeed = 2.0,
   characterNum = 2,
   characterWidth = 0.01,
   characterHeight = 5,
   lineWidth = 4,
   fontSize = 10
 }
-const getProgress = (completed:number=image_progress.count.completed,total:number=image_progress.count.total) => {
-  return (completed != null
-    && total != 0
-    && total != null) ? (completed / total *100) : (0)
+const getProgress = (completed: number=image_progress.count.completed, total: number=image_progress.count.total) => {
+
+  if (completed != null && total != 0 && total != null) {
+    return Math.round((completed / total + Number.EPSILON) * 10000) / 100
+  } else {
+    return 0;
+  }
 }
-const waveProgressRef = ref<HTMLCanvasElement | null>(null)
-// if(canvas){
-//   const ctx = canvas!.getContext('2d')
-//   console.log(`output->ctx`, canvas)
-// }
-// function get_image_url(value: string) {
-//     let ap = convertFileSrc(value);
-//     console.log(ap);
-//     const res = 'url('+ap+')'
-//     return res;
-// }
-// const goutouUrl = ref(get_image_url())
-const goutouUrl = ref('url(../assets/goutou.jpeg)')
-const waveInit=() =>{
-}
+// const waveProgressRef = ref<HTMLCanvasElement>(new Object as HTMLCanvasElement);
+const waveInit = ref<WaveProgress>(new Object as WaveProgress);
+  const waveInit11 = ref<WaveProgress>(new Object as WaveProgress);
 const setCanvasSize = (canvas: HTMLCanvasElement) => {
-    canvas.width = 35;
-    canvas.height = 35;
+  canvas.width = 35;
+  canvas.height = 35;
 }
 onMounted(() => {
   test_some_f();
-  const canvas = waveProgressRef.value = document.getElementById("waveProgress")!
-  // 绘制进度条
-  window.addEventListener('resize',()=>{
-    setCanvasSize(canvas!)
-  })
-  console.log(`output->canvas`,canvas)
-  const waveRun = new WaveProgress({
-    canvas: canvas,
-    progress: getProgress,
-    progressSpeed: progressSettings.progressSpeed,
-    waveCharacter: {
-      number: progressSettings.characterNum,
-      waveWidth: progressSettings.characterWidth,
-      waveHeight: progressSettings.characterHeight,
-    },
-  });
-  waveRun.usePlugin(drawCircle, { lineWidth: progressSettings.lineWidth });
-  waveRun.usePlugin(drawText, { fontSize: progressSettings.fontSize });
-  waveRun.setProgress({
-    to: getProgress(image_progress.count.completed,image_progress.count.total)
-  })
-  console.log(image_progress.count.completed)
-  console.log(waveRun);
-  waveRun.render();
-});
-watch(image_progress.count,(newValue,oldValue)=>{
-  const canvas = waveProgressRef.value = document.getElementById("waveProgress")!
-  const waveRun = new WaveProgress({
-    canvas: canvas,
-    progress: getProgress(image_progress.count.completed,image_progress.count.total),
-    progressSpeed: progressSettings.progressSpeed,
-    waveCharacter: {
-      number: progressSettings.characterNum,
-      waveWidth: progressSettings.characterWidth,
-      waveHeight: progressSettings.characterHeight,
-    },
-  });
-  waveRun.setProgress({
-    from:getProgress(oldValue.completed,oldValue.total),
-    to: getProgress(image_progress.count.completed,image_progress.count.total)
-  })
 
+  // init user_conf
+
+  // 绘制进度条
+  const canvas =  document.getElementById("waveProgress")! as HTMLCanvasElement
+  window.addEventListener('resize', () => {
+    setCanvasSize(canvas)
+  })
+  console.log(`output->canvas`, canvas)
+  const waveRun = new WaveProgress({
+    canvas: canvas,
+    progress: getProgress(),
+    waveSpeed: 0.05,
+    progressSpeed: progressSettings.progressSpeed,
+    waveCharacter: {
+      color: '197,140,19',
+      number: progressSettings.characterNum,
+      waveWidth: progressSettings.characterWidth,
+      waveHeight: progressSettings.characterHeight,
+    },
+  })!;
+  waveInit.value = waveRun;
+  // waveInit.value.usePlugin(drawCircle, { lineWidth: progressSettings.lineWidth });
+  // waveInit.value.usePlugin(drawText, { fontSize: progressSettings.fontSize });
+  waveInit.value.setProgress({
+    to:  0,// getProgress(image_progress.count.completed, image_progress.count.total),
+    from: 0, animated: false,
+  })
+  waveInit.value.render();
+
+
+  // another icon
+  // 绘制进度条
+  const canvas11 = document.getElementById("waveProgress11")! as HTMLCanvasElement
+  console.log(`output->canvas`, canvas11)
+  const waveRun11 = new WaveProgress({
+    canvas: canvas11,
+    progress: getProgress(),
+    waveSpeed: 0.05,
+    progressSpeed: progressSettings.progressSpeed,
+    waveCharacter: {
+      color: '197,140,19',
+      number: progressSettings.characterNum,
+      waveWidth: progressSettings.characterWidth,
+      waveHeight: progressSettings.characterHeight,
+    },
+  })!;
+  waveRun11.usePlugin(drawCarbo, { lineWidth: progressSettings.lineWidth });
+  waveInit11.value = waveRun11;
+  // waveInit.value.usePlugin(drawCircle, { lineWidth: progressSettings.lineWidth });
+  // waveInit.value.usePlugin(drawText, { fontSize: progressSettings.fontSize });
+  waveRun11.setProgress({
+    to:  0,// getProgress(image_progress.count.completed, image_progress.count.total),
+    from: 0, animated: false,
+  })
+  waveRun11.render();
+});
+watch([()=>image_progress.count.completed,()=>image_progress.count.total], (newValue, oldValue) => {
+  console.log(`output->oldValue`, oldValue);
+  let fromData = getProgress(oldValue[0], oldValue[1]);
+  let toData = getProgress(newValue[0], newValue[1]);
+  waveInit.value.setProgress({
+    from: fromData,
+    to: toData,
+    animated: true,
+  });
+  // test
+  waveInit11.value.setProgress({
+    from: fromData,
+    to: toData,
+    animated: true,
+  })
 })
 
 nextTick(() => {
@@ -240,11 +266,16 @@ nextTick(() => {
       <div class="photoSelector">
         <!-- <rotate-square4 v-if="image_progress.status"></rotate-square4>
         <ping-pong v-else></ping-pong> -->
-        <div class="goutou">
-          <canvas ref="waveProgress" width="35" height="35" id="waveProgress" style="border-radius: 48%;"></canvas>
+        <div class="goutou-wrapper">
+          <div class="goutou"></div>
+          <canvas ref="waveProgress" width="35" height="35" id="waveProgress"
+            style="border-radius: 48%;z-index: -1;"></canvas>
+
         </div>
+        <canvas width="90" height="90" id="waveProgress11"></canvas>
+
         <el-button key="button.text" :type="image_progress.status ? 'success' : 'primary'" text> {{
-            `${image_progress.count.completed}/${image_progress.count.total}`
+        `${image_progress.count.completed}/${image_progress.count.total}`
         }} </el-button>
         <!-- <el-progress id="progress-bar" :percentage="image_progress.value" :format="format" :color="color"
           v-if="isNotTinyIcon"></el-progress> -->
@@ -269,7 +300,8 @@ nextTick(() => {
               inline-prompt :active-icon="Files" :inactive-icon="FolderChecked" />
           </el-tooltip>
 
-          <el-button @click="image_progress.selectOutputDirs()">输出目录</el-button>
+          <el-button @click="user_conf.selectOutputDirs()">输出目录</el-button>
+          <el-input v-model="user_conf.latestSelectedOutputPath" class="w-50 m-2" size="small" placeholder="Please Input" />
           <el-button @click="process_image" color="#de4781" size="" plain>开始处理</el-button>
 
         </div>
@@ -278,7 +310,7 @@ nextTick(() => {
             <i-ep-document-add @click="image_progress.selectFiles()" />
           </el-icon>
           <el-icon style="margin-right:20px">
-            <i-ep-folder-add @click="image_progress.selectOutputDirs()" />
+            <i-ep-folder-add @click="user_conf.selectOutputDirs()" />
           </el-icon>
           <el-icon style="margin-right:20px">
             <i-ep-full-screen @click="process_image" />
@@ -350,9 +382,19 @@ nextTick(() => {
 }
 
 .goutou {
-/* background-image: v-bind(goutouUrl); */
-background-image: url(../assets/goutou.jpeg);
-background-repeat: no-repeat;
-    background-size: contain;
+  /* background-image: v-bind(goutouUrl); */
+  -webkit-mask-image: url('../assets/dog_eye.png');
+  mask-image: url('../assets/dog_eye.png');
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  height: 35px;
+  position: absolute;
+  width: 35px;
+  z-index: 1;
+  background-color: white;
 }
+
+.goutou-wrapper {}
 </style>
