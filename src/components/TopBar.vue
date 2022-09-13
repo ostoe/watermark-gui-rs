@@ -2,7 +2,7 @@
 import { Files, FolderChecked } from '@element-plus/icons-vue'
 import { main } from '@popperjs/core';
 import { floor } from 'lodash';
-import { onMounted, ref, reactive } from 'vue';
+import { onMounted, ref, reactive,unref } from 'vue';
 import { image_progress, previewwidget } from '../scripts/reactives';
 import { invoke } from '@tauri-apps/api';
 import { appDir, configDir, homeDir, localDataDir, logDir, resourceDir, fontDir } from '@tauri-apps/api/path';
@@ -11,7 +11,8 @@ import BaseSettingsDrawer from "./BaseSettingsDrawer.vue";
 // 绘制进度条
 import WaveProgress from "@alanchenchen/waveprogress";
 import { drawCircle, drawText } from "@alanchenchen/waveprogress";
-
+import { convertFileSrc } from '@tauri-apps/api/tauri';
+// import {WaveProgress} from "../scripts/WaveProgress"
 // const percentage = ref(90);
 // const progress_count = ref({ completed: 0, total: 0 });
 const colors = [
@@ -154,24 +155,38 @@ enum progressSettings {
   lineWidth = 4,
   fontSize = 10
 }
-const getProgress = () => {
-  return (image_progress.count.completed != null
-    && image_progress.count.total != 0
-    && image_progress.count.total != null) ? (image_progress.count.completed / image_progress.count.total) : (0)
+const getProgress = (completed:number=image_progress.count.completed,total:number=image_progress.count.total) => {
+  return (completed != null
+    && total != 0
+    && total != null) ? (completed / total *100) : (0)
 }
 const waveProgressRef = ref<HTMLCanvasElement | null>(null)
-const canvas = unref(waveProgressRef)
-if(canvas){
-  const ctx = canvas!.getContext('2d')
-  console.log(`output->ctx`, canvas)
-
-}
+// if(canvas){
+//   const ctx = canvas!.getContext('2d')
+//   console.log(`output->ctx`, canvas)
+// }
+// function get_image_url(value: string) {
+//     let ap = convertFileSrc(value);
+//     console.log(ap);
+//     const res = 'url('+ap+')'
+//     return res;
+// }
+// const goutouUrl = ref(get_image_url())
+const goutouUrl = ref('url(../assets/goutou.jpeg)')
 const waveInit=() =>{
 }
-
+const setCanvasSize = (canvas: HTMLCanvasElement) => {
+    canvas.width = 35;
+    canvas.height = 35;
+}
 onMounted(() => {
   test_some_f();
+  const canvas = waveProgressRef.value = document.getElementById("waveProgress")!
   // 绘制进度条
+  window.addEventListener('resize',()=>{
+    setCanvasSize(canvas!)
+  })
+  console.log(`output->canvas`,canvas)
   const waveRun = new WaveProgress({
     canvas: canvas,
     progress: getProgress,
@@ -185,12 +200,30 @@ onMounted(() => {
   waveRun.usePlugin(drawCircle, { lineWidth: progressSettings.lineWidth });
   waveRun.usePlugin(drawText, { fontSize: progressSettings.fontSize });
   waveRun.setProgress({
-    to: image_progress.count.completed / image_progress.count.total * 100
+    to: getProgress(image_progress.count.completed,image_progress.count.total)
   })
   console.log(image_progress.count.completed)
   console.log(waveRun);
   waveRun.render();
 });
+watch(image_progress.count,(newValue,oldValue)=>{
+  const canvas = waveProgressRef.value = document.getElementById("waveProgress")!
+  const waveRun = new WaveProgress({
+    canvas: canvas,
+    progress: getProgress(image_progress.count.completed,image_progress.count.total),
+    progressSpeed: progressSettings.progressSpeed,
+    waveCharacter: {
+      number: progressSettings.characterNum,
+      waveWidth: progressSettings.characterWidth,
+      waveHeight: progressSettings.characterHeight,
+    },
+  });
+  waveRun.setProgress({
+    from:getProgress(oldValue.completed,oldValue.total),
+    to: getProgress(image_progress.count.completed,image_progress.count.total)
+  })
+
+})
 
 nextTick(() => {
   //   const ctx = document.getElementById("waveProgress")!.getContext('2d')
@@ -207,8 +240,8 @@ nextTick(() => {
       <div class="photoSelector">
         <!-- <rotate-square4 v-if="image_progress.status"></rotate-square4>
         <ping-pong v-else></ping-pong> -->
-        <div>
-          <canvas ref="waveProgress" id="waveProgress" style="width: 35px;border-radius: 48%;height: 35px;"></canvas>
+        <div class="goutou">
+          <canvas ref="waveProgress" width="35" height="35" id="waveProgress" style="border-radius: 48%;"></canvas>
         </div>
         <el-button key="button.text" :type="image_progress.status ? 'success' : 'primary'" text> {{
             `${image_progress.count.completed}/${image_progress.count.total}`
@@ -314,5 +347,12 @@ nextTick(() => {
 .previewer-icon {
   font-size: 25px;
   margin-right: 20px;
+}
+
+.goutou {
+/* background-image: v-bind(goutouUrl); */
+background-image: url(../assets/goutou.jpeg);
+background-repeat: no-repeat;
+    background-size: contain;
 }
 </style>
