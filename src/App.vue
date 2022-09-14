@@ -6,7 +6,6 @@
   // import picList from "./picList.vue";
   // import baseSettingsDrawerVue from "./baseSettingsDrawerVue.vue";
   // import previewWidget from "./previewWidget.vue";
-  
   // import { ref, onMounted } from "vue";
   import router from "./router/router";
   // import { Context } from "vm";
@@ -75,9 +74,9 @@
   // const activeMenuId = ref("1-1");
   
   
-  onMounted(() => {
-    //   router.push("/textImageProcess");
-  });
+  // onMounted(() => {
+  //   //   router.push("/textImageProcess");
+  // });
   //获取鼠标点击消除遮罩
   let t: NodeJS.Timeout | null = null;
   // const isCollapse = ref(true);
@@ -92,20 +91,27 @@
   function handleSelect(key: string, keyPath: string) {
     console.log(key, keyPath);
   }
+  const handleOpen = (key: string, keyPath: string[]) => {
+  console.log(key, keyPath)
+}
+const handleClose = (key: string, keyPath: string[]) => {
+  console.log(key, keyPath)
+}
   nextTick(() => { });
       // const picSrc = ref("https://github.com/tauri-apps/tauri/blob/dev/.github/splash.png")
   </script>
       
   <template lang="">
-        <el-container>
+        <el-container class="common-layout index">
           <!-- <el-header> -->
             <!-- <sideBar/> -->
             <!-- <el-container > -->
             <el-aside width="50px">
-              
-              <el-menu  @select="handleSelect" router="true" default-active="" 
-              class="elmenu" :collapse="sidebarReactives.isCollapse"
-                  v-resize:1="resizeSideBar" collapse-transition="false">
+              <el-menu  @select="handleSelect" router default-active=""
+              class="elmenu" :collapse="sidebarReactives.isCollapse" 
+              @open="handleOpen"
+    @close="handleClose"
+                  v-resize:1="resizeSideBar" collapse-transition>
                   <div style="margin-top: 30px"></div>
                   <div @click="changeThisCollapse" class="extend"
                       :style="{ 'padding-left': sidebarReactives.extendPadding + 'px' }">
@@ -118,7 +124,7 @@
                       <el-sub-menu v-if="item.children && item.children.length > 0" :index="index" :key="'item-'+index" >
                         <template #title>
                           <!-- <el-icon class="i-ep-menu"></el-icon> -->
-                          <el-icon><document /></el-icon>
+                          <el-icon><i-ep-menu /></el-icon>
                           <span>{{item.name}}</span>
                       </template>
                         <el-menu-item-group>
@@ -133,15 +139,19 @@
                       </el-sub-menu>
                     
                     <el-menu-item v-else :index="item.path">
-                         <template #title>
-                          <!-- <el-icon class="i-ep-menu"></el-icon> -->
-                          <el-icon v-if="item.iconid == 1">
-                            <Menu />
+                       <el-icon v-if="item.iconid == 1">
+                            <i-ep-HomeFilled />
                           </el-icon>
                           <el-icon v-else-if="item.iconid == 2">
-                            <Crop />
+                            <i-ep-PictureFilled />
                           </el-icon>
-                          <span>{{item.name}}</span>
+                          <el-icon v-else-if="item.iconid == 3">
+                            <i-ep-CameraFilled />
+                          </el-icon>
+                      <!-- <el-icon><i-ep-crop /></el-icon> -->
+                         <template #title>{{item.name}}
+                         
+                          <!-- <span></span> -->
                       </template>
                     </el-menu-item>
                   </template>
@@ -156,9 +166,9 @@
             ></div>
         <el-container>
           <el-main>
-              <transition name="el-fade-in-linear" mode="out-in">
+              <!-- <transition name="el-fade-in-linear" mode="out-in"> -->
                   <router-view/>
-              </transition>
+              <!-- </transition> -->
           </el-main>
         </el-container>
       </el-container>

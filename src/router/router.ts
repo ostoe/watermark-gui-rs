@@ -7,7 +7,7 @@ const textImageProcess = () => import("../components/textImageProcess.vue");
 // const wrapper = () => import("../components/wrapper.vue");
 const base = () => import("../components/base.vue");
 // const topBar = () => import("../components/topBar.vue");
-const home = () => import("../components/home.vue");
+// const home = () => import("../components/home.vue");
 
 
 // const cusIcon = {
@@ -25,16 +25,16 @@ const routes = [
   },
   {
     path: "/textImageProcess",
-    name: "textImageProcess",
+    name: "Exif查询",
     component: textImageProcess,
-    iconid: 1,
+    iconid: 2,
   },
   // { path: 'cus/:id', component: cusIcon }// solve icon ...
   {
     path: "/dragTest",
-    name: "dragTest",
+    name: "景深计算",
     component: dragTest,
-    iconid: 2,
+    iconid: 3,
     // children: [
     //   {
     //     path: "dragTest",
@@ -48,8 +48,6 @@ const routes = [
     //   }
     // ]
   },
-
-
 ];
 
 const router = createRouter({
