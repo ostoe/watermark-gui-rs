@@ -39,7 +39,8 @@ const vResize = {
 
 //获取鼠标点击消除遮罩
 const changeThisCollapse = () => {
-  sidebarReactives.changeThisCollapse()
+  console.log(`output->collapse`)
+  sidebarReactives.changeThisCollapse();
 };
 
 //监听dom变化
@@ -92,85 +93,97 @@ let t: NodeJS.Timeout | null = null;
 function handleSelect(key: string, keyPath: string) {
   console.log(key, keyPath);
 }
-nextTick(() => { });
-    // const picSrc = ref("https://github.com/tauri-apps/tauri/blob/dev/.github/splash.png")
+nextTick(() => {});
+// const picSrc = ref("https://github.com/tauri-apps/tauri/blob/dev/.github/splash.png")
 </script>
-    
+
 <template lang="">
-      <el-container>
-        <!-- <el-header> -->
-          <!-- <sideBar/> -->
-          <!-- <el-container > -->
-          <el-aside width="50px">
-            
-            <el-menu  @select="handleSelect" router="true" default-active="" 
-            class="elmenu" :collapse="sidebarReactives.isCollapse"
-                v-resize:1="resizeSideBar" collapse-transition="false">
-                <div style="margin-top: 30px"></div>
-                <div @click="changeThisCollapse" class="extend"
-                    :style="{ 'padding-left': sidebarReactives.extendPadding + 'px' }">
-                    <el-icon>
-                        <i-ep-arrow-right v-if="sidebarReactives.isCollapse" />
-                        <i-ep-arrow-left v-else/>
-                    </el-icon>
-                </div>
-                <template v-for="(item,index) in $router.options.routes">
-                    
-                    <el-sub-menu v-if="item.children && item.children.length > 0" :index="index" :key="'item-'+index" >
-                      <template #title>
-                        <!-- <el-icon class="i-ep-menu"></el-icon> -->
-                        <el-icon v-if="item.iconid == 1">
-                          <i-ep-menu /> 
-                        </el-icon>
-                        <el-icon v-else-if="item.iconid == 2">
-                          <i-ep-document />
-                        </el-icon>
-                        <span>{{item.name}}</span>
-                    </template>
-                      <el-menu-item-group>
-                        <!-- <template slot="title"><i :class="item.iconCls"></i><span>{{item.name}}</span></template> -->
-                        <template v-for="(child,itemIndex) in item.children">
-                            <el-menu-item v-if="!child.hidden"
-                                          :index="child.path"
-                                          :key="'child-'+itemIndex">{{child.name}}
-                            </el-menu-item>
-                        </template>
-                      </el-menu-item-group>
-                    </el-sub-menu>
-                  
-                  <el-menu-item v-else :index="item.path">
-                       <template #title>
-                        <!-- <el-icon class="i-ep-menu"></el-icon> -->
-                        <el-icon v-if="item.iconid == 1">
-                          <i-ep-menu /> 
-                        </el-icon>
-                        <el-icon v-else-if="item.iconid == 2">
-                          <i-ep-document />
-                        </el-icon>
-                        <span>{{item.name}}</span>
-                    </template>
-                  </el-menu-item>
-                </template>
-            </el-menu>
-          </el-aside>
-        <!-- </el-container> -->
-        <!-- </el-header> -->
+  <el-container>
+    <!-- <el-header> -->
+    <!-- <sideBar/> -->
+    <!-- <el-container > -->
+    <el-aside width="50px">
+      <el-menu
+        @select="handleSelect"
+        router="true"
+        default-active=""
+        class="elmenu"
+        :collapse="sidebarReactives.isCollapse"
+        v-resize:1="resizeSideBar"
+        collapse-transition="false"
+      >
+        <div style="margin-top: 30px"></div>
         <div
-            v-if="!sidebarReactives.isCollapse"
-            class="shadowmask"
-            @click="changeThisCollapse"
-          ></div>
-      <el-container>
-        <el-main>
-            <transition name="el-fade-in-linear" mode="out-in">
-                <router-view/>
-            </transition>
-        </el-main>
-      </el-container>
+          @click="changeThisCollapse"
+          class="extend"
+          :style="{ 'padding-left': sidebarReactives.extendPadding + 'px' }"
+        >
+          <el-icon>
+            <i-ep-arrow-right v-if="sidebarReactives.isCollapse" />
+            <i-ep-arrow-left v-else />
+          </el-icon>
+        </div>
+        <template v-for="(item, index) in $router.options.routes">
+          <el-sub-menu
+            v-if="item.children && item.children.length > 0"
+            :index="index"
+            :key="'item-' + index"
+          >
+            <template #title>
+              <!-- <el-icon class="i-ep-menu"></el-icon> -->
+              <el-icon v-if="item.iconid == 1">
+                <i-ep-menu />
+              </el-icon>
+              <el-icon v-else-if="item.iconid == 2">
+                <i-ep-document />
+              </el-icon>
+              <span>{{ item.name }}</span>
+            </template>
+            <el-menu-item-group>
+              <!-- <template slot="title"><i :class="item.iconCls"></i><span>{{item.name}}</span></template> -->
+              <template v-for="(child, itemIndex) in item.children">
+                <el-menu-item
+                  v-if="!child.hidden"
+                  :index="child.path"
+                  :key="'child-' + itemIndex"
+                  >{{ child.name }}
+                </el-menu-item>
+              </template>
+            </el-menu-item-group>
+          </el-sub-menu>
+
+          <el-menu-item v-else :index="item.path">
+            <template #title>
+              <!-- <el-icon class="i-ep-menu"></el-icon> -->
+              <el-icon v-if="item.iconid == 1">
+                <i-ep-menu />
+              </el-icon>
+              <el-icon v-else-if="item.iconid == 2">
+                <i-ep-document />
+              </el-icon>
+              <span>{{ item.name }}</span>
+            </template>
+          </el-menu-item>
+        </template>
+      </el-menu>
+    </el-aside>
+    <!-- </el-container> -->
+    <!-- </el-header> -->
+    <div
+      v-if="!sidebarReactives.isCollapse"
+      class="shadowmask"
+      @click="changeThisCollapse"
+    ></div>
+    <el-container>
+      <el-main>
+        <transition name="el-fade-in-linear" mode="out-in">
+          <router-view />
+        </transition>
+      </el-main>
     </el-container>
+  </el-container>
 
-
-      <!-- <span class="spantest">fonttest1</span>
+  <!-- <span class="spantest">fonttest1</span>
       <span class="spantest2">fonttest2</span>
       <el-select v-model="fontFamilyValue" class="select" placeholder="选择文字">
         <el-option
@@ -180,9 +193,9 @@ nextTick(() => { });
         />
       </el-select> -->
 
-      <!-- <div class="common-layout index">
+  <!-- <div class="common-layout index">
         <div class="elcontainer"> -->
-          <!-- <SideBar>
+  <!-- <SideBar>
             <template #elmenu>
               <el-menu-item index="4">
                 <el-icon>
@@ -192,15 +205,12 @@ nextTick(() => { });
               </el-menu-item>
             </template>
           </SideBar> -->
-          
-          
-          
-          
-        <!-- </div>
+
+  <!-- </div>
       </div>
       <router-view></router-view> -->
-    </template>
-    
+</template>
+
 <style scoped>
 @import "../assets/style/font.css";
 /* 
@@ -279,4 +289,3 @@ nextTick(() => { });
   opacity: 0.7;
 }
 </style>
-    
