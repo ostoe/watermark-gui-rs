@@ -3,13 +3,11 @@
 // import { defineComponent, ref } from "vue";
 
   // import TextImageProcess from "./textImageProcess.vue";
-  import sideBar from "./sideBar.vue";
-  import TopBar from "./topBar.vue";
-  import PicList from "./picList.vue";
+  // import sideBar from "./sideBar.vue";
+  // import TopBar from "./topBar.vue";
+  // import PicList from "./picList.vue";
   // import BaseSettingsDrawerVue from "./baseSettingsDrawerVue.vue";
-  import PreviewWidget from "./previewWidget.vue";
-
-const isCollapse = ref(true);
+  // import PreviewWidget from "./previewWidget.vue";
 
 
 function test_pro() {
