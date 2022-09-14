@@ -170,7 +170,7 @@ const getProgress = (completed: number=image_progress.count.completed, total: nu
 }
 // const waveProgressRef = ref<HTMLCanvasElement>(new Object as HTMLCanvasElement);
 const waveInit = ref<WaveProgress>(new Object as WaveProgress);
-  const waveInit11 = ref<WaveProgress>(new Object as WaveProgress);
+  // const waveInit11 = ref<WaveProgress>(new Object as WaveProgress);
 const setCanvasSize = (canvas: HTMLCanvasElement) => {
   canvas.width = 35;
   canvas.height = 35;
@@ -209,9 +209,9 @@ onMounted(() => {
 
 
   // another icon
-  // 绘制进度条
+  // // 绘制进度条
   // const canvas11 = document.getElementById("waveProgress11")! as HTMLCanvasElement
-  // console.log(`output->canvas`, canvas11)
+  // // console.log(`output->canvas`, canvas11)
   // const waveRun11 = new WaveProgress({
   //   canvas: canvas11,
   //   progress: getProgress(),
@@ -244,11 +244,11 @@ watch([()=>image_progress.count.completed,()=>image_progress.count.total], (newV
     animated: true,
   });
   // test
-  waveInit11.value.setProgress({
-    from: fromData,
-    to: toData,
-    animated: true,
-  })
+  // waveInit11.value.setProgress({
+  //   from: fromData,
+  //   to: toData,
+  //   animated: true,
+  // })
 })
 
 nextTick(() => {
@@ -272,7 +272,7 @@ nextTick(() => {
             style="border-radius: 48%;z-index: -1;"></canvas>
 
         </div>
-        <canvas width="90" height="90" id="waveProgress11"></canvas>
+        <!-- <canvas width="90" height="90" id="waveProgress11"></canvas> -->
 
         <el-button key="button.text" :type="image_progress.status ? 'success' : 'primary'" text> {{
         `${image_progress.count.completed}/${image_progress.count.total}`

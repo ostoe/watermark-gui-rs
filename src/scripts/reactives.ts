@@ -130,7 +130,7 @@ const user_conf = reactive({
       console.log(update_data_send);
       // send to backend.
       let res: string = await invoke("handle_front_update_user_data", { userData: update_data_send });
-
+      elmessage("初始化：" + res);
 
     }
 
@@ -363,7 +363,7 @@ interface NotificationBackEnd {
   jpg_file_count: number
 }
 
-// 启动坚挺后端的事件。
+// 启动监听后端的事件。
 async function backend_event_recv() {
   // listen to the `click` event and get a function to remove the event listener
   // there's also a `once` function that subscribes to an event and automatically unsubscribes the listener on the first event
@@ -378,6 +378,7 @@ async function backend_event_recv() {
     // let data = event.payload.message.substring(4);
     switch (event.payload.state_code) {
       case 100:
+        // update 
         console.log(event.payload.message + "--- ");
         let result: NotificationBackEnd = JSON.parse(event.payload.message);
         image_progress.update_progress(0, result.jpg_file_count);
@@ -392,7 +393,16 @@ async function backend_event_recv() {
         // progress.update_progress(progress.count.completed, progress.count.total);
         break;
       case 500:
-        console.log("500...");
+        console.log("500: " + event.payload.message);
+        image_progress.increase_one();
+        ElNotification({
+          title: '文件内容有误',
+          message: event.payload.message,
+          type: 'warning',
+          position: 'bottom-right',
+          // offset: 100,
+          duration: 0,
+        })
         break;
       default: console.log("unknown nofitication.: " + event.payload.message);
     }

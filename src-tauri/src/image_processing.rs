@@ -24,11 +24,14 @@ pub fn read_exif(img_path: &str) -> Option<HashMap::<ExifTag, String>> {
     let file = File::open(img_path).expect("failed to open file"); // todo
     let mut decoder = jpeg::Decoder::new(BufReader::new(file));
     let _pixels = decoder.read_info().expect("failed to decode image"); // todo
-    let metadata = decoder.info().unwrap();
+    // let metadata = decoder.info().unwrap();
+    // => metadata ImageInfo { width: 100, height: 77, pixel_format: RGB24, coding_process: DctSequential }
+    // image-rs exif信息有限；
+    // println!("metadata {:?}", metadata);
     if let Some(exif_data) = decoder.exif_data() {
-        println!( "{:?} {} \n", metadata, exif_data.len(), );
+        // println!( "{} \n", exif_data.len(), );
         let exif_parsed = parse_buffer(exif_data).unwrap();
-        let (w, h) = (metadata.width, metadata.height);
+        // let (w, h) = (metadata.width, metadata.height);
     
         println!("{}", exif_parsed.mime);
         let mut exif_map = HashMap::<ExifTag, String>::new();
@@ -167,6 +170,8 @@ pub fn process_single_image(img_path: &str, output_path: &str,  font: &Font, log
     let file_prefix = output_filename.file_name().unwrap();
     let mut file_name_arr = file_prefix.to_str().unwrap().split(".").collect::<Vec<&str>>();
     file_name_arr.pop();// get filename without suffix ".jpg"
+    println!("{:?}, {:?}", file_name_arr, file_pattern);
+
     let mut target_filename = [String::new(), String::new(), String::new(), String::from(".jpg")];
     //  suffix and preffix
     for i in [0, 2]{
@@ -180,13 +185,11 @@ pub fn process_single_image(img_path: &str, output_path: &str,  font: &Font, log
     }
     if file_pattern[1].contains("__custom__") {
         target_filename[1] = file_pattern[1].replace("__custom__", "");
-    } else if file_pattern[1] == "" {
+    } else if file_pattern[1] == "__keep__" {
         target_filename[1] = file_name_arr.join("");
     }
     
-    // let filename_suffix = format!("{}.{}", "-w", "jpg");
-    // file_name_arr.push(&filename_suffix);
-    // let file_prefix = file_name_arr.join(".");
+    println!("{:?}", target_filename);
 
     let output_dir = Path::new(output_path);
     // println!("output: {}-{}-{}",output_dir.display(), file_prefix, filename_suffix);

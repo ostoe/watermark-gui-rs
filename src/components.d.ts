@@ -7,6 +7,7 @@ export {}
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
+    Animation: typeof import('./components/animation.vue')['default']
     Base: typeof import('./components/base.vue')['default']
     BaseSettingsDrawer: typeof import('./components/baseSettingsDrawer.vue')['default']
     DragTest: typeof import('./components/dragTest.vue')['default']
@@ -54,6 +55,7 @@ declare module '@vue/runtime-core' {
     IEpMenu: typeof import('~icons/ep/menu')['default']
     IEpPicture: typeof import('~icons/ep/picture')['default']
     IEpPictureFilled: typeof import('~icons/ep/picture-filled')['default']
+    IEpStopwatch: typeof import('~icons/ep/stopwatch')['default']
     PicList: typeof import('./components/picList.vue')['default']
     PreviewWidget: typeof import('./components/previewWidget.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
@@ -61,6 +63,7 @@ declare module '@vue/runtime-core' {
     SeniorSettings: typeof import('./components/seniorSettings.vue')['default']
     SideBar: typeof import('./components/sideBar.vue')['default']
     TextImageProcess: typeof import('./components/textImageProcess.vue')['default']
+    Timetravel: typeof import('./components/timetravel.vue')['default']
     TopBar: typeof import('./components/TopBar.vue')['default']
     Wrapper: typeof import('./components/wrapper.vue')['default']
   }
