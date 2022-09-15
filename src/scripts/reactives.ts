@@ -246,7 +246,6 @@ const image_progress = reactive({
   image_dir_path: "",
   exif_image_path: "",
   converted_exif_path: "",
-  tags: {} as ExifReader.Tags,
   increase() {
     if (this.value <= 98) {
       this.value += 2;
@@ -345,28 +344,28 @@ const image_progress = reactive({
     }
   },
 
-  async selectSingleFile() {
-    const selected = await open({
-      multiple: false,
-      filters: [
-        {
-          name: "Image",
-          extensions: ["jpg", "jpeg"],
-        },
-      ],
-    });
-    if (typeof selected === "string") {
-      this.exif_image_path = selected;
-      this.converted_exif_path = convertFileSrc(this.exif_image_path)
-      //获取tags
-      const tags = await ExifReader.load(this.converted_exif_path)
-      this.tags = tags
-      console.log(`output->tags`, this.tags)  
-      elmessage("selected: " + this.exif_image_path);
-    } else {
-      elmessage("selected is not single file but " + selected);
-    }
-  },
+  // async selectSingleFile() {
+  //   const selected = await open({
+  //     multiple: false,
+  //     filters: [
+  //       {
+  //         name: "Image",
+  //         extensions: ["jpg", "jpeg"],
+  //       },
+  //     ],
+  //   });
+  //   if (typeof selected === "string") {
+  //     this.exif_image_path = selected;
+  //     this.converted_exif_path = convertFileSrc(this.exif_image_path)
+  //     //获取tags
+  //     const tags = await ExifReader.load(this.converted_exif_path)
+  //     this.tags = tags
+  //     console.log(`output->tags`, this.tags)  
+  //     elmessage("selected: " + this.exif_image_path);
+  //   } else {
+  //     elmessage("selected is not single file but " + selected);
+  //   }
+  // },
   //
 
   async selectDirs() {

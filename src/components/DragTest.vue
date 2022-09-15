@@ -35,9 +35,13 @@ function drop(e: DragEvent) {
 
 }
 
-function selectedFile() {
+function selectedFile(e: globalThis.Event) {
+  const target = e.target as HTMLInputElement
+      const file = target.files![0]; // TODO 判断
+      console.log(file);
   // dropzoneFile.value = document.querySelector(".dropzoneFile").files[0]; ?????
-  image_progress.selectFiles();
+
+  // image_progress.selectFiles();
 }
 
 const x = ref(0)
@@ -74,7 +78,7 @@ event.listen('tauri://file-drop-cancelled', (e) => {
     <span>Drag or Drop File</span>
     <span>OR</span>
     <label for="dropzoneFile">Select File</label>
-    <input type="file" id="dropzoneFile" class="dropzoneFile" />
+    <input type="file" id="dropzoneFile" class="dropzoneFile" @change="selectedFile"/>
     
     <div
   @mousemove="onMousemove"
