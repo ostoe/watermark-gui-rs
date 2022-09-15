@@ -12,6 +12,7 @@ declare module '@vue/runtime-core' {
     BaseSettingsDrawer: typeof import('./components/baseSettingsDrawer.vue')['default']
     DragTest: typeof import('./components/dragTest.vue')['default']
     ElAside: typeof import('element-plus/es')['ElAside']
+    ElAutocomplete: typeof import('element-plus/es')['ElAutocomplete']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCheckbox: typeof import('element-plus/es')['ElCheckbox']
     ElCol: typeof import('element-plus/es')['ElCol']

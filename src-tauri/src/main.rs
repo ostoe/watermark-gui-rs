@@ -140,7 +140,7 @@ fn handle_front_update_key(
         state
             .send(UserOperation::Update(UserSetting::OutputDir(value)))
             .unwrap();
-        return format!("updating user data");
+        return format!("updating userData");
     }
     return format!("error key.");
 }
