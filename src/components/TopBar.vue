@@ -170,7 +170,7 @@ const getProgress = (completed: number=image_progress.count.completed, total: nu
 }
 // const waveProgressRef = ref<HTMLCanvasElement>(new Object as HTMLCanvasElement);
 const waveInit = ref<WaveProgress>(new Object as WaveProgress);
-  const waveInit11 = ref<WaveProgress>(new Object as WaveProgress);
+  // const waveInit11 = ref<WaveProgress>(new Object as WaveProgress);
 const setCanvasSize = (canvas: HTMLCanvasElement) => {
   canvas.width = 35;
   canvas.height = 35;
@@ -244,11 +244,11 @@ watch([()=>image_progress.count.completed,()=>image_progress.count.total], (newV
     animated: true,
   });
   // test
-  waveInit11.value.setProgress({
-    from: fromData,
-    to: toData,
-    animated: true,
-  })
+  // waveInit11.value.setProgress({
+  //   from: fromData,
+  //   to: toData,
+  //   animated: true,
+  // })
 })
 
 nextTick(() => {

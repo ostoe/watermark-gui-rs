@@ -4,6 +4,9 @@ import { fs, invoke } from '@tauri-apps/api'
 import { pictureDir, resolve, resourceDir } from '@tauri-apps/api/path';
 // import { ElNotification,ElMessage } from "element-plus/es/components";
 import { emit, listen } from "@tauri-apps/api/event";
+import { convertFileSrc } from "@tauri-apps/api/tauri";
+import ExifReader from 'exifreader';
+
 // sidebar公共方法/值
 const sidebarReactives = reactive({
   isCollapse: true,
@@ -51,7 +54,6 @@ type RenameType = {
   input: string,
   valid: boolean
 }
-
 
 // const tools = reactive({
 //   message(msg: string) {
@@ -113,7 +115,7 @@ const user_conf = reactive({
       //   let k2 = "autoUseBrand"
       //   user_conf[k2] = entries[i][1];
       // }
-      if (user_data_load.latestSelectedOutputPath == ""){
+      if (user_data_load.latestSelectedOutputPath == "") {
         user_data_load.latestSelectedOutputPath = await pictureDir();
       }
       this.B2A(user_conf, user_data_load);
@@ -126,7 +128,7 @@ const user_conf = reactive({
         brand: this.brand,
         filename_pattern: [this.renamePreffix, this.renameCenter, this.renameSuffix]
       };
-      console.log("init send data:" );
+      console.log("init send data:");
       console.log(update_data_send);
       // send to backend.
       let res: string = await invoke("handle_front_update_user_data", { userData: update_data_send });
@@ -159,7 +161,7 @@ const user_conf = reactive({
   },
 
   async selectOutputDirs() {
-    
+
     const selected = await open({
       directory: true,
       multiple: false,
@@ -200,6 +202,9 @@ const image_progress = reactive({
   count: { completed: 0, total: 0 },
   image_paths: { count: 0, image_paths: [""] },
   image_dir_path: "",
+  exif_image_path: "",
+  converted_exif_path: "",
+  tags: {} as ExifReader.Tags,
   increase() {
     if (this.value <= 98) {
       this.value += 2;
@@ -294,7 +299,28 @@ const image_progress = reactive({
     }
   },
 
-
+  async selectSingleFile() {
+    const selected = await open({
+      multiple: false,
+      filters: [
+        {
+          name: "Image",
+          extensions: ["jpg", "jpeg"],
+        },
+      ],
+    });
+    if (typeof selected === "string") {
+      this.exif_image_path = selected;
+      this.converted_exif_path = convertFileSrc(this.exif_image_path)
+      //获取tags
+      const tags = await ExifReader.load(this.converted_exif_path)
+      this.tags = tags
+      console.log(`output->tags`, this.tags)  
+      elmessage("selected: " + this.exif_image_path);
+    } else {
+      elmessage("selected is not single file but " + selected);
+    }
+  },
   //
 
   async selectDirs() {
