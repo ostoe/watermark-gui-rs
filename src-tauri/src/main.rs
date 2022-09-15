@@ -19,7 +19,7 @@ use tauri::{
     api::path::{home_dir, resource_dir},
     Env, PackageInfo,
 };
-use tauri::{CustomMenuItem, Menu, MenuItem, State, Submenu};
+use tauri::{CustomMenuItem, Menu, MenuItem, State, Submenu, AppHandle, Wry, RunEvent};
 use tauri::{Manager, Window};
 
 
@@ -51,7 +51,8 @@ fn main() {
         .add_submenu(submenu);
     // menu------------------------end
 
-    tauri::Builder::default()
+    let mut context = tauri::generate_context!();
+    let app = tauri::Builder::default()
         .menu(menu)
         .manage(st)
         .invoke_handler(tauri::generate_handler![
@@ -65,6 +66,9 @@ fn main() {
         ])
         .setup(move |app| {
             let main_window = app.get_window("main").unwrap();
+            // let id = main_window.listen("tauri://close-requested", |event| { // invalid
+            //     println!("got window event-name with payload {:?}", event.payload());
+            //     });
             let splashscreen_window = app.get_window("splashscreen").unwrap();
             let resource_path = app_resources_dir(app.package_info());
             println!("resource_path: {}", resource_path.display());
@@ -73,12 +77,49 @@ fn main() {
             let _control_center = std::thread::Builder::new()
                 .name("ControlCenter".to_string())
                 .spawn(move || notification_thread(main_window, notify_front_rt));
-
+            
             Ok(())
         })
-        .run(tauri::generate_context!())
+        .build(context)
         .expect("error while running tauri application");
+    
+    let app_handle = app.app_handle();
+    app.run(handle_app_event);
 }
+
+pub fn handle_app_event(_app_handle: &AppHandle<Wry>, event: RunEvent) {
+    match event {
+        RunEvent::Exit => {
+            println!("exit");
+            // resolve::resolve_reset();
+            tauri::api::process::kill_children();
+        }
+        RunEvent::ExitRequested { api, .. } => {
+            println!("requested exit"); 
+            api.prevent_exit();
+            }
+
+        RunEvent::WindowEvent { label, event, .. } => {
+            println!("WindowEvent: {:?}", event);
+            match event {
+                tauri::WindowEvent::CloseRequested { api, .. } => {
+                    if label == "main" {
+                        api.prevent_close();
+                        let _ = _app_handle.get_window("main").unwrap().hide();
+                        // 另一种写法： app_handle.get_window("main").map(|win| { let _ = win.hide(); });
+                        std::process::exit(0);
+                    }
+                }
+                _ => {}
+            }
+        }
+        RunEvent::Ready => {}
+        RunEvent::Resumed => {}
+        RunEvent::MainEventsCleared => {}
+        _ => {}
+    }
+}
+
 
 #[tauri::command]
 async fn close_splashscreen(window: tauri::Window) {
