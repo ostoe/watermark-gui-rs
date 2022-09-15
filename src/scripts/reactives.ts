@@ -1,13 +1,26 @@
 // import { reactive } from "vue";
 import { open } from "@tauri-apps/api/dialog";
 import { fs, invoke } from '@tauri-apps/api'
-import { pictureDir, resolve, resourceDir } from '@tauri-apps/api/path';
+import { BaseDirectory, dirname, pictureDir, resolve, resourceDir } from '@tauri-apps/api/path';
 // import { ElNotification,ElMessage } from "element-plus/es/components";
 import { emit, listen } from "@tauri-apps/api/event";
+import { readDir } from "@tauri-apps/api/fs";
 import { convertFileSrc } from "@tauri-apps/api/tauri";
 import ExifReader from 'exifreader';
 
 // sidebar公共方法/值
+
+async function test_function() {
+  // console.log("app path:" + BaseDirectory.App);
+  
+}
+
+async function is_dir(dir_path: string) {
+  let a = true;
+  await readDir(dir_path, {recursive: false}).catch(() => a = false);
+  return a;
+}
+
 const sidebarReactives = reactive({
   isCollapse: true,
   activeMenuId: "1-1",
@@ -72,6 +85,7 @@ type UserDataType = {
   qulity: number,
   latestSelectedDirPath: string,
   latestSelectedOutputPath: string,
+  outputPathHistory: {value: string}[],
   autoUseBrand: boolean,
   brand: string,
   font: string,
@@ -85,6 +99,7 @@ const user_conf = reactive({
   qulity: 85,
   latestSelectedDirPath: "",
   latestSelectedOutputPath: "",
+  outputPathHistory: new Array<{value: string}>(),
   autoUseBrand: true,
   brand: "nikon",
   font: "",
@@ -96,6 +111,7 @@ const user_conf = reactive({
   { value: "panasonic", label: "松下" }, { value: "fujifilm", label: "富士" }],
 
   async init_user_conf() {
+    // test_function();
     // TODO: check resources file ...如果不存在提示警告。
     resource_dir.value = await resourceDir();
     this.user_conf_path = await resolve(resource_dir.value, "resources", "user.conf");
@@ -115,8 +131,15 @@ const user_conf = reactive({
       //   let k2 = "autoUseBrand"
       //   user_conf[k2] = entries[i][1];
       // }
-      if (user_data_load.latestSelectedOutputPath == "") {
-        user_data_load.latestSelectedOutputPath = await pictureDir();
+      let pic_path = await pictureDir();
+      if (user_data_load.latestSelectedOutputPath == ""){
+        user_data_load.latestSelectedOutputPath = pic_path;
+      }
+      if (user_data_load.latestSelectedDirPath == "") {
+        user_data_load.latestSelectedDirPath = pic_path;
+      }
+      if (user_data_load.outputPathHistory.length === 0) {
+        user_data_load.outputPathHistory.push({value: pic_path});
       }
       this.B2A(user_conf, user_data_load);
       // TODO 前后端初始化 并且发送数据给后端；
@@ -132,7 +155,7 @@ const user_conf = reactive({
       console.log(update_data_send);
       // send to backend.
       let res: string = await invoke("handle_front_update_user_data", { userData: update_data_send });
-
+      elmessage("初始化：" + res);
 
     }
 
@@ -140,7 +163,7 @@ const user_conf = reactive({
   // A.* <-- B.*
   B2A(A: UserDataType, B: UserDataType) {
     const properties = ["autoUseBrand", "brand", "font", "latestSelectedDirPath",
-      "latestSelectedOutputPath", "qulity", "brands", "renameSuffix", "renamePreffix", "renameCenter"]
+      "latestSelectedOutputPath", "outputPathHistory", "qulity", "brands", "renameSuffix", "renamePreffix", "renameCenter"]
     properties.forEach((ele) => {
       if (B[ele] != null || B[ele] == "") {
         A[ele] = B[ele];
@@ -186,8 +209,27 @@ const user_conf = reactive({
       key: key,
       value: value,
     });
-    elmessage("update output dir: " + res);
+    elmessage("设置输出文件夹: " + res);
   },
+
+  async updated_output_dir(path: string) {
+    this.outputPathHistory.reverse();
+    if (this.outputPathHistory.length == 5) {
+      this.outputPathHistory.shift();
+      this.outputPathHistory.push({value: path});
+    } else {
+      this.outputPathHistory.push({value: path});
+    }
+    this.outputPathHistory.reverse();
+    this.latestSelectedOutputPath = path;
+      // console.log("selected single dir " + selected);
+    // elmessage("设置输出文件夹成功 " + path);
+    this.update_user_data2BD("output_dir", path);
+    let user_save: UserDataType = new Object as UserDataType;
+    this.B2A(user_save, user_conf);
+    let json_contents = JSON.stringify(user_save, null, 4);
+    await fs.writeTextFile(this.user_conf_path, json_contents);
+  }
 
   ///
 
@@ -273,6 +315,7 @@ const image_progress = reactive({
           extensions: ["jpg", "jpeg"],
         },
       ],
+      defaultPath: user_conf.latestSelectedDirPath,
     });
     if (Array.isArray(selected) && selected?.length != 0) {
       // console.log(selected);
@@ -282,6 +325,7 @@ const image_progress = reactive({
       } as ImageProps;
       image_progress.update_progress(0, selected.length);
       elmessage("selected: " + this.image_paths);
+      user_conf.latestSelectedDirPath = await dirname(selected[0]);
       // user selected multiple files
     } else if (selected === null) {
       // user cancelled the selection
@@ -292,10 +336,12 @@ const image_progress = reactive({
     } else if (typeof selected === "string") {
       // console.log("single fil: " + selected);
       this.image_paths = { count: 1, image_paths: [selected] };
+
       // this.message("handle_json: " + handle_json.count);
       //   await process_single_image(handle_json);
       image_progress.update_progress(0, 1);
       elmessage("selected: " + this.image_paths);
+      user_conf.latestSelectedDirPath = await dirname(selected);
     }
   },
 
@@ -327,7 +373,7 @@ const image_progress = reactive({
     const selected = await open({
       directory: true,
       multiple: false,
-      // defaultPath: await appDir(),
+      defaultPath: user_conf.latestSelectedDirPath,
     });
     if (selected === null) {
       // user cancelled the selection
@@ -339,6 +385,7 @@ const image_progress = reactive({
       console.log("selected single dir " + selected);
       elmessage("selected single dir " + selected);
       this.image_dir_path = selected;
+      user_conf.latestSelectedDirPath = selected;
     }
   },
 
@@ -389,7 +436,7 @@ interface NotificationBackEnd {
   jpg_file_count: number
 }
 
-// 启动坚挺后端的事件。
+// 启动监听后端的事件。
 async function backend_event_recv() {
   // listen to the `click` event and get a function to remove the event listener
   // there's also a `once` function that subscribes to an event and automatically unsubscribes the listener on the first event
@@ -404,6 +451,7 @@ async function backend_event_recv() {
     // let data = event.payload.message.substring(4);
     switch (event.payload.state_code) {
       case 100:
+        // update 
         console.log(event.payload.message + "--- ");
         let result: NotificationBackEnd = JSON.parse(event.payload.message);
         image_progress.update_progress(0, result.jpg_file_count);
@@ -418,7 +466,16 @@ async function backend_event_recv() {
         // progress.update_progress(progress.count.completed, progress.count.total);
         break;
       case 500:
-        console.log("500...");
+        console.log("500: " + event.payload.message);
+        image_progress.increase_one();
+        ElNotification({
+          title: '文件内容有误',
+          message: event.payload.message,
+          type: 'warning',
+          position: 'bottom-right',
+          // offset: 100,
+          duration: 0,
+        })
         break;
       default: console.log("unknown nofitication.: " + event.payload.message);
     }
@@ -444,7 +501,18 @@ async function drag_event_handle() {
   });
 };
 
+async function test_close_event() {
+  // .listen<null>('tauri://close-requested', (event) => {
+  const unlisten = await listen<null>("tauri://close-requested", (event) => {
+    console.log("close----");
+    const { appWindow } = require('@tauri-apps/api/window');
+				resolve();
+				appWindow.close();
+    invoke("send_event");
+  })
+};
 
+test_close_event();
 
 // run init function
 user_conf.init_user_conf();
@@ -455,6 +523,6 @@ drag_event_handle();
 // onMounted(() => { // invalid 
 // })
 
-export { image_progress, sidebarReactives, previewwidget, elmessage, user_conf };
+export { image_progress, sidebarReactives, previewwidget, elmessage, user_conf , is_dir};
 export type { UserDataType, UserSettings, RenameType };
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { nextTick, ref, onMounted } from "vue";
 // import { image_progress } from "../main";
-import { image_progress } from '../scripts/reactives';
+import { elmessage, image_progress } from '../scripts/reactives';
 import { emit, listen } from "@tauri-apps/api/event";
 import { event, invoke } from "@tauri-apps/api";
 // import { ElMessage, ElNotification } from "element-plus";
@@ -76,6 +76,14 @@ const send_event_test = async ()=>{
   })
 }
 
+const send_event = async ()=>{
+  let res = await invoke("send_event");
+
+  // elmessage("[测试发送]: "+ res);
+}
+
+
+
 
 function handleFileChange(e: InputEvent) {
   const el = e.target as HTMLInputElement;
@@ -125,7 +133,7 @@ onMounted(() => {
         <suspense>
           <!-- <el-col > -->
         <el-container direction="horizontal">
-          <el-button @click="send_event_test" color="#de4781" size="large" :plain="isPlain">[s]测试event</el-button>
+          <el-button @click="send_event" color="#de4781" size="large" :plain="isPlain">[s]测试event</el-button>
         <!-- </suspense>
         <suspense> -->
          <el-button @click="greetTest"  color="#322aef"  size="large"  :plain="isPlain" >[i]测试Rust </el-button>

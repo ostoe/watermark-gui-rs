@@ -10,6 +10,7 @@ const base = () => import("../components/base.vue");
 // const home = () => import("../components/home.vue");
 
 
+
 // const cusIcon = {
 //   template: '<{{ $route.params.id }}/> '
 // }
@@ -48,6 +49,12 @@ const routes = [
     //   }
     // ]
   },
+  {
+    path: "/animation",
+    name: "时间",
+    component: () => import("../components/animation.vue"),
+    iconid: 4,
+  }
 ];
 
 const router = createRouter({

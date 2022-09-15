@@ -24,7 +24,7 @@ use tauri::{Manager, Window};
 
 
 fn main() {
-    println!("current_dir {:?}", std::env::current_dir().unwrap());
+    // println!("current_dir {:?}", std::env::current_dir().unwrap());
     let mut builder = Builder::from_default_env();
     builder.target(Target::Stdout);
 
@@ -140,7 +140,7 @@ fn handle_front_update_key(
         state
             .send(UserOperation::Update(UserSetting::OutputDir(value)))
             .unwrap();
-        return format!("updating user data");
+        return format!("updating userData");
     }
     return format!("error key.");
 }
@@ -172,7 +172,7 @@ fn handle_front_update_user_data(
     // #TODO 初次启动批量初始化配置
     state.send(UserOperation::Update(UserSetting::FileNamePattern(user_data.filename_pattern))).unwrap();
     
-    return format!("updating..");
+    return format!("已初始化用户数据..");
 }
 
 
@@ -182,6 +182,7 @@ fn send_event(window: Window) {
     // loop {
     windows_send_msg(&window, "front-backend", "ZZZ", 200);
     // }
+    println!("close.....");
     //   });
 }
 

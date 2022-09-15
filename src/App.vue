@@ -107,7 +107,7 @@ const handleClose = (key: string, keyPath: string[]) => {
             <!-- <sideBar/> -->
             <!-- <el-container > -->
             <el-aside width="50px">
-              <el-menu  @select="handleSelect" router default-active=""
+              <el-menu  @select="handleSelect" router default-active="/"
               class="elmenu" :collapse="sidebarReactives.isCollapse" 
               @open="handleOpen"
     @close="handleClose"
@@ -147,6 +147,9 @@ const handleClose = (key: string, keyPath: string[]) => {
                           </el-icon>
                           <el-icon v-else-if="item.iconid == 3">
                             <i-ep-CameraFilled />
+                          </el-icon>
+                          <el-icon v-else-if="item.iconid == 4" >
+                            <i-ep-Stopwatch />
                           </el-icon>
                       <!-- <el-icon><i-ep-crop /></el-icon> -->
                          <template #title>{{item.name}}

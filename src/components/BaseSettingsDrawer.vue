@@ -127,6 +127,7 @@ const baseForm: Ref<UserDataType> = ref({
     qulity: 0,
     latestSelectedDirPath: "",
     latestSelectedOutputPath: "",
+    outputPathHistory: [],
     autoUseBrand: false,
     brand: "",
     font: "",

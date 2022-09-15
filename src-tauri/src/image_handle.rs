@@ -136,23 +136,41 @@ pub fn control_center_thread(
                         // todo let brand = exif_data.get(&rexif::ExifTag::Make).unwrap();
                         //
                         let mut tmp_logo_spacing_ratio = logo_spacing_ratio;
+                        // let logo_image: &DynamicImage;
                         if auto_user_brand {
-                            let camera_make = exif_data.get(&rexif::ExifTag::Make).unwrap();
+                            let camera_make = match exif_data.get(&rexif::ExifTag::Make) {
+                                Some(v) => v,
+                                _ => "Unknown",
+                            };
                             let make_vec: Vec<String> =
                                 camera_make.split(" ").map(|x| String::from(x)).collect();
                             // println!("{:?}", make_vec);
                             brand = make_vec[0].to_lowercase();
+                            if !BRANDS.contains(&brand.as_str()) { 
+                                index += 1;
+                                let nofity_name = Path::new(&image_path).file_name().unwrap().to_str().unwrap();
+                                notify_front_st.send(Notification::Error(format!("{} {}", "无品牌信息或不支持该品牌", nofity_name.to_string()))).unwrap();
+                                if index >= image_length {
+                                    index = 0;
+                                    image_length = 0;
+                                    is_pause = true;
+                                    break;
+                                }
+                                // unsupported brand or unkown brand
+                                continue; }
                             // *band --> str   &*brand --> &str :::::   String --> &str
                             if brand == "nikon" {
                                 tmp_logo_spacing_ratio = 1.0;
                             }
                         }
                         // let index = index.to_string();
+                        println!("brand: {}", brand);
+                        let logo_image = brand_map.get(&*brand).expect("brand error...");
                         match image_processing::process_single_image(
                             image_path,
                             &output_path,
                             &font,
-                            brand_map.get(&*brand).expect("brand error..."), // if "Samsung Techwin" panic...
+                            logo_image, // if "Samsung Techwin" panic...
                             exif_data,
                             qulity,
                             watermark_ratio,
@@ -178,7 +196,7 @@ pub fn control_center_thread(
                             }
                         }
                         // img = image_list[index]...;
-
+                        // 判断是否收到暂停命令；
                         if let Ok(opt) =
                             operation_st.recv_timeout(std::time::Duration::from_millis(1))
                         {

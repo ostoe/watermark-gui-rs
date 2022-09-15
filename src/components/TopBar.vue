@@ -3,18 +3,58 @@ import { Files, FolderChecked } from '@element-plus/icons-vue'
 import { main } from '@popperjs/core';
 import { floor } from 'lodash';
 import { onMounted, ref, reactive } from 'vue';
-import { image_progress, previewwidget, user_conf } from '../scripts/reactives';
+import { image_progress, previewwidget, user_conf, is_dir } from '../scripts/reactives';
 import { invoke } from '@tauri-apps/api';
 import { convertFileSrc } from '@tauri-apps/api/tauri';
 import { appDir, configDir, homeDir, localDataDir, logDir, resourceDir, fontDir } from '@tauri-apps/api/path';
 import { ElMessage, ElNotification } from "element-plus";
 import BaseSettingsDrawer from "./BaseSettingsDrawer.vue";
-import WaveProgress,{drawCarbo, drawCircle,drawText} from "../scripts/wave-progress-plugin";
+import WaveProgress, { drawCarbo, drawCircle, drawText } from "../scripts/wave-progress-plugin";
 import { objectPick } from '@vueuse/shared';
-
+import { Calendar, Search, SuccessFilled, WarningFilled } from '@element-plus/icons-vue'
 
 // const percentage = ref(90);
 // const progress_count = ref({ completed: 0, total: 0 });
+const inputInvalid = ref(true);
+const inputDir = ref(user_conf.latestSelectedOutputPath);
+// const inputHistory = ref<{value: string}[]>([]);
+const querySearch = (queryString: string, cb: any) => {
+  cb(user_conf.outputPathHistory);
+}
+
+async function handleSelect(item: any) {
+  if (await is_dir(inputDir.value)) {
+    inputInvalid.value = true;
+   if ( item.value != user_conf.latestSelectedOutputPath) {
+    user_conf.updated_output_dir(item.value);
+    // backend update dir
+   }
+  } else {
+    inputInvalid.value = false;
+  }
+
+}
+const handleIconClick = (ev: Event) => {
+  console.log(ev)
+}
+
+async function input_value_change(v: string) {
+  console.log(inputDir.value);
+  if (await is_dir(inputDir.value)) {
+    inputInvalid.value = true;
+   if ( v != user_conf.latestSelectedOutputPath) {
+    user_conf.updated_output_dir(v);
+    // backend update dir
+   }
+  } else {
+    inputInvalid.value = false;
+  }
+}
+
+// invalid
+// const test_blur = (e: any) => {console.log("test_blur", e)}
+// const test_focus = (e: any) => {console.log("focus", e)}
+// const test_input = (e: any) => {console.log("input", e)}
 const colors = [
   { color: '#f56c6c', percentage: 0 },
   { color: '#e6a23c', percentage: 25 },
@@ -37,26 +77,26 @@ async function test_some_f() {
 
 //自定义指令
 const vResize = {
-      mounted: (el: any, binding: { value: (arg0: { width: number }) => void }) => {
-            let ResizeObserver = window.ResizeObserver;
-            el._resizer = new ResizeObserver((entries) => {
-                  for (const entry of entries) {
-                        // console.log(entry.contentRect.width)
-                        binding.value({ width: entry.contentRect.width });
-                  }
-            });
-            el._resizer.observe(el);
-            // console.log(binding)
-      },
-      unmounted: (el: { _resizer: { disconnect: () => void } }) => {
-            el._resizer.disconnect();
-      },
+  mounted: (el: any, binding: { value: (arg0: { width: number }) => void }) => {
+    let ResizeObserver = window.ResizeObserver;
+    el._resizer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        // console.log(entry.contentRect.width)
+        binding.value({ width: entry.contentRect.width });
+      }
+    });
+    el._resizer.observe(el);
+    // console.log(binding)
+  },
+  unmounted: (el: { _resizer: { disconnect: () => void } }) => {
+    el._resizer.disconnect();
+  },
 };
 
 const bigIcon = ref(true)
 const isNotTinyIcon = ref(true)
 const ListenTopbarWidth = (width: any) => {
-  bigIcon.value = (width.width >= 960) ? true : false
+  bigIcon.value = (width.width >= 10) ? true : false // 960 --> 10
   isNotTinyIcon.value = (width.width >= 720) ? true : false
 }
 
@@ -160,7 +200,7 @@ enum progressSettings {
   lineWidth = 4,
   fontSize = 10
 }
-const getProgress = (completed: number=image_progress.count.completed, total: number=image_progress.count.total) => {
+const getProgress = (completed: number = image_progress.count.completed, total: number = image_progress.count.total) => {
 
   if (completed != null && total != 0 && total != null) {
     return Math.round((completed / total + Number.EPSILON) * 10000) / 100
@@ -170,22 +210,23 @@ const getProgress = (completed: number=image_progress.count.completed, total: nu
 }
 // const waveProgressRef = ref<HTMLCanvasElement>(new Object as HTMLCanvasElement);
 const waveInit = ref<WaveProgress>(new Object as WaveProgress);
-  // const waveInit11 = ref<WaveProgress>(new Object as WaveProgress);
+const waveInit11 = ref<WaveProgress>(new Object as WaveProgress);
 const setCanvasSize = (canvas: HTMLCanvasElement) => {
   canvas.width = 35;
   canvas.height = 35;
 }
 onMounted(() => {
-  test_some_f();
+  // test_some_f();
 
   // init user_conf
-
+  // load user_conf 
+  // inputHistory.value = [{value:"/Users/fly/Pictures/"}, {value: "fdf"}];
+  // inputHistory.value = user_conf.outputPathHistory;
   // 绘制进度条
-  const canvas =  document.getElementById("waveProgress")! as HTMLCanvasElement
+  const canvas = document.getElementById("waveProgress")! as HTMLCanvasElement
   window.addEventListener('resize', () => {
     setCanvasSize(canvas)
   })
-  console.log(`output->canvas`, canvas)
   const waveRun = new WaveProgress({
     canvas: canvas,
     progress: getProgress(),
@@ -202,39 +243,39 @@ onMounted(() => {
   // waveInit.value.usePlugin(drawCircle, { lineWidth: progressSettings.lineWidth });
   // waveInit.value.usePlugin(drawText, { fontSize: progressSettings.fontSize });
   waveInit.value.setProgress({
-    to:  0,// getProgress(image_progress.count.completed, image_progress.count.total),
+    to: 0,// getProgress(image_progress.count.completed, image_progress.count.total),
     from: 0, animated: false,
   })
   waveInit.value.render();
 
 
   // another icon
-  // 绘制进度条
+  // // 绘制进度条
   // const canvas11 = document.getElementById("waveProgress11")! as HTMLCanvasElement
-  // console.log(`output->canvas`, canvas11)
+  // // console.log(`output->canvas`, canvas11)
   // const waveRun11 = new WaveProgress({
   //   canvas: canvas11,
   //   progress: getProgress(),
   //   waveSpeed: 0.05,
-  //   progressSpeed: progressSettings.progressSpeed,
+  //   progressSpeed: 2.0,
   //   waveCharacter: {
-  //     color: '197,140,19',
-  //     number: progressSettings.characterNum,
-  //     waveWidth: progressSettings.characterWidth,
-  //     waveHeight: progressSettings.characterHeight,
+  //     color: '70,194,240',
+  //     number: 2,
+  //     waveWidth: 0.01,
+  //     waveHeight: 5,
   //   },
   // })!;
-  // waveRun11.usePlugin(drawCarbo, { lineWidth: progressSettings.lineWidth });
   // waveInit11.value = waveRun11;
-  // // waveInit.value.usePlugin(drawCircle, { lineWidth: progressSettings.lineWidth });
-  // // waveInit.value.usePlugin(drawText, { fontSize: progressSettings.fontSize });
-  // waveRun11.setProgress({
+  // // waveRun11.usePlugin(drawCarbo, { lineWidth: progressSettings.lineWidth });
+  // waveInit11.value.usePlugin(drawCircle, { lineWidth: 4 });
+  // waveInit11.value.usePlugin(drawText, { fontSize: 10 });
+  // waveInit11.value.setProgress({
   //   to:  0,// getProgress(image_progress.count.completed, image_progress.count.total),
   //   from: 0, animated: false,
   // })
-  // waveRun11.render();
+  // waveInit11.value.render();
 });
-watch([()=>image_progress.count.completed,()=>image_progress.count.total], (newValue, oldValue) => {
+watch([() => image_progress.count.completed, () => image_progress.count.total], (newValue, oldValue) => {
   console.log(`output->oldValue`, oldValue);
   let fromData = getProgress(oldValue[0], oldValue[1]);
   let toData = getProgress(newValue[0], newValue[1]);
@@ -244,11 +285,15 @@ watch([()=>image_progress.count.completed,()=>image_progress.count.total], (newV
     animated: true,
   });
   // test
-  // waveInit11.value.setProgress({
-  //   from: fromData,
-  //   to: toData,
-  //   animated: true,
-  // })
+  waveInit11.value.setProgress({
+    from: fromData,
+    to: toData,
+    animated: true,
+  })
+})
+
+watch([() => user_conf.latestSelectedOutputPath], (nv, ov) => {
+  inputDir.value = nv[0];
 })
 
 nextTick(() => {
@@ -272,7 +317,7 @@ nextTick(() => {
             style="border-radius: 48%;z-index: -1;"></canvas>
 
         </div>
-        <canvas width="90" height="90" id="waveProgress11"></canvas>
+        <canvas width="40" height="40" id="waveProgress11"></canvas>
 
         <el-button key="button.text" :type="image_progress.status ? 'success' : 'primary'" text> {{
         `${image_progress.count.completed}/${image_progress.count.total}`
@@ -296,12 +341,24 @@ nextTick(() => {
           </el-tooltip>
           <el-tooltip :content="'输入模式：' + (selectType ? '文件' : '文件夹')" placement="bottom-end" effect="light">
 
-            <el-switch v-model="selectType" style="--el-switch-on-color: #13ce66; --el-switch-off-color: #bababa"
+            <el-switch v-model="selectType" style="--el-switch-on-color: #38D6BF; --el-switch-off-color: #D4BE94"
               inline-prompt :active-icon="Files" :inactive-icon="FolderChecked" />
           </el-tooltip>
 
           <el-button @click="user_conf.selectOutputDirs()">输出目录</el-button>
-          <el-input v-model="user_conf.latestSelectedOutputPath" class="w-50 m-2" size="small" placeholder="Please Input" />
+
+          <el-autocomplete v-model="inputDir" class="inline-input w-50" size="default" placeholder="Please Input"
+            :fetch-suggestions="querySearch" @change="input_value_change" @select="handleSelect">
+            <template #suffix>
+              <el-icon v-if="inputInvalid" color="#33CC33" class="el-input__icon" @click="handleIconClick">
+                <SuccessFilled />
+              </el-icon>
+              <el-icon v-else class="el-input__icon" color="#FF3333" @click="handleIconClick">
+                <WarningFilled />
+              </el-icon>
+            </template>
+          </el-autocomplete>
+
           <el-button @click="process_image" color="#de4781" size="" plain>开始处理</el-button>
 
         </div>
