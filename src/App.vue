@@ -187,72 +187,71 @@ const handleClose = (key: string, keyPath: string[]) => {
   .spantest2 {
     font-family: "FiraCode-Bold";
   } */
-  
-  .elmenu {
-    z-index: 101;
-    position: absolute;
-    left: 0;
-    height: 100%;
-  }
-  
-  .footer-div {
-    background-color: rgb(255, 255, 255);
-    display: flex;
-    height: 4vh;
-    width: 100%;
-    bottom: 0;
-    right: 0;
-    align-items: center;
-  }
-  
-  /* .el-container {
+
+.elmenu {
+  z-index: 101;
+  position: absolute;
+  left: 0;
+  height: 100%;
+}
+
+.footer-div {
+  background-color: rgb(255, 255, 255);
+  display: flex;
+  height: 4vh;
+  width: 100%;
+  bottom: 0;
+  right: 0;
+  align-items: center;
+}
+
+/* .el-container {
     width: var(--el-aside-width,120px);
   } */
-  
-  .extend,
-  .darkBtn {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin: 10px 5px 20px 5px;
-  }
-  
-  .copyrightSpan {
-    font-size: xx-small;
-  }
-  
-  .common-layout {
-    height: 100%;
-    width: auto;
-  }
-  
-  .elcontainer {
-    margin-left: 50px;
-  }
-  
-  .footer-div {
-    background-color: rgb(255, 255, 255);
-    display: flex;
-    height: 4vh;
-    width: 100%;
-    bottom: 0;
-    right: 0;
-    align-items: center;
-  }
-  
-  /* .el-container {
+
+.extend,
+.darkBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 10px 5px 20px 5px;
+}
+
+.copyrightSpan {
+  font-size: xx-small;
+}
+
+.common-layout {
+  height: 100%;
+  width: auto;
+}
+
+.elcontainer {
+  margin-left: 50px;
+}
+
+.footer-div {
+  background-color: rgb(255, 255, 255);
+  display: flex;
+  height: 4vh;
+  width: 100%;
+  bottom: 0;
+  right: 0;
+  align-items: center;
+}
+
+/* .el-container {
         width: var(--el-aside-width,120px);
       } */
-  
-  .common-layout .shadowmask {
-    position: absolute;
-    top: 0 auto;
-    left: 0 auto;
-    width: 100%;
-    height: 100%;
-    z-index: 100;
-    background-color: #000;
-    opacity: 0.7;
-  }
-  </style>
-      
+
+.common-layout .shadowmask {
+  position: absolute;
+  top: 0 auto;
+  left: 0 auto;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+  background-color: #000;
+  opacity: 0.7;
+}
+</style>
