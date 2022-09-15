@@ -125,7 +125,7 @@ onMounted(() => {
         <suspense>
           <!-- <el-col > -->
         <el-container direction="horizontal">
-          <el-button @click="send_event" color="#de4781" size="large" :plain="isPlain">[s]测试event</el-button>
+          <el-button @click="send_event_test" color="#de4781" size="large" :plain="isPlain">[s]测试event</el-button>
         <!-- </suspense>
         <suspense> -->
          <el-button @click="greetTest"  color="#322aef"  size="large"  :plain="isPlain" >[i]测试Rust </el-button>

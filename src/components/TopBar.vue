@@ -210,29 +210,29 @@ onMounted(() => {
 
   // another icon
   // 绘制进度条
-  const canvas11 = document.getElementById("waveProgress11")! as HTMLCanvasElement
-  console.log(`output->canvas`, canvas11)
-  const waveRun11 = new WaveProgress({
-    canvas: canvas11,
-    progress: getProgress(),
-    waveSpeed: 0.05,
-    progressSpeed: progressSettings.progressSpeed,
-    waveCharacter: {
-      color: '197,140,19',
-      number: progressSettings.characterNum,
-      waveWidth: progressSettings.characterWidth,
-      waveHeight: progressSettings.characterHeight,
-    },
-  })!;
-  waveRun11.usePlugin(drawCarbo, { lineWidth: progressSettings.lineWidth });
-  waveInit11.value = waveRun11;
-  // waveInit.value.usePlugin(drawCircle, { lineWidth: progressSettings.lineWidth });
-  // waveInit.value.usePlugin(drawText, { fontSize: progressSettings.fontSize });
-  waveRun11.setProgress({
-    to:  0,// getProgress(image_progress.count.completed, image_progress.count.total),
-    from: 0, animated: false,
-  })
-  waveRun11.render();
+  // const canvas11 = document.getElementById("waveProgress11")! as HTMLCanvasElement
+  // console.log(`output->canvas`, canvas11)
+  // const waveRun11 = new WaveProgress({
+  //   canvas: canvas11,
+  //   progress: getProgress(),
+  //   waveSpeed: 0.05,
+  //   progressSpeed: progressSettings.progressSpeed,
+  //   waveCharacter: {
+  //     color: '197,140,19',
+  //     number: progressSettings.characterNum,
+  //     waveWidth: progressSettings.characterWidth,
+  //     waveHeight: progressSettings.characterHeight,
+  //   },
+  // })!;
+  // waveRun11.usePlugin(drawCarbo, { lineWidth: progressSettings.lineWidth });
+  // waveInit11.value = waveRun11;
+  // // waveInit.value.usePlugin(drawCircle, { lineWidth: progressSettings.lineWidth });
+  // // waveInit.value.usePlugin(drawText, { fontSize: progressSettings.fontSize });
+  // waveRun11.setProgress({
+  //   to:  0,// getProgress(image_progress.count.completed, image_progress.count.total),
+  //   from: 0, animated: false,
+  // })
+  // waveRun11.render();
 });
 watch([()=>image_progress.count.completed,()=>image_progress.count.total], (newValue, oldValue) => {
   console.log(`output->oldValue`, oldValue);

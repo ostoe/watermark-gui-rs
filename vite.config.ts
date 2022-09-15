@@ -38,7 +38,8 @@ export default defineConfig({
       '@': pathSrc,
     },
   },
-  plugins: [Vue(),
+  plugins: [
+    Vue(),
     // ui自动导入
     AutoImport({
       // Auto import functions from Vue, e.g. ref, reactive, toRef...
@@ -52,7 +53,7 @@ export default defineConfig({
         // Auto import icon components
         // 自动导入图标组件
         IconsResolver({
-          prefix: 'Icon',
+          prefix: 'icon',
         })
       ],
       dts: path.resolve(pathSrc, 'auto-imports.d.ts'),
@@ -72,6 +73,7 @@ export default defineConfig({
     }),
 
     Icons({
+      compiler: 'vue3',
       autoInstall: true,
     }),
     // 快捷路径插件
