@@ -45,12 +45,13 @@ event.listen('tauri://file-drop-hover', (e) => {
  - 集成其他工具，如计算景深 超焦距之类
  - 进度条 [v]
  - 字体啊，logo位置、比例，还有日期格式，自定义显示光圈iso与否，放在高级设置里面了
- - 记录用户数据，输出文件夹之类的。
+ - 记录用户数据，输出文件夹之类的。 [v]
  - font size test...
  - replace Dynamic with ImageBuffer<u8> []
  - 处理等待时，其他组件的控制
  - reset 后强制提示
  - 点击关闭后关闭后台程序，默认会进入后台且无法重新调用
+ - 在线更新
 
 
 

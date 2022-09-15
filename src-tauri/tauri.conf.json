@@ -33,7 +33,10 @@
 				"all": true,
 				"asset": true,
 				"assetScope": ["*"]
-			}
+			},
+      "globalShortcut": {
+        "all": true
+      }
     },
     "bundle": {
       "active": true,

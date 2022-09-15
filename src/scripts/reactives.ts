@@ -475,7 +475,18 @@ async function drag_event_handle() {
   });
 };
 
+async function test_close_event() {
+  // .listen<null>('tauri://close-requested', (event) => {
+  const unlisten = await listen<null>("tauri://close-requested", (event) => {
+    console.log("close----");
+    const { appWindow } = require('@tauri-apps/api/window');
+				resolve();
+				appWindow.close();
+    invoke("send_event");
+  })
+};
 
+test_close_event();
 
 // run init function
 user_conf.init_user_conf();

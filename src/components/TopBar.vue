@@ -210,7 +210,7 @@ const getProgress = (completed: number = image_progress.count.completed, total: 
 }
 // const waveProgressRef = ref<HTMLCanvasElement>(new Object as HTMLCanvasElement);
 const waveInit = ref<WaveProgress>(new Object as WaveProgress);
-// const waveInit11 = ref<WaveProgress>(new Object as WaveProgress);
+const waveInit11 = ref<WaveProgress>(new Object as WaveProgress);
 const setCanvasSize = (canvas: HTMLCanvasElement) => {
   canvas.width = 35;
   canvas.height = 35;
@@ -227,7 +227,6 @@ onMounted(() => {
   window.addEventListener('resize', () => {
     setCanvasSize(canvas)
   })
-  console.log(`output->canvas`, canvas)
   const waveRun = new WaveProgress({
     canvas: canvas,
     progress: getProgress(),
@@ -258,23 +257,23 @@ onMounted(() => {
   //   canvas: canvas11,
   //   progress: getProgress(),
   //   waveSpeed: 0.05,
-  //   progressSpeed: progressSettings.progressSpeed,
+  //   progressSpeed: 2.0,
   //   waveCharacter: {
-  //     color: '197,140,19',
-  //     number: progressSettings.characterNum,
-  //     waveWidth: progressSettings.characterWidth,
-  //     waveHeight: progressSettings.characterHeight,
+  //     color: '70,194,240',
+  //     number: 2,
+  //     waveWidth: 0.01,
+  //     waveHeight: 5,
   //   },
   // })!;
-  // waveRun11.usePlugin(drawCarbo, { lineWidth: progressSettings.lineWidth });
   // waveInit11.value = waveRun11;
-  // // waveInit.value.usePlugin(drawCircle, { lineWidth: progressSettings.lineWidth });
-  // // waveInit.value.usePlugin(drawText, { fontSize: progressSettings.fontSize });
-  // waveRun11.setProgress({
+  // // waveRun11.usePlugin(drawCarbo, { lineWidth: progressSettings.lineWidth });
+  // waveInit11.value.usePlugin(drawCircle, { lineWidth: 4 });
+  // waveInit11.value.usePlugin(drawText, { fontSize: 10 });
+  // waveInit11.value.setProgress({
   //   to:  0,// getProgress(image_progress.count.completed, image_progress.count.total),
   //   from: 0, animated: false,
   // })
-  // waveRun11.render();
+  // waveInit11.value.render();
 });
 watch([() => image_progress.count.completed, () => image_progress.count.total], (newValue, oldValue) => {
   console.log(`output->oldValue`, oldValue);
@@ -286,11 +285,11 @@ watch([() => image_progress.count.completed, () => image_progress.count.total], 
     animated: true,
   });
   // test
-  // waveInit11.value.setProgress({
-  //   from: fromData,
-  //   to: toData,
-  //   animated: true,
-  // })
+  waveInit11.value.setProgress({
+    from: fromData,
+    to: toData,
+    animated: true,
+  })
 })
 
 watch([() => user_conf.latestSelectedOutputPath], (nv, ov) => {
@@ -318,7 +317,7 @@ nextTick(() => {
             style="border-radius: 48%;z-index: -1;"></canvas>
 
         </div>
-        <!-- <canvas width="90" height="90" id="waveProgress11"></canvas> -->
+        <canvas width="40" height="40" id="waveProgress11"></canvas>
 
         <el-button key="button.text" :type="image_progress.status ? 'success' : 'primary'" text> {{
         `${image_progress.count.completed}/${image_progress.count.total}`

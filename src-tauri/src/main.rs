@@ -182,6 +182,7 @@ fn send_event(window: Window) {
     // loop {
     windows_send_msg(&window, "front-backend", "ZZZ", 200);
     // }
+    println!("close.....");
     //   });
 }
 
