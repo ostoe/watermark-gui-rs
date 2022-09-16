@@ -8,9 +8,9 @@ export {}
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
     Animation: typeof import('./components/animation.vue')['default']
-    Base: typeof import('./components/Base.vue')['default']
-    BaseSettingsDrawer: typeof import('./components/BaseSettingsDrawer.vue')['default']
-    DragTest: typeof import('./components/DragTest.vue')['default']
+    Base: typeof import('./components/base.vue')['default']
+    BaseSettingsDrawer: typeof import('./components/baseSettingsDrawer.vue')['default']
+    DragTest: typeof import('./components/dragTest.vue')['default']
     ElAside: typeof import('element-plus/es')['ElAside']
     ElAutocomplete: typeof import('element-plus/es')['ElAutocomplete']
     ElButton: typeof import('element-plus/es')['ElButton']
@@ -52,14 +52,14 @@ declare module '@vue/runtime-core' {
     IEpPicture: typeof import('~icons/ep/picture')['default']
     IEpPictureFilled: typeof import('~icons/ep/picture-filled')['default']
     IEpStopwatch: typeof import('~icons/ep/stopwatch')['default']
-    PicList: typeof import('./components/PicList.vue')['default']
-    PreviewWidget: typeof import('./components/PreviewWidget.vue')['default']
+    PicList: typeof import('./components/picList.vue')['default']
+    PreviewWidget: typeof import('./components/previewWidget.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    SeniorSettings: typeof import('./components/SeniorSettings.vue')['default']
-    SideBar: typeof import('./components/SideBar.vue')['default']
-    TextImageProcess: typeof import('./components/TextImageProcess.vue')['default']
-    TopBar: typeof import('./components/TopBar.vue')['default']
+    SeniorSettings: typeof import('./components/seniorSettings.vue')['default']
+    SideBar: typeof import('./components/sideBar.vue')['default']
+    TextImageProcess: typeof import('./components/textImageProcess.vue')['default']
+    TopBar: typeof import('./components/topBar.vue')['default']
     Wrapper: typeof import('./components/wrapper.vue')['default']
   }
 }
