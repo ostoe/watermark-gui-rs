@@ -255,7 +255,7 @@ const image_progress = reactive({
     }
   },
   //
-
+ 
   status_toogle() {
     this.status = !this.status;
     // console.log(this.status);

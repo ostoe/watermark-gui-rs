@@ -100,16 +100,19 @@ pub fn handle_app_event(_app_handle: &AppHandle<Wry>, event: RunEvent) {
             }
 
         RunEvent::WindowEvent { label, event, .. } => {
-            println!("WindowEvent: {:?}", event);
             match event {
                 tauri::WindowEvent::CloseRequested { api, .. } => {
+                    println!("WindowEvent: CloseRequested");
                     if label == "main" {
                         api.prevent_close();
                         let _ = _app_handle.get_window("main").unwrap().hide();
                         // 另一种写法： app_handle.get_window("main").map(|win| { let _ = win.hide(); });
                         std::process::exit(0);
                     }
-                }
+                },
+                tauri::WindowEvent::Focused(b) => {println!("isFocused?: {}", b)}
+                // tauri::WindowEvent::Moved(m) => {}
+                // tauri::WindowEvent::(b) => {println!("isFocused?: {}", b)}
                 _ => {}
             }
         }

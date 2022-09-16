@@ -29,7 +29,7 @@ const renameCenter = ref({
 const renameSuffix = ref({
     SD: [{ id: 1, label: "空", value: "" }, { id: 2, label: "自定义", value: "__custom__" }, { id: 3, label: "自定义+【序号】", value: "__serial_number__" }],
     value: { id: 2, label: "自定义", value: "__custom__" },
-    input: "-w",
+    input: "-WM",
     valid: true,
 });
 
@@ -46,7 +46,21 @@ function check_input_suffix() {
 }
 
 function resetConfirmEvent() {
-    //#TODO
+    baseForm.value.autoUseBrand = true;
+    baseForm.value.qulity = 85;
+    baseForm.value.brand = "nikon";
+    baseForm.value.autoUseBrand = true;
+    baseForm.value.renameSuffix = "";
+    renamePreffix.value.input = "";
+    renamePreffix.value.valid = true;
+    renamePreffix.value.value = renamePreffix.value.SD[0];
+    renameCenter.value.input = "";
+    renameCenter.value.valid = true;
+    renameCenter.value.value = renameCenter.value.SD[0];
+    renameSuffix.value.input = "-WM";
+    renameSuffix.value.valid = true;
+    renameSuffix.value.value = renameSuffix.value.SD[1];
+
 }
 
 const preview_filename = ref(["", "", "", ".jpg"]);
@@ -154,7 +168,7 @@ async function saveSetting() {
     if (renamePreffix.value.valid && renameCenter.value.valid && renameSuffix.value.valid) {
         // send backend
         let filename_tmp = ["", "", ""];
-        // TODO user_conf存储 __custom 前端解析 转换为 renamePreffix模式；然后配置加载初始化程序
+        // 
         if (renamePreffix.value.value.value != "") { filename_tmp[0] = baseForm.value.renamePreffix = renamePreffix.value.value.value + renamePreffix.value.input; }
         if (renameCenter.value.value.value != "") { filename_tmp[1] = baseForm.value.renameCenter = renameCenter.value.value.value + renameCenter.value.input; }
         if (renameSuffix.value.value.value != "") { filename_tmp[2] = baseForm.value.renameSuffix = renameSuffix.value.value.value + renameSuffix.value.input; }
@@ -365,9 +379,9 @@ onMounted(() => {
         <div style="margin: 10px 0 20% 0; border-bottom: 0%;">
             <el-row>
                 <el-popconfirm confirm-button-text="是" cancel-button-text="否" :icon="InfoFilled" icon-color="#626AEF"
-                    title="重置确认" @confirm="resetConfirmEvent" @cancel="">
+                    title="重置（仍未保存）" @confirm="resetConfirmEvent" @cancel="">
                     <template #reference>
-                        <el-button type="primary" size="small">reset</el-button>
+                        <el-button type="primary" size="small" plain color="#0FCAC7">默认</el-button>
                     </template>
                 </el-popconfirm>
                 <el-button type="primary" size="large" @click="saveSetting"> 保存 </el-button>

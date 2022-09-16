@@ -2,10 +2,10 @@
   // import dragTest from "./dragTest.vue";
   // import TextImageProcess from "./textImageProcess.vue";
   // import sideBar from "./sideBar.vue";
-  // import topBar from "./topBar.vue";
-  // import picList from "./picList.vue";
-  // import baseSettingsDrawerVue from "./baseSettingsDrawerVue.vue";
-  // import previewWidget from "./previewWidget.vue";
+  import topBar from "./topBar.vue";
+  import picList from "./picList.vue";
+  import baseSettingsDrawerVue from "./baseSettingsDrawerVue.vue";
+  import previewWidget from "./previewWidget.vue";
   // import { ref, onMounted } from "vue";
   import router from "./router/router";
   // import { Context } from "vm";
@@ -149,7 +149,13 @@ const handleClose = (key: string, keyPath: string[]) => {
                             <i-ep-CameraFilled />
                           </el-icon>
                           <el-icon v-else-if="item.iconid == 4" >
-                            <i-ep-Stopwatch />
+                            <i-ep-UploadFilled />
+                          </el-icon>
+                          <el-icon v-else-if="item.iconid == 5" >
+                            <i-ep-Stopwatch /> 
+                          </el-icon>
+                          <el-icon v-else-if="item.iconid == 6" >
+                            <i-ep-LocationInformation /> 
                           </el-icon>
                       <!-- <el-icon><i-ep-crop /></el-icon> -->
                          <template #title>{{item.name}}

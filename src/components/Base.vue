@@ -180,7 +180,7 @@ async function selectedFile(e: globalThis.Event) {
   padding: 8px 12px;
   color: #fff;
   /* width: 50px; */
-  background-color: #d71596;
+  background-color: #25dce3;
   transition: 0.3s ease all;
   border-radius:30px;
 }
