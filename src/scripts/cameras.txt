@@ -144,9 +144,11 @@
     </option>
 </optgroup>
 
+
+
 for x in cong:
     label = re.findall(r'label="(.*?)">', x)[0]
     d = {"label": label,"options": []}
     for b in re.findall(r'<option value="(.*?)" data-coc="(.*?)">(.*?)</option>',x):
-        d["options"].append({"id":int(b[0]), "value":float(b[1]), "label":b[2]})
+        d["options"].append({ "value": {"id":int(b[0]), "value":float(b[1])}, "label":b[2]})
     l.append(d)

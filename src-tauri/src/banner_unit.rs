@@ -4,12 +4,12 @@ use serde::{Serialize, Deserialize};
 
 
 
-pub struct BannerUnit{
-    banner_type: BannerType,
-    size: (u32, u32),
-    position: f32, // % 
-    // time_str: String,
-}
+// pub struct BannerUnit{
+//     pub banner_type: BannerType,
+//     pub size: (u32, u32),
+//     pub position: f32, // % 
+//     // time_str: String,
+// }
 // 利用 宏实现 enum display
 pub enum  BannerType{
     Logo,
@@ -45,6 +45,18 @@ pub enum UserSetting {
     AutoUseBrand(bool, String),
     Font(String),
     FileNamePattern([String;3]),
+    Style(WaterMarkStyle)
+}
+
+pub struct WaterMarkStyle {
+     pub watermark_ratio: f32,
+     #[allow(non_snake_case)]
+     pub watermark_scale: f32,
+     pub logo_ratio: f32,
+     pub logo_spacing_ratio: f32,
+     pub position_ratio: f32,
+     pub split_line_spacing: u32,
+     pub font_path: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]

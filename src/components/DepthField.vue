@@ -5,11 +5,11 @@
 
 
 const form = ref({
-    CoC: 0.03, // CIRCLE OF CONFUSION (COC)
+    CoC: {id: 48, value: 0.03}, // CIRCLE OF CONFUSION (COC)
     focus_length: 50, // 焦距
     aperture: 1.8, // 光圈
     object_distance: 3, // 物距
-    od_units: 1, // 单位(米)
+    od_units: {label: "米(m)", value: 1.0}, // 单位(米)
 })
 
 const resultForm = ref({
@@ -28,10 +28,11 @@ function doDepthOfField() {
     console.log(form.value);
     // get input data from the form
     let distance = form.value.object_distance;
-    let CoC = form.value.CoC;
+    let CoC = form.value.CoC.value;
     let aperture = form.value.aperture;
     let focal = form.value.focus_length;
-    let units = form.value.od_units;
+    let units = form.value.od_units.value;
+    console.log(distance, CoC, aperture, focal, units);
     // ensure that we have numbers in the variables
     focal = focal * 1.0;
     aperture = aperture * 1.0;
@@ -105,278 +106,160 @@ const onSubmit = () => {
 }
 
 
-const cameraOptions = [{
-    label: 'Blackmagic',
-    options: [{ id: 0, value: 0.013, label: 'Blackmagic Cinema Camera' },
-    {
-        id: 1,
-        value: 0.01,
-        label: 'Blackmagic Pocket Cinema Camera, Studio Camera HD'
-    },
-    {
-        id: 2,
-        value: 0.01,
-        label: 'Blackmagic Studio Camera 4K, URSA Broadcast/HDMI'
-    },
-    {
-        id: 3,
-        value: 0.017,
-        label: 'Blackmagic Production Camera 4K, URSA EF/PL'
-    }]
-},
-{
-    label: 'Canon',
-    options: [{
-        id: 4,
-        value: 0.019,
-        label: 'Canon Digital Rebel, XS, XSi, XT, XTi'
-    },
-    {
-        id: 7,
-        value: 0.019,
-        label: 'Canon EOS 200D, 7D, 70D, 30D, 20Da, 20D, 10D'
-    },
-    { id: 8, value: 0.019, label: 'Canon EOS 60Da, 60D, 50D, 40D' },
-    { id: 9, value: 0.019, label: 'Canon EOS D60, D30' },
-    {
-        id: 10,
-        value: 0.024,
-        label: 'Canon EOS 1D, 1D Mark II, 1D Mark II N, 1D Mark III'
-    },
-    { id: 11, value: 0.023, label: 'Canon EOS 1D Mark IV' },
-    {
-        id: 12,
-        value: 0.03,
-        label: 'Canon EOS 1Ds, 1Ds Mark I, 1DS Mark II, 1DS Mark III'
-    },
-    { id: 13, value: 0.03, label: 'Canon EOS R, 1D C, 1D X, 1D X Mark II' },
-    { id: 15, value: 0.03, label: 'Canon EOS 6D, 6D Mark II' },
-    { id: 16, value: 0.019, label: 'Canon EOS 7D, 7D Mark II' },
-    {
-        id: 17,
-        value: 0.019,
-        label: 'Canon EOS 800D, 760D, 750D, 700D, 650D, 600D, 550D, M3'
-    }]
-},
-{
-    label: 'Fujifilm',
-    options: [{
-        id: 19,
-        value: 0.019,
-        label: 'Fujifilm FinePix S5 Pro, S3 Pro, S2 Pro, S1 Pro, IS Pro'
-    },
-    { id: 89, value: 0.038, label: 'Fujifilm GFX 50S, 50R' }]
-},
-{
-    label: 'Hasselblad',
-    options: [{ id: 21, value: 0.02, label: 'Hasselblad Lunar' },
-    { id: 22, value: 0.036, label: 'Hasselblad 503 CW, 503 CWD' },
-    { id: 23, value: 0.038, label: 'Hasselblad H5D-40, H4D-40' },
-    {
-        id: 24,
-        value: 0.042,
-        label: 'Hasselblad H3D II-31, H3D II-39, H3D II-50'
-    },
-    {
-        id: 25,
-        value: 0.043,
-        label: 'Hasselblad H5D-50, H4D-50MS, H4D-50, H4D-200MS'
-    },
-    { id: 26, value: 0.047, label: 'Hasselblad H4D-60' }]
-},
-{
-    label: 'Konica Minolta',
-    options: [{
-        id: 27,
-        value: 0.02,
-        label: 'Konica Minolta DYNAX 5D, 7D'
-    },
-    { id: 28, value: 0.02, label: 'Konica Minolta Maxxum 5D, 7D' }]
-},
-{
-    label: 'Leaf',
-    options: [{
-        id: 29,
-        value: 0.038,
-        label: 'Leaf Aptus II 8, Aptus II 6, Credo 40'
-    },
-    { id: 30, value: 0.042, label: 'Leaf Aptus II 7, AptusII 5' },
-    { id: 31, value: 0.046, label: 'Leaf Aptus II 10' },
-    { id: 32, value: 0.047, label: 'Leaf Credo 80, Credo 60' }]
-},
-{
-    label: 'Leica',
-    options: [{ id: 33, value: 0.011, label: 'Leica V-Lux (Typ 114)' },
-    { id: 34, value: 0.015, label: 'Leica D-Lux (Typ 109)' },
-    { id: 35, value: 0.016, label: 'Leica Digilux 3' },
-    { id: 36, value: 0.019, label: 'Leica X (Typ 113)' },
-    {
-        id: 37,
-        value: 0.02,
-        label: 'Leica X2, X1, X-E (Typ 102), X-U (Typ 113)'
-    },
-    { id: 38, value: 0.023, label: 'Leica M8, M8.2' },
-    {
-        id: 39,
-        value: 0.03,
-        label: 'Leica M9, M9 P, M-Monochrom, Q (Typ 116)'
-    },
-    {
-        id: 40,
-        value: 0.038,
-        label: 'Leica S, S2, S (Typ 007), S-E (Typ 006)'
-    }]
-},
-{
-    label: 'Mamiya',
-    options: [{ id: 41, value: 0.038, label: 'Mamiya DM40 Digital Back' },
-    { id: 42, value: 0.042, label: 'Mamiya ZD Back, DM33' }]
-},
-{
-    label: 'Nikon',
-    options: [{
-        id: 43,
-        value: 0.011,
-        label: 'Nikon 1 J1, 1 J2, 1 V1, 1 V2, 1 V3'
-    },
-    { id: 44, value: 0.019, label: 'Nikon D3400, D3200, D3100' },
-    {
-        id: 45,
-        value: 0.02,
-        label: 'Nikon D90, D80, D70, D70s, D60, D50, D40, D40x'
-    },
-    { id: 47, value: 0.02, label: 'Nikon D500, D300, D300S, D200, D100' },
-    {
-        id: 48,
-        value: 0.03,
-        label: 'Nikon D850, D810, D810A, D800, D800E, D750, D700, D610, D600'
-    },
-    {
-        id: 49,
-        value: 0.02,
-        label: 'Nikon D2X, D2Xs, D2H, D2Hs, D1H, D1X, D1'
-    },
-    { id: 50, value: 0.03, label: 'Nikon D4S, D4, D3X, D3S, Df, Z6, Z7' }]
-},
-{
-    label: 'Olympus',
-    options: [{
-        id: 51,
-        value: 0.015,
-        label: 'Olympus OM-D E-M10, OM-D E-M5, OM-D E-M1'
-    },
-    { id: 53, value: 0.015, label: 'Olympus PEN E-PM1, E-PM2, F' },
-    { id: 54, value: 0.016, label: 'Olympus PEN E-P2, E-P1, E-PL1s' },
-    {
-        id: 56,
-        value: 0.016,
-        label: 'Olympus E-620, E-600, E-520, E-510, E-500'
-    }]
-},
-{
-    label: 'Panasonic',
-    options: [{
-        id: 57,
-        value: 0.015,
-        label: 'Panasonic Lumix DMC-G7, DMC-G5, DMC-G3'
-    },
-    {
-        id: 58,
-        value: 0.016,
-        label: 'Panasonic Lumix DMC-G10, DMC-G2, DMC-G1, DMC-GF1'
-    },
-    {
-        id: 61,
-        value: 0.015,
-        label: 'Panasonic Lumix DMC-GX7, DMC-GX1, DMC-GM5'
-    },
-    { id: 62, value: 0.016, label: 'Panasonic Lumix DMC-L10, DMC-L1' },
-    { id: 88, value: 0.0136, label: 'Panasonic Lumix DMC-LX100' }]
-},
-{
-    label: 'Pentax',
-    options: [{
-        id: 63,
-        value: 0.02,
-        label: 'Pentax K200D, K110D, K100D, K100D Super'
-    },
-    { id: 64, value: 0.02, label: 'Pentax K2000, K20D, K10D' },
-    { id: 66, value: 0.02, label: 'Pentax K-30, K-01' },
-    { id: 67, value: 0.02, label: 'Pentax *ist D, DL, DL2, DS DS2, K-S1' },
-    { id: 68, value: 0.038, label: 'Pentax 645D, 645Z' },
-    { id: 87, value: 0.03, label: 'Pentax K-1, K-1 Mark II' }]
-},
-{
-    label: 'Phase One',
-    options: [{
-        id: 69,
-        value: 0.038,
-        label: 'Phase One P 40+ Digital Back, IQ140 Digital Back'
-    },
-    { id: 70, value: 0.043, label: 'Phase One P 45+ Digital Back' },
-    { id: 71, value: 0.047, label: 'Phase One P 65+ Digital Back' }]
-},
-{
-    label: 'Samsung',
-    options: [{
-        id: 73,
-        value: 0.02,
-        label: 'Samsung GX-20, GX-10, GX-1L, GX-1S'
-    },
-    { id: 74, value: 0.02, label: 'Samsung NX1, NX20, NX11, NX10, NX5' },
-    {
-        id: 75,
-        value: 0.02,
-        label: 'Samsung NX1000, NX300, NX210, NX200, NX100'
-    }]
-},
-{
-    label: 'Sigma',
-    options: [{
-        id: 76,
-        value: 0.017,
-        label: 'Sigma DP1, DP1s, DP1X, DP2, DP2s, DP2X'
-    },
-    { id: 77, value: 0.017, label: 'Sigma SD15, SD14, SD10, SD9' },
-    { id: 78, value: 0.02, label: 'Sigma SD1, SD1 Merrill' }]
-},
-{
-    label: 'Sony',
-    options: [{
-        id: 80,
-        value: 0.02,
-        label: 'Sony Alpha DSLR-A700, A580, A560, A500, A550, A450, A390'
-    },
-    { id: 81, value: 0.03, label: 'Sony Alpha DSLR-A900, A850' },
-    {
-        id: 82,
-        value: 0.02,
-        label: 'Sony a6500, a6300, a6000, a5000, a3000'
-    },
-    {
-        id: 83,
-        value: 0.02,
-        label: 'Sony a77, a77II, a65, a57, a55, a37, a35, a33'
-    },
-    {
-        id: 84,
-        value: 0.03,
-        label: 'Sony a9, a7, a7 II, a7 III, a7R, a7R II, a7s, a99, a99 II'
-    },
-    { id: 85, value: 0.03, label: 'Sony Cyber-shot DSC-RX1' },
-    {
-        id: 86,
-        value: 0.011,
-        label: 'Sony Cyber-shot DSC-RX10, RX10 II, RX10 III, RX10 IV'
-    }]
-}]
+const cameraOptions = [{label: 'Blackmagic',
+  options: [{value: {id: 0, value: 0.013},
+    label: 'Blackmagic Cinema Camera'},
+   {value: {id: 1, value: 0.01},
+    label: 'Blackmagic Pocket Cinema Camera, Studio Camera HD'},
+   {value: {id: 2, value: 0.01},
+    label: 'Blackmagic Studio Camera 4K, URSA Broadcast/HDMI'},
+   {value: {id: 3, value: 0.017},
+    label: 'Blackmagic Production Camera 4K, URSA EF/PL'}]},
+ {label: 'Canon',
+  options: [{value: {id: 4, value: 0.019},
+    label: 'Canon Digital Rebel, XS, XSi, XT, XTi'},
+   {value: {id: 7, value: 0.019},
+    label: 'Canon EOS 200D, 7D, 70D, 30D, 20Da, 20D, 10D'},
+   {value: {id: 8, value: 0.019},
+    label: 'Canon EOS 60Da, 60D, 50D, 40D'},
+   {value: {id: 9, value: 0.019}, label: 'Canon EOS D60, D30'},
+   {value: {id: 10, value: 0.024},
+    label: 'Canon EOS 1D, 1D Mark II, 1D Mark II N, 1D Mark III'},
+   {value: {id: 11, value: 0.023}, label: 'Canon EOS 1D Mark IV'},
+   {value: {id: 12, value: 0.03},
+    label: 'Canon EOS 1Ds, 1Ds Mark I, 1DS Mark II, 1DS Mark III'},
+   {value: {id: 13, value: 0.03},
+    label: 'Canon EOS R, 1D C, 1D X, 1D X Mark II'},
+   {value: {id: 15, value: 0.03}, label: 'Canon EOS 6D, 6D Mark II'},
+   {value: {id: 16, value: 0.019}, label: 'Canon EOS 7D, 7D Mark II'},
+   {value: {id: 17, value: 0.019},
+    label: 'Canon EOS 800D, 760D, 750D, 700D, 650D, 600D, 550D, M3'}]},
+ {label: 'Fujifilm',
+  options: [{value: {id: 19, value: 0.019},
+    label: 'Fujifilm FinePix S5 Pro, S3 Pro, S2 Pro, S1 Pro, IS Pro'},
+   {value: {id: 89, value: 0.038}, label: 'Fujifilm GFX 50S, 50R'}]},
+ {label: 'Hasselblad',
+  options: [{value: {id: 21, value: 0.02},
+    label: 'Hasselblad Lunar'},
+   {value: {id: 22, value: 0.036},
+    label: 'Hasselblad 503 CW, 503 CWD'},
+   {value: {id: 23, value: 0.038}, label: 'Hasselblad H5D-40, H4D-40'},
+   {value: {id: 24, value: 0.042},
+    label: 'Hasselblad H3D II-31, H3D II-39, H3D II-50'},
+   {value: {id: 25, value: 0.043},
+    label: 'Hasselblad H5D-50, H4D-50MS, H4D-50, H4D-200MS'},
+   {value: {id: 26, value: 0.047}, label: 'Hasselblad H4D-60'}]},
+ {label: 'Konica Minolta',
+  options: [{value: {id: 27, value: 0.02},
+    label: 'Konica Minolta DYNAX 5D, 7D'},
+   {value: {id: 28, value: 0.02},
+    label: 'Konica Minolta Maxxum 5D, 7D'}]},
+ {label: 'Leaf',
+  options: [{value: {id: 29, value: 0.038},
+    label: 'Leaf Aptus II 8, Aptus II 6, Credo 40'},
+   {value: {id: 30, value: 0.042},
+    label: 'Leaf Aptus II 7, AptusII 5'},
+   {value: {id: 31, value: 0.046}, label: 'Leaf Aptus II 10'},
+   {value: {id: 32, value: 0.047}, label: 'Leaf Credo 80, Credo 60'}]},
+ {label: 'Leica',
+  options: [{value: {id: 33, value: 0.011},
+    label: 'Leica V-Lux (Typ 114)'},
+   {value: {id: 34, value: 0.015}, label: 'Leica D-Lux (Typ 109)'},
+   {value: {id: 35, value: 0.016}, label: 'Leica Digilux 3'},
+   {value: {id: 36, value: 0.019}, label: 'Leica X (Typ 113)'},
+   {value: {id: 37, value: 0.02},
+    label: 'Leica X2, X1, X-E (Typ 102), X-U (Typ 113)'},
+   {value: {id: 38, value: 0.023}, label: 'Leica M8, M8.2'},
+   {value: {id: 39, value: 0.03},
+    label: 'Leica M9, M9 P, M-Monochrom, Q (Typ 116)'},
+   {value: {id: 40, value: 0.038},
+    label: 'Leica S, S2, S (Typ 007), S-E (Typ 006)'}]},
+ {label: 'Mamiya',
+  options: [{value: {id: 41, value: 0.038},
+    label: 'Mamiya DM40 Digital Back'},
+   {value: {id: 42, value: 0.042}, label: 'Mamiya ZD Back, DM33'}]},
+ {label: 'Nikon',
+  options: [{value: {id: 43, value: 0.011},
+    label: 'Nikon 1 J1, 1 J2, 1 V1, 1 V2, 1 V3'},
+   {value: {id: 44, value: 0.019}, label: 'Nikon D3400, D3200, D3100'},
+   {value: {id: 45, value: 0.02},
+    label: 'Nikon D90, D80, D70, D70s, D60, D50, D40, D40x'},
+   {value: {id: 47, value: 0.02},
+    label: 'Nikon D500, D300, D300S, D200, D100'},
+   {value: {id: 48, value: 0.03},
+    label: 'Nikon ℤ9, ℤ7, ℤ6, ℤ5, D850, D810, D810A, D800, D800E, D750, D700, D610, D600'},
+   {value: {id: 49, value: 0.02},
+    label: 'Nikon D2X, D2Xs, D2H, D2Hs, D1H, D1X, D1'},
+   {value: {id: 50, value: 0.03},
+    label: 'Nikon D4S, D4, D3X, D3S, Df, Z6, Z7'}]},
+ {label: 'Olympus',
+  options: [{value: {id: 51, value: 0.015},
+    label: 'Olympus OM-D E-M10, OM-D E-M5, OM-D E-M1'},
+   {value: {id: 53, value: 0.015},
+    label: 'Olympus PEN E-PM1, E-PM2, F'},
+   {value: {id: 54, value: 0.016},
+    label: 'Olympus PEN E-P2, E-P1, E-PL1s'},
+   {value: {id: 56, value: 0.016},
+    label: 'Olympus E-620, E-600, E-520, E-510, E-500'}]},
+ {label: 'Panasonic',
+  options: [{value: {id: 57, value: 0.015},
+    label: 'Panasonic Lumix DMC-G7, DMC-G5, DMC-G3'},
+   {value: {id: 58, value: 0.016},
+    label: 'Panasonic Lumix DMC-G10, DMC-G2, DMC-G1, DMC-GF1'},
+   {value: {id: 61, value: 0.015},
+    label: 'Panasonic Lumix DMC-GX7, DMC-GX1, DMC-GM5'},
+   {value: {id: 62, value: 0.016},
+    label: 'Panasonic Lumix DMC-L10, DMC-L1'},
+   {value: {id: 88, value: 0.0136},
+    label: 'Panasonic Lumix DMC-LX100'}]},
+ {label: 'Pentax',
+  options: [{value: {id: 63, value: 0.02},
+    label: 'Pentax K200D, K110D, K100D, K100D Super'},
+   {value: {id: 64, value: 0.02}, label: 'Pentax K2000, K20D, K10D'},
+   {value: {id: 66, value: 0.02}, label: 'Pentax K-30, K-01'},
+   {value: {id: 67, value: 0.02},
+    label: 'Pentax *ist D, DL, DL2, DS DS2, K-S1'},
+   {value: {id: 68, value: 0.038}, label: 'Pentax 645D, 645Z'},
+   {value: {id: 87, value: 0.03}, label: 'Pentax K-1, K-1 Mark II'}]},
+ {label: 'Phase One',
+  options: [{value: {id: 69, value: 0.038},
+    label: 'Phase One P 40+ Digital Back, IQ140 Digital Back'},
+   {value: {id: 70, value: 0.043},
+    label: 'Phase One P 45+ Digital Back'},
+   {value: {id: 71, value: 0.047},
+    label: 'Phase One P 65+ Digital Back'}]},
+ {label: 'Samsung',
+  options: [{value: {id: 73, value: 0.02},
+    label: 'Samsung GX-20, GX-10, GX-1L, GX-1S'},
+   {value: {id: 74, value: 0.02},
+    label: 'Samsung NX1, NX20, NX11, NX10, NX5'},
+   {value: {id: 75, value: 0.02},
+    label: 'Samsung NX1000, NX300, NX210, NX200, NX100'}]},
+ {label: 'Sigma',
+  options: [{value: {id: 76, value: 0.017},
+    label: 'Sigma DP1, DP1s, DP1X, DP2, DP2s, DP2X'},
+   {value: {id: 77, value: 0.017},
+    label: 'Sigma SD15, SD14, SD10, SD9'},
+   {value: {id: 78, value: 0.02}, label: 'Sigma SD1, SD1 Merrill'}]},
+ {label: 'Sony',
+  options: [{value: {id: 80, value: 0.02},
+    label: 'Sony Alpha DSLR-A700, A580, A560, A500, A550, A450, A390'},
+   {value: {id: 81, value: 0.03}, label: 'Sony Alpha DSLR-A900, A850'},
+   {value: {id: 82, value: 0.02},
+    label: 'Sony a6500, a6300, a6000, a5000, a3000'},
+   {value: {id: 83, value: 0.02},
+    label: 'Sony a77, a77II, a65, a57, a55, a37, a35, a33'},
+   {value: {id: 84, value: 0.03},
+    label: 'Sony a9, a7, a7 II, a7 III, a7R, a7R II, a7s, a99, a99 II'},
+   {value: {id: 85, value: 0.03}, label: 'Sony Cyber-shot DSC-RX1'},
+   {value: {id: 86, value: 0.011},
+    label: 'Sony Cyber-shot DSC-RX10, RX10 II, RX10 III, RX10 IV'}]}]
 
-const selectedCamera = ref(cameraOptions[1]) // #TODO default 以及持续变化的问题
+// #TODO default 以及持续变化的问题
 
 function handleSelected(x: any) {
     console.log(x);
-    console.log(typeof selectedCamera);
-    console.log(selectedCamera);
+    console.log(form.value.CoC);
 }
 </script>
 
@@ -385,18 +268,17 @@ function handleSelected(x: any) {
     <el-form :model="form" label-width="120px">
         <el-form-item label="">
             <span>胶片格式，数码相机，或自定义弥散圆</span>
-            <el-select v-model="selectedCamera" default-first-option @change="handleSelected" value-key="id"
-                placeholder="please select your zone">
-                <el-option-group v-for="group in cameraOptions" value-key="id" :label="group.label">
-                    <el-option v-for="cameras in group.options" value-key="id" :label="cameras.label"
-                        :value="cameras.value" />
+            <el-select v-model="form.CoC" default-first-option @change="handleSelected" value-key="id"
+                placeholder="please select your zone" filterable >
+                <el-option-group v-for="group in cameraOptions"  :label="group.label">
+                    <el-option v-for="cameras in group.options" :value="cameras.value" :label="cameras.label"/>
                 </el-option-group>
             </el-select>
         </el-form-item>
         <el-form-item>
             <el-col :span="11">
                 <span>镜头实际焦距(mm)</span>
-                <el-select v-model="form.focus_length">
+                <el-select v-model="form.focus_length" filterable >
                     <el-option value="3">3</el-option>
                     <el-option value="3.6">3.6</el-option>
                     <el-option value="4">4</el-option>
@@ -610,49 +492,51 @@ function handleSelected(x: any) {
             </el-col>
             <el-col :span="11">
                 <span>光圈大小</span>
-                <el-select v-model="form.aperture" default-first-option>
-                    <el-option value="0.95">f/0.95</el-option>
-                    <el-option value="1">f/1</el-option>
-                    <el-option value="1.2">f/1.2</el-option>
-                    <el-option value="1.414214">f/1.4</el-option>
-                    <el-option value="1.587401">f/1.6</el-option>
-                    <el-option value="1.681793">f/1.7</el-option>
-                    <el-option value="1.781797">f/1.8</el-option>
-                    <el-option value="2.000000">f/2</el-option>
-                    <el-option value="2.244924">f/2.2</el-option>
-                    <el-option value="2.378414">f/2.4</el-option>
-                    <el-option value="2.519842">f/2.5</el-option>
-                    <el-option value="2.828427">f/2.8</el-option>
-                    <el-option value="3.174802">f/3.2</el-option>
-                    <el-option value="3.363586">f/3.4</el-option>
-                    <el-option value="3.563595">f/3.6</el-option>
-                    <el-option value="4.000000">f/4</el-option>
-                    <el-option value="4.489848">f/4.5</el-option>
-                    <el-option value="4.756828">f/4.8</el-option>
-                    <el-option value="5.039684">f/5</el-option>
-                    <el-option value="5.656854">f/5.6</el-option>
-                    <el-option value="6.349604">f/6.4</el-option>
-                    <el-option value="6.727171">f/6.7</el-option>
-                    <el-option value="7.127190">f/7.1</el-option>
-                    <el-option value="8.000000">f/8</el-option>
-                    <el-option value="8.979696">f/9</el-option>
-                    <el-option value="9.513657">f/9.5</el-option>
-                    <el-option value="10.07937">f/10</el-option>
-                    <el-option value="11.313708">f/11</el-option>
-                    <el-option value="12.699208">f/12.7</el-option>
-                    <el-option value="13.454343">f/13.5</el-option>
-                    <el-option value="14.254379">f/14.3</el-option>
-                    <el-option value="16.000000">f/16</el-option>
-                    <el-option value="17.959393">f/18</el-option>
-                    <el-option value="19.027314">f/19</el-option>
-                    <el-option value="20.158737">f/20</el-option>
-                    <el-option value="22.627417">f/22</el-option>
-                    <el-option value="25.398417">f/25</el-option>
-                    <el-option value="26.908685">f/27</el-option>
-                    <el-option value="28.508759">f/28</el-option>
-                    <el-option value="32">f/32</el-option>
-                    <el-option value="45.254834">f/45</el-option>
-                    <el-option value="64">f/64</el-option>
+                <el-select v-model="form.aperture" default-first-option filterable >
+                    <el-option value="0.95" label="f/0.95"/>
+                    <el-option value="1.0" label="f/1"/>
+                    <el-option value="1.122462" label="f/1.1"/>
+                    <el-option value="1.189207" label="f/1.2"/>
+                    <el-option value="1.259921" label="f/1.3"/>
+                    <el-option value="1.414214" label="f/1.4"/>
+                    <el-option value="1.587401" label="f/1.6"/>
+                    <el-option value="1.681793" label="f/1.7"/>
+                    <el-option value="1.781797" label="f/1.8"/>
+                    <el-option value="2.000000" label="f/2"/>
+                    <el-option value="2.244924" label="f/2.2"/>
+                    <el-option value="2.378414" label="f/2.4"/>
+                    <el-option value="2.519842" label="f/2.5"/>
+                    <el-option value="2.828427" label="f/2.8"/>
+                    <el-option value="3.174802" label="f/3.2"/>
+                    <el-option value="3.363586" label="f/3.4"/>
+                    <el-option value="3.563595" label="f/3.6"/>
+                    <el-option value="4.000000" label="f/4"/>
+                    <el-option value="4.489848" label="f/4.5"/>
+                    <el-option value="4.756828" label="f/4.8"/>
+                    <el-option value="5.039684" label="f/5"/>
+                    <el-option value="5.656854" label="f/5.6"/>
+                    <el-option value="6.349604" label="f/6.4"/>
+                    <el-option value="6.727171" label="f/6.7"/>
+                    <el-option value="7.127190" label="f/7.1"/>
+                    <el-option value="8.000000" label="f/8"/>
+                    <el-option value="8.979696" label="f/9"/>
+                    <el-option value="9.513657" label="f/9.5"/>
+                    <el-option value="10.07937" label="f/10"/>
+                    <el-option value="11.313708" label="f/11"/>
+                    <el-option value="12.699208" label="f/12.7"/>
+                    <el-option value="13.454343" label="f/13.5"/>
+                    <el-option value="14.254379" label="f/14.3"/>
+                    <el-option value="16.000000" label="f/16"/>
+                    <el-option value="17.959393" label="f/18"/>
+                    <el-option value="19.027314" label="f/19"/>
+                    <el-option value="20.158737" label="f/20"/>
+                    <el-option value="22.627417" label="f/22"/>
+                    <el-option value="25.398417" label="f/25"/>
+                    <el-option value="26.908685" label="f/27"/>
+                    <el-option value="28.508759" label="f/28"/>
+                    <el-option value="32" label="f/32"/>
+                    <el-option value="45.254834" label="f/45"/>
+                    <el-option value="64" label="f/64"/>
                 </el-select>
                 <!-- <el-input v-model="form.name" /> -->
             </el-col>
@@ -669,11 +553,11 @@ function handleSelected(x: any) {
             </el-col>
             <el-col :span="11">
                 <span>距离单位</span>
-                <el-select v-model="form.od_units" default-first-option placeholder="选择单位">
-                    <el-option label="米(m)" value=1.0 />
-                    <el-option label="厘米(cm)" value=0.01 />
-                    <el-option label="英尺(m?)" value=0.3048 />
-                    <el-option label="英尺(m?)" value=0.0254 />
+                <el-select v-model="form.od_units" placeholder="选择单位">
+                    <el-option label="米(m)" value="1.0" />
+                    <el-option label="厘米(cm)" value="0.01" />
+                    <el-option label="英尺(feet)" value="0.3048" />
+                    <el-option label="英寸(in)" value="0.0254" />
                 </el-select>
             </el-col>
             <el-button plain @click="doDepthOfField" color="#783471">计算</el-button>

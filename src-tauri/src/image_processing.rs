@@ -1,20 +1,19 @@
 extern crate jpeg_decoder as jpeg;
 use std::collections::HashMap;
 
-use std::fmt::format;
 use std::fs::File;
-use std::io::{BufReader, Read, BufWriter};
+use std::io::{BufReader, BufWriter};
 use std::path::Path;
 
-use banner_unit::{BannerType, BannerUnit};
-use image::imageops::{invert, FilterType};
+// use banner_unit::{BannerType, BannerUnit};
+use image::imageops::{FilterType};
 use image::{self, DynamicImage, GenericImage, Pixel};
 use image::{ImageBuffer, ImageOutputFormat};
 use rexif::{parse_buffer, ExifTag};
 
-use crate::banner_unit;
-use image::{RgbImage, Rgba};
-use imageproc::drawing::{draw_text_mut, text_size, Canvas};
+// use crate::banner_unit;
+use image::{Rgba};
+use imageproc::drawing::{draw_text_mut, text_size};
 use rusttype::{Font, Scale};
 
 pub fn read_exif(img_path: &str) -> Option<HashMap::<ExifTag, String>> {
@@ -233,5 +232,5 @@ fn generator_draw_text(
         text,
     );
     let (w, h) = text_size(scale, &font, text);
-    // println!("Text size: {}x{}", w, h);
+    println!("Text size: {}x{}", w, h);
 }
