@@ -519,7 +519,6 @@ user_conf.init_user_conf();
 backend_event_recv();
 drag_event_handle();
 
-
 // onMounted(() => { // invalid 
 // })
 
