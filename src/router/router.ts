@@ -2,12 +2,12 @@
 // https://router.vuejs.org/guide/essentials/history-mode.html#hash-mode
 import { createRouter, createWebHashHistory } from "vue-router";
 
-const dragTest = () => import("../components/DragTest.vue");
-const textImageProcess = () => import("../components/TextImageProcess.vue");
+const DragTest = () => import("../components/DragTest.vue");
+const TextImageProcess = () => import("../components/TextImageProcess.vue");
 // const wrapper = () => import("../components/wrapper.vue");
-const base = () => import("../components/base.vue");
-const topBar = () => import("../components/topBar.vue");
-const baseSettingsDrawer = () => import("../components/baseSettingsDrawer.vue");
+const Base = () => import("../components/Base.vue");
+const TopBar = () => import("../components/TopBar.vue");
+const BaseSettingsDrawer = () => import("../components/BaseSettingsDrawer.vue");
 const DepthField = () => import("../components/DepthField.vue");
 
 
@@ -21,14 +21,14 @@ const routes = [
   {
     path: "/",
     name: "基础",
-    component: base,
+    component: Base,
     iconid: 1,
     
   },
   {
-    path: "/textImageProcess",
+    path: "/TextImageProcess",
     name: "Exif查询",
-    component: textImageProcess,
+    component: TextImageProcess,
     iconid: 2,
   },
   // { path: 'cus/:id', component: cusIcon }// solve icon ...
@@ -51,9 +51,9 @@ const routes = [
     // ]
   },
   {
-    path: "/dragTest",
+    path: "/DragTest",
     name: "DragTest",
-    component: dragTest,
+    component: DragTest,
     iconid: 4,
   },
   {

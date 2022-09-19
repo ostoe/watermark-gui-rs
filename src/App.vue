@@ -2,10 +2,10 @@
   // import dragTest from "./dragTest.vue";
   // import TextImageProcess from "./textImageProcess.vue";
   // import sideBar from "./sideBar.vue";
-  import topBar from "./topBar.vue";
-  import picList from "./picList.vue";
-  import baseSettingsDrawerVue from "./baseSettingsDrawerVue.vue";
-  import previewWidget from "./previewWidget.vue";
+  // import topBar from "./TopBar.vue";
+  // import picList from "./PicList.vue";
+  // import BaseSettingsDrawerVue from "./BaseSettingsDrawerVue.vue";
+  // import previewWidget from "./previewWidget.vue";
   // import { ref, onMounted } from "vue";
   import router from "./router/router";
   // import { Context } from "vm";
