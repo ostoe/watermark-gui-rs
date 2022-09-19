@@ -57,6 +57,7 @@ pub struct WaterMarkStyle {
      pub position_ratio: f32,
      pub split_line_spacing: u32,
      pub font_path: String,
+     pub font_scale: f32,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]

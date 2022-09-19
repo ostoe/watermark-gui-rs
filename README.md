@@ -73,6 +73,7 @@ unplugin autoimport 最佳实践
 ref: https://github.com/zzzgydi/clash-verge/blob/66ccbf70f8d51153ef097fb62deae833c683b26c/src-tauri/src/main.rs
 
 
+coc ref: https://en.wikipedia.org/wiki/Zeiss_formula  对角线距离43.25 / 1500 = 0.029
 
 
 图像插值使用：[参考](https://stackoverflow.com/questions/23853632/which-kind-of-interpolation-best-for-resizing-image)

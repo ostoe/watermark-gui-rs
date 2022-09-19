@@ -125,6 +125,7 @@ const user_conf = reactive({
     } else {
       // console.log("kong1");
       let user_data_load: UserDataType = JSON.parse(contents);
+      // console.log(user_data_load);
       // let entries = Object.entries(user_data);
       // for (let i=0; i < entries.length; i++) {
       //   let key = entries[i][0]
@@ -142,7 +143,7 @@ const user_conf = reactive({
         user_data_load.outputPathHistory.push({value: pic_path});
       }
       this.B2A(user_conf, user_data_load);
-      // TODO 前后端初始化 并且发送数据给后端；
+      
       // user_conf.update_user_data2BD("output_dir", pictureDirPath);
       let update_data_send: UserSettings = {
         output_dir: this.latestSelectedOutputPath,
@@ -153,7 +154,7 @@ const user_conf = reactive({
       };
       console.log("init send data:");
       console.log(update_data_send);
-      // send to backend.
+      // 前后端初始化 并且发送数据给后端；
       let res: string = await invoke("handle_front_update_user_data", { userData: update_data_send });
       elmessage("初始化：" + res);
 

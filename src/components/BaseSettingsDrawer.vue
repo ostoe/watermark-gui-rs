@@ -21,8 +21,8 @@ const renamePreffix = ref({
     valid: true,
 });
 const renameCenter = ref({
-    SD: [{ id: 1, label: "原名称", value: "" }, { id: 2, label: "自定义", value: "__custom__" }],
-    value: { id: 1, label: "原名称", value: "" },
+    SD: [{ id: 1, label: "原名称", value: "__keep__" }, { id: 2, label: "自定义", value: "__custom__" }],
+    value: { id: 1, label: "原名称", value: "__keep__" },
     input: "",
     valid: true,
 });
@@ -66,7 +66,7 @@ function resetConfirmEvent() {
 const preview_filename = ref(["", "", "", ".jpg"]);
 
 function check_input(rename: Ref<RenameType>, preview_index: number) {
-    console.log("-----" + "value");
+    // console.log("-----" + "value");
 
     // let a = [renamePreffix, renameCenter, renameSuffix];
     // for (let i = 0; i < 3; i++) {
@@ -99,12 +99,14 @@ function check_input(rename: Ref<RenameType>, preview_index: number) {
 function check_select_prefix() {
     if (renamePreffix.value.value.id == 1) {
         renamePreffix.value.valid = true
+        renamePreffix.value.input = ""
         preview_filename.value[0] = "";
     }
 }
 function check_select_center() {
     if (renameCenter.value.value.id == 1) {
         renameCenter.value.valid = true
+        renameCenter.value.input = ""
         preview_filename.value[1] = "basename";
     }
 }
@@ -112,6 +114,7 @@ function check_select_center() {
 function check_select_suffix() {
     if (renameSuffix.value.value.id == 1) {
         renameSuffix.value.valid = true
+        renameSuffix.value.input = ""
         preview_filename.value[2] = "";
     }
 }
