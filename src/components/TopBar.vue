@@ -8,7 +8,7 @@ import { invoke } from '@tauri-apps/api';
 import { convertFileSrc } from '@tauri-apps/api/tauri';
 import { appDir, configDir, homeDir, localDataDir, logDir, resourceDir, fontDir } from '@tauri-apps/api/path';
 import { ElMessage, ElNotification } from "element-plus";
-import BaseSettingsDrawer from "./BaseSettingsDrawer.vue";
+import baseSettingsDrawer from "./baseSettingsDrawer.vue";
 import WaveProgress, { drawCarbo, drawCircle, drawText } from "../scripts/wave-progress-plugin";
 import { objectPick } from '@vueuse/shared';
 import { Calendar, Search, SuccessFilled, WarningFilled } from '@element-plus/icons-vue'
@@ -385,7 +385,7 @@ nextTick(() => {
         </el-icon>
       </div>
       <div class="options" @click="showDrawTable">
-        <base-settings-drawer></base-settings-drawer>
+        <baseSettingsDrawer></baseSettingsDrawer>
       </div>
     </el-col>
   </el-row>

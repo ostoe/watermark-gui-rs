@@ -1,0 +1,154 @@
+<optgroup label="Blackmagic">
+    <option value="0" data-coc="0.013">Blackmagic Cinema Camera</option>
+    <option value="1" data-coc="0.01">Blackmagic Pocket Cinema Camera, Studio Camera HD</option>
+    <option value="2" data-coc="0.01">Blackmagic Studio Camera 4K, URSA Broadcast/HDMI</option>
+    <option value="3" data-coc="0.017">Blackmagic Production Camera 4K, URSA EF/PL</option>
+</optgroup>
+<optgroup label="Canon">
+    <option value="4" data-coc="0.019">Canon Digital Rebel, XS, XSi, XT, XTi</option>
+    <option value="5" data-coc="0.019">Canon Digital Rebel T7i, T7, T6i, T6s, T6, T5, T4i, T3i, T3, T2i, T1i
+    </option>
+    <option value="6" data-coc="0.019">Canon EOS 4000D, 2000D, 1300D, 1200D, 1100D, 1000D, 500D, 450D, 400D,
+        350D,
+        300D, 100D</option>
+    <option value="7" data-coc="0.019">Canon EOS 200D, 7D, 70D, 30D, 20Da, 20D, 10D</option>
+    <option value="8" data-coc="0.019">Canon EOS 60Da, 60D, 50D, 40D</option>
+    <option value="9" data-coc="0.019">Canon EOS D60, D30</option>
+    <option value="10" data-coc="0.024">Canon EOS 1D, 1D Mark II, 1D Mark II N, 1D Mark III</option>
+    <option value="11" data-coc="0.023">Canon EOS 1D Mark IV</option>
+    <option value="12" data-coc="0.03">Canon EOS 1Ds, 1Ds Mark I, 1DS Mark II, 1DS Mark III</option>
+    <option value="13" data-coc="0.03">Canon EOS R, 1D C, 1D X, 1D X Mark II</option>
+    <option value="14" data-coc="0.03">Canon EOS 5D, 5D Mark II, 5D Mark III, 5D Mark IV, 5DS, 5DS R
+    </option>
+    <option value="15" data-coc="0.03">Canon EOS 6D, 6D Mark II</option>
+    <option value="16" data-coc="0.019">Canon EOS 7D, 7D Mark II</option>
+    <option value="17" data-coc="0.019">Canon EOS 800D, 760D, 750D, 700D, 650D, 600D, 550D, M3</option>
+    <option value="18" data-coc="0.019">Canon EOS Kiss Digital, Kiss Digital
+        N/X/X2/X3/X4/X6/X6i/X70/X8i/X9/X9i
+    </option>
+</optgroup>
+<optgroup label="Fujifilm">
+    <option value="19" data-coc="0.019">Fujifilm FinePix S5 Pro, S3 Pro, S2 Pro, S1 Pro, IS Pro</option>
+    <option value="20" data-coc="0.02">Fujifilm X100, X100F, X100S, X100T, X-T3, X-T2, X-T1, X-T20, X-T10,
+        X-Pro1,
+        X-Pro2, X-M1, X-E1, X-E2, X-A1, X70</option>
+    <option value="89" data-coc="0.038">Fujifilm GFX 50S, 50R</option>
+</optgroup>
+<optgroup label="Hasselblad">
+    <option value="21" data-coc="0.02">Hasselblad Lunar</option>
+    <option value="22" data-coc="0.036">Hasselblad 503 CW, 503 CWD</option>
+    <option value="23" data-coc="0.038">Hasselblad H5D-40, H4D-40</option>
+    <option value="24" data-coc="0.042">Hasselblad H3D II-31, H3D II-39, H3D II-50</option>
+    <option value="25" data-coc="0.043">Hasselblad H5D-50, H4D-50MS, H4D-50, H4D-200MS</option>
+    <option value="26" data-coc="0.047">Hasselblad H4D-60</option>
+</optgroup>
+<optgroup label="Konica Minolta">
+    <option value="27" data-coc="0.02">Konica Minolta DYNAX 5D, 7D</option>
+    <option value="28" data-coc="0.02">Konica Minolta Maxxum 5D, 7D</option>
+</optgroup>
+<optgroup label="Leaf">
+    <option value="29" data-coc="0.038">Leaf Aptus II 8, Aptus II 6, Credo 40</option>
+    <option value="30" data-coc="0.042">Leaf Aptus II 7, AptusII 5</option>
+    <option value="31" data-coc="0.046">Leaf Aptus II 10</option>
+    <option value="32" data-coc="0.047">Leaf Credo 80, Credo 60</option>
+</optgroup>
+<optgroup label="Leica">
+    <option value="33" data-coc="0.011">Leica V-Lux (Typ 114)</option>
+    <option value="34" data-coc="0.015">Leica D-Lux (Typ 109)</option>
+    <option value="35" data-coc="0.016">Leica Digilux 3</option>
+    <option value="36" data-coc="0.019">Leica X (Typ 113)</option>
+    <option value="37" data-coc="0.02">Leica X2, X1, X-E (Typ 102), X-U (Typ 113)</option>
+    <option value="38" data-coc="0.023">Leica M8, M8.2</option>
+    <option value="39" data-coc="0.03">Leica M9, M9 P, M-Monochrom, Q (Typ 116)</option>
+    <option value="40" data-coc="0.038">Leica S, S2, S (Typ 007), S-E (Typ 006)</option>
+</optgroup>
+<optgroup label="Mamiya">
+    <option value="41" data-coc="0.038">Mamiya DM40 Digital Back</option>
+    <option value="42" data-coc="0.042">Mamiya ZD Back, DM33</option>
+</optgroup>
+<optgroup label="Nikon">
+    <option value="43" data-coc="0.011">Nikon 1 J1, 1 J2, 1 V1, 1 V2, 1 V3</option>
+    <option value="44" data-coc="0.019">Nikon D3400, D3200, D3100</option>
+    <option value="45" data-coc="0.02">Nikon D90, D80, D70, D70s, D60, D50, D40, D40x</option>
+    <option value="46" data-coc="0.02">Nikon D7500, D7200, D7100, D7000, D5600, D5500, D5300, D5100, D5000,
+        D3500,
+        D3300, D3000</option>
+    <option value="47" data-coc="0.02">Nikon D500, D300, D300S, D200, D100</option>
+    <option value="48" data-coc="0.03">Nikon D850, D810, D810A, D800, D800E, D750, D700, D610, D600</option>
+    <option value="49" data-coc="0.02">Nikon D2X, D2Xs, D2H, D2Hs, D1H, D1X, D1</option>
+    <option value="50" data-coc="0.03">Nikon D4S, D4, D3X, D3S, Df, Z6, Z7</option>
+</optgroup>
+<optgroup label="Olympus">
+    <option value="51" data-coc="0.015">Olympus OM-D E-M10, OM-D E-M5, OM-D E-M1</option>
+    <option value="52" data-coc="0.015">Olympus PEN E-PL8, E-PL7, E-PL6, E-PL5, E-PL3, E-P5, E-P3, E-PL2,
+        E-PL1
+    </option>
+    <option value="53" data-coc="0.015">Olympus PEN E-PM1, E-PM2, F</option>
+    <option value="54" data-coc="0.016">Olympus PEN E-P2, E-P1, E-PL1s</option>
+    <option value="55" data-coc="0.016">Olympus E-450, E-420, E-410, E-400, E-330, E-300, E-30, E-5, E-3,
+        E-1
+    </option>
+    <option value="56" data-coc="0.016">Olympus E-620, E-600, E-520, E-510, E-500</option>
+</optgroup>
+<optgroup label="Panasonic">
+    <option value="57" data-coc="0.015">Panasonic Lumix DMC-G7, DMC-G5, DMC-G3</option>
+    <option value="58" data-coc="0.016">Panasonic Lumix DMC-G10, DMC-G2, DMC-G1, DMC-GF1</option>
+    <option value="59" data-coc="0.015">Panasonic Lumix DMC-GF8, DMC-GF7, DMC-GF6, DMC-GF5, DMC-GF3, DMC-GF2
+    </option>
+    <option value="60" data-coc="0.015">Panasonic Lumix DMC-GH4, DMC-GH3, DMC-GH2, DMC-GH1, DMC-GX7,
+        DMC-GX1,
+        DMC-GM-5</option>
+    <option value="61" data-coc="0.015">Panasonic Lumix DMC-GX7, DMC-GX1, DMC-GM5</option>
+    <option value="62" data-coc="0.016">Panasonic Lumix DMC-L10, DMC-L1</option>
+    <option value="88" data-coc="0.0136">Panasonic Lumix DMC-LX100</option>
+</optgroup>
+<optgroup label="Pentax">
+    <option value="63" data-coc="0.02">Pentax K200D, K110D, K100D, K100D Super</option>
+    <option value="64" data-coc="0.02">Pentax K2000, K20D, K10D</option>
+    <option value="65" data-coc="0.02">Pentax K-500, K-7, K-5 II, K-5 IIs, K-5, K-3, K-3 II, K-r, K-x, K-m
+    </option>
+    <option value="66" data-coc="0.02">Pentax K-30, K-01</option>
+    <option value="67" data-coc="0.02">Pentax *ist D, DL, DL2, DS DS2, K-S1</option>
+    <option value="68" data-coc="0.038">Pentax 645D, 645Z</option>
+    <option value="87" data-coc="0.03">Pentax K-1, K-1 Mark II</option>
+</optgroup>
+<optgroup label="Phase One">
+    <option value="69" data-coc="0.038">Phase One P 40+ Digital Back, IQ140 Digital Back</option>
+    <option value="70" data-coc="0.043">Phase One P 45+ Digital Back</option>
+    <option value="71" data-coc="0.047">Phase One P 65+ Digital Back</option>
+    <option value="72" data-coc="0.047">Phase One IQ280/IQ260/IQ180/IQ160 Digital Back, IQ260 Achromatic
+    </option>
+</optgroup>
+<optgroup label="Samsung">
+    <option value="73" data-coc="0.02">Samsung GX-20, GX-10, GX-1L, GX-1S</option>
+    <option value="74" data-coc="0.02">Samsung NX1, NX20, NX11, NX10, NX5</option>
+    <option value="75" data-coc="0.02">Samsung NX1000, NX300, NX210, NX200, NX100</option>
+</optgroup>
+<optgroup label="Sigma">
+    <option value="76" data-coc="0.017">Sigma DP1, DP1s, DP1X, DP2, DP2s, DP2X</option>
+    <option value="77" data-coc="0.017">Sigma SD15, SD14, SD10, SD9</option>
+    <option value="78" data-coc="0.02">Sigma SD1, SD1 Merrill</option>
+</optgroup>
+<optgroup label="Sony">
+    <option value="79" data-coc="0.02">Sony Alpha DSLR-A380, A350, A330, A300, A290, A230, A200, A100
+    </option>
+    <option value="80" data-coc="0.02">Sony Alpha DSLR-A700, A580, A560, A500, A550, A450, A390</option>
+    <option value="81" data-coc="0.03">Sony Alpha DSLR-A900, A850</option>
+    <option value="82" data-coc="0.02">Sony a6500, a6300, a6000, a5000, a3000</option>
+    <option value="83" data-coc="0.02">Sony a77, a77II, a65, a57, a55, a37, a35, a33</option>
+    <option value="84" data-coc="0.03">Sony a9, a7, a7 II, a7 III, a7R, a7R II, a7s, a99, a99 II</option>
+    <option value="85" data-coc="0.03">Sony Cyber-shot DSC-RX1</option>
+    <option value="86" data-coc="0.011">Sony Cyber-shot DSC-RX10, RX10 II, RX10 III, RX10 IV</option>
+    <option value="87" data-coc="0.02">Sony NEX-7, NEX-6, NEX-5, NEX-5N, NEX-5R, NEX-3, NEX-3N, NEX-C3,
+        NEX-F3
+    </option>
+</optgroup>
+
+
+
+for x in cong:
+    label = re.findall(r'label="(.*?)">', x)[0]
+    d = {"label": label,"options": []}
+    for b in re.findall(r'<option value="(.*?)" data-coc="(.*?)">(.*?)</option>',x):
+        d["options"].append({ "value": {"id":int(b[0]), "value":float(b[1])}, "label":b[2]})
+    l.append(d)

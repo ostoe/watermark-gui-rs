@@ -2,7 +2,7 @@ use std::{
     collections::HashMap,
     ffi::OsStr,
     io::{BufReader, Read},
-    path::{self, Path, PathBuf},
+    path::{Path, PathBuf},
     vec,
 };
 
@@ -18,9 +18,11 @@ pub fn control_center_thread(
     operation_st: Receiver<UserOperation>,
     notify_front_st: Sender<Notification>,
 ) {
+    #[allow(non_snake_case)]
     let BRANDS = ["nikon", "canon", "sony", "panasonic", "fujifilm"];
     if let UserOperation::Init(resources_path) = operation_st.recv().unwrap() {
-        let (mut font, mut brand_map) = _init(resources_path, &BRANDS);
+        #[allow(unused_mut)] 
+        let (mut font, brand_map) = _init(resources_path, &BRANDS);
         let mut is_pause = true;
         let mut image_list = Vec::<String>::new(); // Vec<String>
         let mut image_length = 0usize;
@@ -31,6 +33,7 @@ pub fn control_center_thread(
         let mut brand = String::from("nikon");
         let mut auto_user_brand = true;
         let mut watermark_ratio = 0.1172f32 * 0.8;
+        #[allow(non_snake_case)]
         let mut WATERMARK_SCALE = 0.50;
         let mut logo_ratio = 0.70f32;
         let mut logo_spacing_ratio = 0.35f32; // if nokon logo should 1
@@ -78,10 +81,10 @@ pub fn control_center_thread(
                         }
                         index = 0;
                         is_pause ^= true;
-                        notify_front_st.send(Notification::Single(String::from("jpg_file_count"), image_length.to_string() ));
+                        let _opt_result = notify_front_st.send(Notification::Single(String::from("jpg_file_count"), image_length.to_string() ));
                         // panic!("hekkl");
                     } else {
-                        notify_front_st.send(Notification::Error(String::from("文件夹解析失败")));
+                        let _opt_result = notify_front_st.send(Notification::Error(String::from("文件夹解析失败")));
                     }
                 }
 
@@ -110,14 +113,22 @@ pub fn control_center_thread(
                             auto_user_brand = true;
                         }
                     }
-                    UserSetting::Font(path) => {
+                    UserSetting::Font(_path) => {
                         // update font
                     }
                     UserSetting::FileNamePattern(pattern) => {
                         filename_pattern = pattern;
                     }
-
-                    _ => {}
+                    UserSetting::Style(s) => {
+                        logo_ratio = s.logo_ratio;
+                        logo_spacing_ratio = s.logo_spacing_ratio;
+                        position_ratio = s.position_ratio;
+                        WATERMARK_SCALE = s.watermark_scale;
+                        watermark_ratio = s.watermark_ratio;
+                        split_line_spacing = s.split_line_spacing;
+                        // TODO font
+                    }
+                    
                 },
 
                 _ => {
@@ -207,7 +218,7 @@ pub fn control_center_thread(
                         }
                     } else {
                         println!("skip: {}", &image_path);
-                        let opt =
+                        let _opt_result =
                             notify_front_st.send(Notification::SkipFile(String::from(image_path)));
                     }
                     index += 1;

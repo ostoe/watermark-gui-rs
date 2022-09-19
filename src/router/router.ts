@@ -5,9 +5,10 @@ import { createRouter, createWebHashHistory } from "vue-router";
 const dragTest = () => import("../components/DragTest.vue");
 const textImageProcess = () => import("../components/TextImageProcess.vue");
 // const wrapper = () => import("../components/wrapper.vue");
-const base = () => import("../components/Base.vue");
-// const topBar = () => import("../components/topBar.vue");
-// const home = () => import("../components/home.vue");
+const base = () => import("../components/base.vue");
+const topBar = () => import("../components/topBar.vue");
+const baseSettingsDrawer = () => import("../components/baseSettingsDrawer.vue");
+const DepthField = () => import("../components/DepthField.vue");
 
 
 
@@ -32,9 +33,9 @@ const routes = [
   },
   // { path: 'cus/:id', component: cusIcon }// solve icon ...
   {
-    path: "/dragTest",
+    path: "/DepthField",
     name: "景深计算",
-    component: dragTest,
+    component: DepthField,
     iconid: 3,
     // children: [
     //   {
@@ -50,10 +51,22 @@ const routes = [
     // ]
   },
   {
+    path: "/dragTest",
+    name: "DragTest",
+    component: dragTest,
+    iconid: 4,
+  },
+  {
     path: "/animation",
     name: "时间",
     component: () => import("../components/animation.vue"),
-    iconid: 4,
+    iconid: 5,
+  },
+  {
+    path: "/About",
+    name: "About",
+    component: () => import("../components/About.vue"),
+    iconid: 6,
   }
 ];
 

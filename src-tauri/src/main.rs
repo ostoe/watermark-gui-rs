@@ -2,21 +2,18 @@
     all(not(debug_assertions), target_os = "windows"),
     windows_subsystem = "windows"
 )]
-#[macro_use]
+// #[macro_use]
 extern crate log;
 use app::banner_unit::{ImagesPathFromFront, Notification, UserOperation, UserSettingsJson, UserSetting};
 use app::image_handle::control_center_thread;
-use app::image_processing;
+// use app::image_processing;
 use app::notify_center::{ notification_thread, windows_send_msg};
 use crossbeam_channel::unbounded;
 use env_logger::{Builder, Target};
-use image::DynamicImage;
-use rusttype::Font;
 use std::env;
-use std::io::{BufReader, Read};
 use std::path::PathBuf;
 use tauri::{
-    api::path::{home_dir, resource_dir},
+    api::path::{resource_dir},
     Env, PackageInfo,
 };
 use tauri::{CustomMenuItem, Menu, MenuItem, State, Submenu, AppHandle, Wry, RunEvent};
@@ -51,7 +48,7 @@ fn main() {
         .add_submenu(submenu);
     // menu------------------------end
 
-    let mut context = tauri::generate_context!();
+    let context = tauri::generate_context!();
     let app = tauri::Builder::default()
         .menu(menu)
         .manage(st)
@@ -69,7 +66,7 @@ fn main() {
             // let id = main_window.listen("tauri://close-requested", |event| { // invalid
             //     println!("got window event-name with payload {:?}", event.payload());
             //     });
-            let splashscreen_window = app.get_window("splashscreen").unwrap();
+            let _splashscreen_window = app.get_window("splashscreen").unwrap();
             let resource_path = app_resources_dir(app.package_info());
             println!("resource_path: {}", resource_path.display());
             st_clone.send(UserOperation::Init(resource_path)).unwrap();
@@ -83,7 +80,7 @@ fn main() {
         .build(context)
         .expect("error while running tauri application");
     
-    let app_handle = app.app_handle();
+    let _app_handle = app.app_handle();
     app.run(handle_app_event);
 }
 
@@ -100,16 +97,19 @@ pub fn handle_app_event(_app_handle: &AppHandle<Wry>, event: RunEvent) {
             }
 
         RunEvent::WindowEvent { label, event, .. } => {
-            println!("WindowEvent: {:?}", event);
             match event {
                 tauri::WindowEvent::CloseRequested { api, .. } => {
+                    println!("WindowEvent: CloseRequested");
                     if label == "main" {
                         api.prevent_close();
                         let _ = _app_handle.get_window("main").unwrap().hide();
                         // 另一种写法： app_handle.get_window("main").map(|win| { let _ = win.hide(); });
                         std::process::exit(0);
                     }
-                }
+                },
+                tauri::WindowEvent::Focused(b) => {println!("isFocused?: {}", b)}
+                // tauri::WindowEvent::Moved(m) => {}
+                // tauri::WindowEvent::(b) => {println!("isFocused?: {}", b)}
                 _ => {}
             }
         }
