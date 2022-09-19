@@ -3,7 +3,7 @@
 // import { reactive } from 'vue'
 // do not use same name with ref
 import type { FormInstance, FormRules } from 'element-plus'
-
+const hyperImage = new URL("../assets/HyperfocusDistance.png", import.meta.url).toString();//src="http://localhost:5173/src/assets/HyperF.png"
 const form = reactive({
     CoC: { id: 0, value: 0.013 }, // CIRCLE OF CONFUSION (COC)
     focus_length: "50.0", // 焦距
@@ -782,29 +782,25 @@ const rules = reactive<FormRules>({
             </template>景深值越小（浅），虚化效果越好</el-descriptions-item>
     </el-descriptions>
 
-    <!-- </div> -->
+    <div class="block text-center">
+    <el-carousel height="500px">
+      <el-carousel-item  >
+        <!-- <h3 class="small justify-center" text="2xl">{{ item }}</h3> -->
+        <el-image :src="hyperImage" fit="cover"/>
+      </el-carousel-item>
+      <el-carousel-item  >
+        <!-- <h3 class="small justify-center" text="2xl">{{ item }}</h3> -->
+        <el-image :src="hyperImage"/>
+      </el-carousel-item>
+    </el-carousel>
+  </div>
 
-    <!-- TODO 添加公式 -->
+    
 
-    <div>
-        <span>
-            其中：
-            δ——容许弥散圆直径
-            F——镜头的拍摄光圈值
-            f——镜头焦距
-            L——对焦距离
-            ΔL1——前景深
-            ΔL2——后景深
-            ΔL——景深
-            公式：
-            前景深 ΔL1=FδL2/（f2+FδL）
-            后景深 ΔL2=FδL2/（f2−FδL）
-            景深 ΔL=ΔL1+ΔL2=（2f2FδL2）/（f4−F2δ2L2）"
-        </span>
-    </div>
 </template>
 
 <style lang="scss" scoped>
+
 // 下拉框
 .tk-select-button {
     width: 100%;

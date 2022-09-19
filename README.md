@@ -52,7 +52,7 @@ event.listen('tauri://file-drop-hover', (e) => {
  - reset 后强制提示
  - 点击关闭后关闭后台程序，默认会进入后台且无法重新调用 [v]
  - 在线更新
- - 景深计算器 [v] 景深计算器示意图 []
+ - 景深计算器 [v] 景深计算器示意图 []  [ref](https://dofsimulator.net/en/)
 
 
 

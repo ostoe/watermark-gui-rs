@@ -190,7 +190,7 @@ function get_image_url(value: string) {
   return ap;
 }
 // const goutouUrl = ref(get_image_url())
-const goutouUrl = ref(get_image_url('/Users/dongyifan/watermark-gui-rs/src/assets/goutou.jpeg'))
+// const goutouUrl = ref(get_image_url('/Users/dongyifan/watermark-gui-rs/src/assets/goutou.jpeg'))
 
 enum progressSettings {
   progressSpeed = 2.0,
