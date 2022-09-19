@@ -2,10 +2,10 @@
 // https://router.vuejs.org/guide/essentials/history-mode.html#hash-mode
 import { createRouter, createWebHashHistory } from "vue-router";
 
-const dragTest = () => import("../components/dragTest.vue");
-const textImageProcess = () => import("../components/textImageProcess.vue");
+const dragTest = () => import("../components/DragTest.vue");
+const textImageProcess = () => import("../components/TextImageProcess.vue");
 // const wrapper = () => import("../components/wrapper.vue");
-const base = () => import("../components/base.vue");
+const base = () => import("../components/Base.vue");
 // const topBar = () => import("../components/topBar.vue");
 // const home = () => import("../components/home.vue");
 
