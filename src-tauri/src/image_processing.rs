@@ -58,7 +58,7 @@ pub fn read_exif(img_path: &str) -> Option<HashMap::<ExifTag, String>> {
 }
 
 
-pub fn process_single_image(img_path: &str, output_path: &str,  font: &Font, logo_image: &DynamicImage, 
+pub fn process_single_image(img_path: &str, output_path: &str,  font: &Font, font_scale: f32, logo_image: &DynamicImage, 
     exif_map: HashMap::<ExifTag, String>, 
     qulity: u8, watermark_ratio: f32, watermark_scale: f32, logo_spacing_ratio: f32, 
     position_ratio: f32,
@@ -140,9 +140,9 @@ pub fn process_single_image(img_path: &str, output_path: &str,  font: &Font, log
     let second_text_y =     h + ((banner_h as f32 * 0.55) as u32); // TODO ????
     let second_text_x =     (w as f32 * position_ratio) as u32 + split_line_spacing;
     let texts = vec![
-        ( camera_device, banner_h * 0.25 ,((w as f32 * 0.03) as u32, first_text_y), 1.0, &font, Rgba([0u8, 0u8, 0u8, 0])),  // brand
-        ( &composit_text, banner_h * 0.20 ,(second_text_x , first_text_y), 1.0, &font, Rgba([0u8, 0u8, 0u8, 0])), // 20mm f/1.8 1/100 iso 100
-        ( data_time, banner_h * 0.18,(second_text_x , second_text_y), 1.0, &font, Rgba([168u8, 168u8, 168u8, 0])), // data
+        ( camera_device, banner_h * 0.25 ,((w as f32 * 0.03) as u32, first_text_y), font_scale, &font, Rgba([0u8, 0u8, 0u8, 0])),  // brand
+        ( &composit_text, banner_h * 0.20 ,(second_text_x , first_text_y), font_scale, &font, Rgba([0u8, 0u8, 0u8, 0])), // 20mm f/1.8 1/100 iso 100
+        ( data_time, banner_h * 0.18,(second_text_x , second_text_y), font_scale, &font, Rgba([168u8, 168u8, 168u8, 0])), // data
     ];
     // text
     for x in texts.iter() {
@@ -219,7 +219,7 @@ fn generator_draw_text(
     //     size, position};
     // let line_width = 24.0;
     let scale = Scale {
-        x: font_size,
+        x: font_size * scale,
         y: font_size * scale,
     };
     draw_text_mut(

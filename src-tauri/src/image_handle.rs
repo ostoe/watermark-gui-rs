@@ -28,6 +28,7 @@ pub fn control_center_thread(
         let mut image_length = 0usize;
         let mut index = 0usize;
         // user params: --------------------------------begin
+        let mut font_scale = 1.0;
         let mut output_path = String::from("");
         let mut qulity: u8 = 85;
         let mut brand = String::from("nikon");
@@ -126,6 +127,7 @@ pub fn control_center_thread(
                         WATERMARK_SCALE = s.watermark_scale;
                         watermark_ratio = s.watermark_ratio;
                         split_line_spacing = s.split_line_spacing;
+                        font_scale = s.font_scale;
                         // TODO font
                     }
                     
@@ -181,6 +183,7 @@ pub fn control_center_thread(
                             image_path,
                             &output_path,
                             &font,
+                            font_scale,
                             logo_image, // if "Samsung Techwin" panic...
                             exif_data,
                             qulity,
