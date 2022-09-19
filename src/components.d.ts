@@ -9,7 +9,7 @@ declare module '@vue/runtime-core' {
   export interface GlobalComponents {
     About: typeof import('./components/About.vue')['default']
     Animation: typeof import('./components/animation.vue')['default']
-    Base: typeof import('./components/base.vue')['default']
+    Base: typeof import('./components/Base.vue')['default']
     BaseSettingsDrawer: typeof import('./components/baseSettingsDrawer.vue')['default']
     DepthField: typeof import('./components/DepthField.vue')['default']
     DragTest: typeof import('./components/dragTest.vue')['default']
@@ -69,8 +69,8 @@ declare module '@vue/runtime-core' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SeniorSettings: typeof import('./components/seniorSettings.vue')['default']
-    SideBar: typeof import('./components/sideBar.vue')['default']
-    TextImageProcess: typeof import('./components/textImageProcess.vue')['default']
+    SideBar: typeof import('./components/SideBar.vue')['default']
+    TextImageProcess: typeof import('./components/TextImageProcess.vue')['default']
     TopBar: typeof import('./components/topBar.vue')['default']
     Wrapper: typeof import('./components/wrapper.vue')['default']
   }

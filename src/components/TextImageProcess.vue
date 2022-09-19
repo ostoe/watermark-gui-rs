@@ -11,7 +11,7 @@ import { pictureDir } from "@tauri-apps/api/path";
 // import { watch } from "fs";
 import baseSettingsDrawerVue from "./BaseSettingsDrawer.vue";
 import ExifReader from "exifreader";
-import type { UploadInstance, UploadProps, UploadRawFile } from 'element-plus'
+import type { UploadFile,UploadFiles, UploadInstance, UploadProps, UploadRawFile } from 'element-plus'
 
 const isCollapse = ref(true);
 // const progress_count = ref({ completed: 0, total: 0 });
@@ -253,8 +253,13 @@ watch(exifTags, (newValue, oldValue) => {
   tableExifData.value = []
   var reg = "^[ ]+$";
   var re = new RegExp(reg);
+  console.log(newValue);
   for (const [key, value] of Object.entries(newValue)) {
-    console.log(key, value);
+    if (key == "MakerNote") {
+      console.log(value.value);
+      console.log(typeof value.value);
+    }
+    // console.log(key, value);
     if (typeof value.description === "string" && value.description != "" && !re.test(value.description)) {
       tableExifData.value.push({ label: key, data: value.description });
     }
@@ -343,8 +348,14 @@ const handleExceed: UploadProps['onExceed'] = (files) => {
 const handleOnChange: UploadProps['onChange'] = (uploadFile) => {
   console.log(uploadFile)
 }
-</script>
 
+function handleUpload(file: UploadFile, _fs: UploadFiles) {
+  console.log(file, _fs);
+  selectFile(file.raw!)
+}
+
+// :on-exceed="handleExceed"
+</script>
 <template lang="">
   <el-row class="exifinput">
     <el-col :span="20">
@@ -357,7 +368,7 @@ const handleOnChange: UploadProps['onChange'] = (uploadFile) => {
         :limit="1"
         :auto-upload="false"
         :drag="false"
-        :on-exceed="handleExceed"
+        :on-change="handleUpload"
         :show-file-list="false"
       >
         <template #trigger>
