@@ -54,11 +54,11 @@ onBeforeUnmount(()=>{
 })
 const lastX = ref(0)
 const lastY = ref(0)
-const realTop = ref(50)
-const realHeight = ref(500)
-const realLeft = ref('')
-const realRight = ref(10)
-const realWidth = ref(500)
+const realTop = ref(90)
+const realHeight = ref(55)
+const realLeft = ref(70)
+const realRight = ref(0)
+const realWidth = ref(450)
 const close = () => {
   previewwidget.inputValue = false
 }
@@ -116,7 +116,7 @@ const startChangeRightBottom = (event:any) => {
   forbidSelect()
 }
 const onMove = (event:any) => {
-  if (realLeft.value !== '') {
+  if (realLeft.value !== 0) {
     realLeft.value = realLeft.value + (event.screenX - lastX.value)
   }
   else {

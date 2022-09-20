@@ -3,6 +3,13 @@
 // import { reactive } from 'vue'
 // do not use same name with ref
 import type { FormInstance, FormRules } from 'element-plus'
+import { sidebarReactives } from "../scripts/reactives";
+
+const getMaxHeight=computed(()=>{
+  return (sidebarReactives.curWindowHeight)
+})
+
+
 const hyperImage = new URL("../assets/HyperfocusDistance.png", import.meta.url).toString();//src="http://localhost:5173/src/assets/HyperF.png"
 const form = reactive({
     CoC: { id: 0, value: 0.013 }, // CIRCLE OF CONFUSION (COC)
@@ -441,366 +448,369 @@ const rules = reactive<FormRules>({
 </script>
 
 <template>
+    <el-scrollbar height="100%" :max-height="getMaxHeight">
 
-    <el-form :model="form" label-width="120px" status-icon ref="ruleFormRef" :rules="rules">
-        <el-row>
+        <el-form :model="form" label-width="120px" status-icon ref="ruleFormRef" :rules="rules">
+            <el-row>
 
 
-            <el-form-item label="">
-                <span>胶片格式，数码相机，或自定义弥散圆</span>
-                <el-select v-model="form.CoC" default-first-option @change="handleSelected" value-key="id"
-                    placeholder="please select your zone" filterable>
-                    <el-option-group v-for="group in cameraOptions" :label="group.label">
-                        <el-option v-for="cameras in group.options" :value="cameras.value" :label="cameras.label" />
-                    </el-option-group>
-                </el-select>
-            </el-form-item>
-        </el-row>
-        <el-row>
-            <el-col :span="11">
-                <el-form-item>
-                    <span>镜头实际焦距(mm)</span>
-                    <el-select v-model="form.focus_length" filterable>
-                        <el-option value="3">3</el-option>
-                        <el-option value="3.6">3.6</el-option>
-                        <el-option value="4">4</el-option>
-                        <el-option value="4.3">4.3</el-option>
-                        <el-option value="4.5">4.5</el-option>
-                        <el-option value="4.6">4.6</el-option>
-                        <el-option value="4.7">4.7</el-option>
-                        <el-option value="4.75">4.75</el-option>
-                        <el-option value="5.0">5</el-option>
-                        <el-option value="5.2">5.2</el-option>
-                        <el-option value="5.3">5.3</el-option>
-                        <el-option value="5.4">5.4</el-option>
-                        <el-option value="5.5">5.5</el-option>
-                        <el-option value="5.6">5.6</el-option>
-                        <el-option value="5.7">5.7</el-option>
-                        <el-option value="5.8">5.8</el-option>
-                        <el-option value="5.9">5.9</el-option>
-                        <el-option value="6.0">6</el-option>
-                        <el-option value="6.1">6.1</el-option>
-                        <el-option value="6.2">6.2</el-option>
-                        <el-option value="6.3">6.3</el-option>
-                        <el-option value="6.4">6.4</el-option>
-                        <el-option value="6.5">6.5</el-option>
-                        <el-option value="6.6">6.6</el-option>
-                        <el-option value="6.8">6.8</el-option>
-                        <el-option value="6.9">6.9</el-option>
-                        <el-option value="7.0">7</el-option>
-                        <el-option value="7.1">7.1</el-option>
-                        <el-option value="7.15">7.15</el-option>
-                        <el-option value="7.2">7.2</el-option>
-                        <el-option value="7.25">7.25</el-option>
-                        <el-option value="7.3">7.3</el-option>
-                        <el-option value="7.4">7.4</el-option>
-                        <el-option value="7.5">7.5</el-option>
-                        <el-option value="7.6">7.6</el-option>
-                        <el-option value="7.7">7.7</el-option>
-                        <el-option value="7.8">7.8</el-option>
-                        <el-option value="8.0">8</el-option>
-                        <el-option value="8.2">8.2</el-option>
-                        <el-option value="8.3">8.3</el-option>
-                        <el-option value="9.0">9</el-option>
-                        <el-option value="9.2">9.2</el-option>
-                        <el-option value="9.7">9.7</el-option>
-                        <el-option value="9.9">9.9</el-option>
-                        <el-option value="10.0">10</el-option>
-                        <el-option value="10.5">10.5</el-option>
-                        <el-option value="10.8">10.8</el-option>
-                        <el-option value="11.0">11</el-option>
-                        <el-option value="12.0">12</el-option>
-                        <el-option value="12.5">12.5</el-option>
-                        <el-option value="12.6">12.6</el-option>
-                        <el-option value="13.0">13</el-option>
-                        <el-option value="13.5">13.5</el-option>
-                        <el-option value="14.0">14</el-option>
-                        <el-option value="15.0">15</el-option>
-                        <el-option value="15.5">15.5</el-option>
-                        <el-option value="15.6">15.6</el-option>
-                        <el-option value="16.0">16</el-option>
-                        <el-option value="16.2">16.2</el-option>
-                        <el-option value="16.8">16.8</el-option>
-                        <el-option value="17.0">17</el-option>
-                        <el-option value="17.1">17.1</el-option>
-                        <el-option value="17.4">17.4</el-option>
-                        <el-option value="18.0">18</el-option>
-                        <el-option value="18.3">18.3</el-option>
-                        <el-option value="18.6">18.6</el-option>
-                        <el-option value="19.0">19</el-option>
-                        <el-option value="19.2">19.2</el-option>
-                        <el-option value="19.5">19.5</el-option>
-                        <el-option value="19.8">19.8</el-option>
-                        <el-option value="20.0">20</el-option>
-                        <el-option value="20.3">20.3</el-option>
-                        <el-option value="21.0">21</el-option>
-                        <el-option value="21.3">21.3</el-option>
-                        <el-option value="21.4">21.4</el-option>
-                        <el-option value="21.9">21.9</el-option>
-                        <el-option value="22.0">22</el-option>
-                        <el-option value="22.2">22.2</el-option>
-                        <el-option value="22.5">22.5</el-option>
-                        <el-option value="22.8">22.8</el-option>
-                        <el-option value="23.0">23</el-option>
-                        <el-option value="23.1">23.1</el-option>
-                        <el-option value="23.4">23.4</el-option>
-                        <el-option value="23.5">23.5</el-option>
-                        <el-option value="24.0">24</el-option>
-                        <el-option value="24.9">24.9</el-option>
-                        <el-option value="25.0">25</el-option>
-                        <el-option value="25.8">25.8</el-option>
-                        <el-option value="26.0">26</el-option>
-                        <el-option value="26.4">26.4</el-option>
-                        <el-option value="27.0">27</el-option>
-                        <el-option value="28.0">28</el-option>
-                        <el-option value="28.6">28.6</el-option>
-                        <el-option value="28.8">28.8</el-option>
-                        <el-option value="30.0">30</el-option>
-                        <el-option value="31.0">31</el-option>
-                        <el-option value="32.0">32</el-option>
-                        <el-option value="33.0">33</el-option>
-                        <el-option value="34.0">34</el-option>
-                        <el-option value="35.0">35</el-option>
-                        <el-option value="35.5">35.5</el-option>
-                        <el-option value="36.0">36</el-option>
-                        <el-option value="37.0">37</el-option>
-                        <el-option value="37.5">37.5</el-option>
-                        <el-option value="38.0">38</el-option>
-                        <el-option value="39.0">39</el-option>
-                        <el-option value="40.0">40</el-option>
-                        <el-option value="41.0">41</el-option>
-                        <el-option value="42.0">42</el-option>
-                        <el-option value="43.0">43</el-option>
-                        <el-option value="45.0">45</el-option>
-                        <el-option value="46.0">46</el-option>
-                        <el-option value="46.8">46.8</el-option>
-                        <el-option value="47.0">47</el-option>
-                        <el-option value="48.0">48</el-option>
-                        <el-option value="48.5">48.5</el-option>
-                        <el-option value="50.0">50</el-option>
-                        <el-option value="50.8">50.8</el-option>
-                        <el-option value="50.9">50.9</el-option>
-                        <el-option value="51.0">51.0</el-option>
-                        <el-option value="51.2">51.2</el-option>
-                        <el-option value="51.6">51.6</el-option>
-                        <el-option value="52.0">52</el-option>
-                        <el-option value="53.0">53</el-option>
-                        <el-option value="54.0">54</el-option>
-                        <el-option value="55.0">55</el-option>
-                        <el-option value="55.2">55.2</el-option>
-                        <el-option value="56.0">56</el-option>
-                        <el-option value="58.0">58</el-option>
-                        <el-option value="59.0">59</el-option>
-                        <el-option value="60.0">60</el-option>
-                        <el-option value="61.0">61</el-option>
-                        <el-option value="63.0">63</el-option>
-                        <el-option value="65.0">65</el-option>
-                        <el-option value="66.0">66</el-option>
-                        <el-option value="69.0">69</el-option>
-                        <el-option value="70.0">70</el-option>
-                        <el-option value="72.0">72</el-option>
-                        <el-option value="75.0">75</el-option>
-                        <el-option value="76.0">76</el-option>
-                        <el-option value="80.0">80</el-option>
-                        <el-option value="85.0">85</el-option>
-                        <el-option value="86.0">86</el-option>
-                        <el-option value="90.0">90</el-option>
-                        <el-option value="95.0">95</el-option>
-                        <el-option value="100.0">100</el-option>
-                        <el-option value="101.0">101</el-option>
-                        <el-option value="102.0">102</el-option>
-                        <el-option value="103.0">103</el-option>
-                        <el-option value="104.0">104</el-option>
-                        <el-option value="105.0">105</el-option>
-                        <el-option value="106.0">106</el-option>
-                        <el-option value="110.0">110</el-option>
-                        <el-option value="111.0">111</el-option>
-                        <el-option value="114.0">114</el-option>
-                        <el-option value="115.0">115</el-option>
-                        <el-option value="117.0">117</el-option>
-                        <el-option value="120.0">120</el-option>
-                        <el-option value="121.0">121</el-option>
-                        <el-option value="123.0">123</el-option>
-                        <el-option value="125.0">125</el-option>
-                        <el-option value="127.0">127</el-option>
-                        <el-option value="130.0">130</el-option>
-                        <el-option value="135.0">135</el-option>
-                        <el-option value="140.0">140</el-option>
-                        <el-option value="145.0">145</el-option>
-                        <el-option value="150.0">150</el-option>
-                        <el-option value="152.0">152</el-option>
-                        <el-option value="155.0">155</el-option>
-                        <el-option value="160.0">160</el-option>
-                        <el-option value="165.0">165</el-option>
-                        <el-option value="168.0">168</el-option>
-                        <el-option value="170.0">170</el-option>
-                        <el-option value="180.0">180</el-option>
-                        <el-option value="190.0">190</el-option>
-                        <el-option value="200.0">200</el-option>
-                        <el-option value="203.0">203</el-option>
-                        <el-option value="205.0">205</el-option>
-                        <el-option value="210.0">210</el-option>
-                        <el-option value="215.0">215</el-option>
-                        <el-option value="240.0">240</el-option>
-                        <el-option value="250.0">250</el-option>
-                        <el-option value="254.0">254</el-option>
-                        <el-option value="255.0">255</el-option>
-                        <el-option value="260.0">260</el-option>
-                        <el-option value="270.0">270</el-option>
-                        <el-option value="280.0">280</el-option>
-                        <el-option value="300.0">300</el-option>
-                        <el-option value="305.0">305</el-option>
-                        <el-option value="320.0">320</el-option>
-                        <el-option value="350.0">350</el-option>
-                        <el-option value="355.0">355</el-option>
-                        <el-option value="360.0">360</el-option>
-                        <el-option value="375.0">375</el-option>
-                        <el-option value="380.0">380</el-option>
-                        <el-option value="400.0">400</el-option>
-                        <el-option value="420.0">420</el-option>
-                        <el-option value="450.0">450</el-option>
-                        <el-option value="480.0">480</el-option>
-                        <el-option value="500.0">500</el-option>
-                        <el-option value="600.0">600</el-option>
-                        <el-option value="610.0">610</el-option>
-                        <el-option value="720.0">720</el-option>
-                        <el-option value="800.0">800</el-option>
-                        <el-option value="1000.0">1000</el-option>
-                        <el-option value="1200.0">1200</el-option>
+                <el-form-item label="">
+                    <span>胶片格式，数码相机，或自定义弥散圆</span>
+                    <el-select v-model="form.CoC" default-first-option @change="handleSelected" value-key="id"
+                        placeholder="please select your zone" filterable>
+                        <el-option-group v-for="group in cameraOptions" :label="group.label">
+                            <el-option v-for="cameras in group.options" :value="cameras.value" :label="cameras.label" />
+                        </el-option-group>
                     </el-select>
                 </el-form-item>
-            </el-col>
-            <el-col :span="2" class="text-center">
-                <!-- <span class="text-gray-500">-</span> -->
-            </el-col>
-            <el-col :span="11">
-                <el-form-item>
-                    <span>光圈大小</span>
-                    <el-select v-model="form.aperture" default-first-option filterable>
-                        <el-option value="0.95" label="f/0.95" />
-                        <el-option value="1.0" label="f/1" />
-                        <el-option value="1.122462" label="f/1.1" />
-                        <el-option value="1.189207" label="f/1.2" />
-                        <el-option value="1.259921" label="f/1.3" />
-                        <el-option value="1.414214" label="f/1.4" />
-                        <el-option value="1.587401" label="f/1.6" />
-                        <el-option value="1.681793" label="f/1.7" />
-                        <el-option value="1.781797" label="f/1.8" />
-                        <el-option value="2.000000" label="f/2" />
-                        <el-option value="2.244924" label="f/2.2" />
-                        <el-option value="2.378414" label="f/2.4" />
-                        <el-option value="2.519842" label="f/2.5" />
-                        <el-option value="2.828427" label="f/2.8" />
-                        <el-option value="3.174802" label="f/3.2" />
-                        <el-option value="3.363586" label="f/3.4" />
-                        <el-option value="3.563595" label="f/3.6" />
-                        <el-option value="4.000000" label="f/4" />
-                        <el-option value="4.489848" label="f/4.5" />
-                        <el-option value="4.756828" label="f/4.8" />
-                        <el-option value="5.039684" label="f/5" />
-                        <el-option value="5.656854" label="f/5.6" />
-                        <el-option value="6.349604" label="f/6.4" />
-                        <el-option value="6.727171" label="f/6.7" />
-                        <el-option value="7.127190" label="f/7.1" />
-                        <el-option value="8.000000" label="f/8" />
-                        <el-option value="8.979696" label="f/9" />
-                        <el-option value="9.513657" label="f/9.5" />
-                        <el-option value="10.07937" label="f/10" />
-                        <el-option value="11.313708" label="f/11" />
-                        <el-option value="12.699208" label="f/12.7" />
-                        <el-option value="13.454343" label="f/13.5" />
-                        <el-option value="14.254379" label="f/14.3" />
-                        <el-option value="16.000000" label="f/16" />
-                        <el-option value="17.959393" label="f/18" />
-                        <el-option value="19.027314" label="f/19" />
-                        <el-option value="20.158737" label="f/20" />
-                        <el-option value="22.627417" label="f/22" />
-                        <el-option value="25.398417" label="f/25" />
-                        <el-option value="26.908685" label="f/27" />
-                        <el-option value="28.508759" label="f/28" />
-                        <el-option value="32" label="f/32" />
-                        <el-option value="45.254834" label="f/45" />
-                        <el-option value="64" label="f/64" />
-                    </el-select>
-                </el-form-item>
-            </el-col>
-        </el-row>
-        <el-row>
-            <el-col :span="11">
-                <el-form-item prop="object_distance">
-                    <el-row>
-                        <span class="ml-3 w-35 text-gray-600 inline-flex items-center">拍摄距离</span>
-                    </el-row>
-                    <el-row>
-                        <el-input v-model="form.object_distance" @change="" />
-                    </el-row>
-                </el-form-item>
-            </el-col>
-            <el-col :span="2" class="text-center">
-            </el-col>
-            <el-col :span="11">
-                <el-form-item>
-                    <span>距离单位</span>
-                    <el-select v-model="form.od_units" placeholder="选择单位">
-                        <el-option label="米(m)" value="1.0" />
-                        <el-option label="厘米(cm)" value="0.01" />
-                        <el-option label="英尺(feet)" value="0.3048" />
-                        <el-option label="英寸(in)" value="0.0254" />
-                    </el-select>
-                </el-form-item>
-            </el-col>
-        </el-row>
-        <el-form-item inline>
-            <!-- <el-col :span="11">
+            </el-row>
+            <el-row>
+                <el-col :span="11">
+                    <el-form-item>
+                        <span>镜头实际焦距(mm)</span>
+                        <el-select v-model="form.focus_length" filterable>
+                            <el-option value="3">3</el-option>
+                            <el-option value="3.6">3.6</el-option>
+                            <el-option value="4">4</el-option>
+                            <el-option value="4.3">4.3</el-option>
+                            <el-option value="4.5">4.5</el-option>
+                            <el-option value="4.6">4.6</el-option>
+                            <el-option value="4.7">4.7</el-option>
+                            <el-option value="4.75">4.75</el-option>
+                            <el-option value="5.0">5</el-option>
+                            <el-option value="5.2">5.2</el-option>
+                            <el-option value="5.3">5.3</el-option>
+                            <el-option value="5.4">5.4</el-option>
+                            <el-option value="5.5">5.5</el-option>
+                            <el-option value="5.6">5.6</el-option>
+                            <el-option value="5.7">5.7</el-option>
+                            <el-option value="5.8">5.8</el-option>
+                            <el-option value="5.9">5.9</el-option>
+                            <el-option value="6.0">6</el-option>
+                            <el-option value="6.1">6.1</el-option>
+                            <el-option value="6.2">6.2</el-option>
+                            <el-option value="6.3">6.3</el-option>
+                            <el-option value="6.4">6.4</el-option>
+                            <el-option value="6.5">6.5</el-option>
+                            <el-option value="6.6">6.6</el-option>
+                            <el-option value="6.8">6.8</el-option>
+                            <el-option value="6.9">6.9</el-option>
+                            <el-option value="7.0">7</el-option>
+                            <el-option value="7.1">7.1</el-option>
+                            <el-option value="7.15">7.15</el-option>
+                            <el-option value="7.2">7.2</el-option>
+                            <el-option value="7.25">7.25</el-option>
+                            <el-option value="7.3">7.3</el-option>
+                            <el-option value="7.4">7.4</el-option>
+                            <el-option value="7.5">7.5</el-option>
+                            <el-option value="7.6">7.6</el-option>
+                            <el-option value="7.7">7.7</el-option>
+                            <el-option value="7.8">7.8</el-option>
+                            <el-option value="8.0">8</el-option>
+                            <el-option value="8.2">8.2</el-option>
+                            <el-option value="8.3">8.3</el-option>
+                            <el-option value="9.0">9</el-option>
+                            <el-option value="9.2">9.2</el-option>
+                            <el-option value="9.7">9.7</el-option>
+                            <el-option value="9.9">9.9</el-option>
+                            <el-option value="10.0">10</el-option>
+                            <el-option value="10.5">10.5</el-option>
+                            <el-option value="10.8">10.8</el-option>
+                            <el-option value="11.0">11</el-option>
+                            <el-option value="12.0">12</el-option>
+                            <el-option value="12.5">12.5</el-option>
+                            <el-option value="12.6">12.6</el-option>
+                            <el-option value="13.0">13</el-option>
+                            <el-option value="13.5">13.5</el-option>
+                            <el-option value="14.0">14</el-option>
+                            <el-option value="15.0">15</el-option>
+                            <el-option value="15.5">15.5</el-option>
+                            <el-option value="15.6">15.6</el-option>
+                            <el-option value="16.0">16</el-option>
+                            <el-option value="16.2">16.2</el-option>
+                            <el-option value="16.8">16.8</el-option>
+                            <el-option value="17.0">17</el-option>
+                            <el-option value="17.1">17.1</el-option>
+                            <el-option value="17.4">17.4</el-option>
+                            <el-option value="18.0">18</el-option>
+                            <el-option value="18.3">18.3</el-option>
+                            <el-option value="18.6">18.6</el-option>
+                            <el-option value="19.0">19</el-option>
+                            <el-option value="19.2">19.2</el-option>
+                            <el-option value="19.5">19.5</el-option>
+                            <el-option value="19.8">19.8</el-option>
+                            <el-option value="20.0">20</el-option>
+                            <el-option value="20.3">20.3</el-option>
+                            <el-option value="21.0">21</el-option>
+                            <el-option value="21.3">21.3</el-option>
+                            <el-option value="21.4">21.4</el-option>
+                            <el-option value="21.9">21.9</el-option>
+                            <el-option value="22.0">22</el-option>
+                            <el-option value="22.2">22.2</el-option>
+                            <el-option value="22.5">22.5</el-option>
+                            <el-option value="22.8">22.8</el-option>
+                            <el-option value="23.0">23</el-option>
+                            <el-option value="23.1">23.1</el-option>
+                            <el-option value="23.4">23.4</el-option>
+                            <el-option value="23.5">23.5</el-option>
+                            <el-option value="24.0">24</el-option>
+                            <el-option value="24.9">24.9</el-option>
+                            <el-option value="25.0">25</el-option>
+                            <el-option value="25.8">25.8</el-option>
+                            <el-option value="26.0">26</el-option>
+                            <el-option value="26.4">26.4</el-option>
+                            <el-option value="27.0">27</el-option>
+                            <el-option value="28.0">28</el-option>
+                            <el-option value="28.6">28.6</el-option>
+                            <el-option value="28.8">28.8</el-option>
+                            <el-option value="30.0">30</el-option>
+                            <el-option value="31.0">31</el-option>
+                            <el-option value="32.0">32</el-option>
+                            <el-option value="33.0">33</el-option>
+                            <el-option value="34.0">34</el-option>
+                            <el-option value="35.0">35</el-option>
+                            <el-option value="35.5">35.5</el-option>
+                            <el-option value="36.0">36</el-option>
+                            <el-option value="37.0">37</el-option>
+                            <el-option value="37.5">37.5</el-option>
+                            <el-option value="38.0">38</el-option>
+                            <el-option value="39.0">39</el-option>
+                            <el-option value="40.0">40</el-option>
+                            <el-option value="41.0">41</el-option>
+                            <el-option value="42.0">42</el-option>
+                            <el-option value="43.0">43</el-option>
+                            <el-option value="45.0">45</el-option>
+                            <el-option value="46.0">46</el-option>
+                            <el-option value="46.8">46.8</el-option>
+                            <el-option value="47.0">47</el-option>
+                            <el-option value="48.0">48</el-option>
+                            <el-option value="48.5">48.5</el-option>
+                            <el-option value="50.0">50</el-option>
+                            <el-option value="50.8">50.8</el-option>
+                            <el-option value="50.9">50.9</el-option>
+                            <el-option value="51.0">51.0</el-option>
+                            <el-option value="51.2">51.2</el-option>
+                            <el-option value="51.6">51.6</el-option>
+                            <el-option value="52.0">52</el-option>
+                            <el-option value="53.0">53</el-option>
+                            <el-option value="54.0">54</el-option>
+                            <el-option value="55.0">55</el-option>
+                            <el-option value="55.2">55.2</el-option>
+                            <el-option value="56.0">56</el-option>
+                            <el-option value="58.0">58</el-option>
+                            <el-option value="59.0">59</el-option>
+                            <el-option value="60.0">60</el-option>
+                            <el-option value="61.0">61</el-option>
+                            <el-option value="63.0">63</el-option>
+                            <el-option value="65.0">65</el-option>
+                            <el-option value="66.0">66</el-option>
+                            <el-option value="69.0">69</el-option>
+                            <el-option value="70.0">70</el-option>
+                            <el-option value="72.0">72</el-option>
+                            <el-option value="75.0">75</el-option>
+                            <el-option value="76.0">76</el-option>
+                            <el-option value="80.0">80</el-option>
+                            <el-option value="85.0">85</el-option>
+                            <el-option value="86.0">86</el-option>
+                            <el-option value="90.0">90</el-option>
+                            <el-option value="95.0">95</el-option>
+                            <el-option value="100.0">100</el-option>
+                            <el-option value="101.0">101</el-option>
+                            <el-option value="102.0">102</el-option>
+                            <el-option value="103.0">103</el-option>
+                            <el-option value="104.0">104</el-option>
+                            <el-option value="105.0">105</el-option>
+                            <el-option value="106.0">106</el-option>
+                            <el-option value="110.0">110</el-option>
+                            <el-option value="111.0">111</el-option>
+                            <el-option value="114.0">114</el-option>
+                            <el-option value="115.0">115</el-option>
+                            <el-option value="117.0">117</el-option>
+                            <el-option value="120.0">120</el-option>
+                            <el-option value="121.0">121</el-option>
+                            <el-option value="123.0">123</el-option>
+                            <el-option value="125.0">125</el-option>
+                            <el-option value="127.0">127</el-option>
+                            <el-option value="130.0">130</el-option>
+                            <el-option value="135.0">135</el-option>
+                            <el-option value="140.0">140</el-option>
+                            <el-option value="145.0">145</el-option>
+                            <el-option value="150.0">150</el-option>
+                            <el-option value="152.0">152</el-option>
+                            <el-option value="155.0">155</el-option>
+                            <el-option value="160.0">160</el-option>
+                            <el-option value="165.0">165</el-option>
+                            <el-option value="168.0">168</el-option>
+                            <el-option value="170.0">170</el-option>
+                            <el-option value="180.0">180</el-option>
+                            <el-option value="190.0">190</el-option>
+                            <el-option value="200.0">200</el-option>
+                            <el-option value="203.0">203</el-option>
+                            <el-option value="205.0">205</el-option>
+                            <el-option value="210.0">210</el-option>
+                            <el-option value="215.0">215</el-option>
+                            <el-option value="240.0">240</el-option>
+                            <el-option value="250.0">250</el-option>
+                            <el-option value="254.0">254</el-option>
+                            <el-option value="255.0">255</el-option>
+                            <el-option value="260.0">260</el-option>
+                            <el-option value="270.0">270</el-option>
+                            <el-option value="280.0">280</el-option>
+                            <el-option value="300.0">300</el-option>
+                            <el-option value="305.0">305</el-option>
+                            <el-option value="320.0">320</el-option>
+                            <el-option value="350.0">350</el-option>
+                            <el-option value="355.0">355</el-option>
+                            <el-option value="360.0">360</el-option>
+                            <el-option value="375.0">375</el-option>
+                            <el-option value="380.0">380</el-option>
+                            <el-option value="400.0">400</el-option>
+                            <el-option value="420.0">420</el-option>
+                            <el-option value="450.0">450</el-option>
+                            <el-option value="480.0">480</el-option>
+                            <el-option value="500.0">500</el-option>
+                            <el-option value="600.0">600</el-option>
+                            <el-option value="610.0">610</el-option>
+                            <el-option value="720.0">720</el-option>
+                            <el-option value="800.0">800</el-option>
+                            <el-option value="1000.0">1000</el-option>
+                            <el-option value="1200.0">1200</el-option>
+                        </el-select>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="2" class="text-center">
+                    <!-- <span class="text-gray-500">-</span> -->
+                </el-col>
+                <el-col :span="11">
+                    <el-form-item>
+                        <span>光圈大小</span>
+                        <el-select v-model="form.aperture" default-first-option filterable>
+                            <el-option value="0.95" label="f/0.95" />
+                            <el-option value="1.0" label="f/1" />
+                            <el-option value="1.122462" label="f/1.1" />
+                            <el-option value="1.189207" label="f/1.2" />
+                            <el-option value="1.259921" label="f/1.3" />
+                            <el-option value="1.414214" label="f/1.4" />
+                            <el-option value="1.587401" label="f/1.6" />
+                            <el-option value="1.681793" label="f/1.7" />
+                            <el-option value="1.781797" label="f/1.8" />
+                            <el-option value="2.000000" label="f/2" />
+                            <el-option value="2.244924" label="f/2.2" />
+                            <el-option value="2.378414" label="f/2.4" />
+                            <el-option value="2.519842" label="f/2.5" />
+                            <el-option value="2.828427" label="f/2.8" />
+                            <el-option value="3.174802" label="f/3.2" />
+                            <el-option value="3.363586" label="f/3.4" />
+                            <el-option value="3.563595" label="f/3.6" />
+                            <el-option value="4.000000" label="f/4" />
+                            <el-option value="4.489848" label="f/4.5" />
+                            <el-option value="4.756828" label="f/4.8" />
+                            <el-option value="5.039684" label="f/5" />
+                            <el-option value="5.656854" label="f/5.6" />
+                            <el-option value="6.349604" label="f/6.4" />
+                            <el-option value="6.727171" label="f/6.7" />
+                            <el-option value="7.127190" label="f/7.1" />
+                            <el-option value="8.000000" label="f/8" />
+                            <el-option value="8.979696" label="f/9" />
+                            <el-option value="9.513657" label="f/9.5" />
+                            <el-option value="10.07937" label="f/10" />
+                            <el-option value="11.313708" label="f/11" />
+                            <el-option value="12.699208" label="f/12.7" />
+                            <el-option value="13.454343" label="f/13.5" />
+                            <el-option value="14.254379" label="f/14.3" />
+                            <el-option value="16.000000" label="f/16" />
+                            <el-option value="17.959393" label="f/18" />
+                            <el-option value="19.027314" label="f/19" />
+                            <el-option value="20.158737" label="f/20" />
+                            <el-option value="22.627417" label="f/22" />
+                            <el-option value="25.398417" label="f/25" />
+                            <el-option value="26.908685" label="f/27" />
+                            <el-option value="28.508759" label="f/28" />
+                            <el-option value="32" label="f/32" />
+                            <el-option value="45.254834" label="f/45" />
+                            <el-option value="64" label="f/64" />
+                        </el-select>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="11">
+                    <el-form-item prop="object_distance">
+                        <el-row>
+                            <span class="ml-3 w-35 text-gray-600 inline-flex items-center">拍摄距离</span>
+                        </el-row>
+                        <el-row>
+                            <el-input v-model="form.object_distance" @change="" />
+                        </el-row>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="2" class="text-center">
+                </el-col>
+                <el-col :span="11">
+                    <el-form-item>
+                        <span>距离单位</span>
+                        <el-select v-model="form.od_units" placeholder="选择单位">
+                            <el-option label="米(m)" value="1.0" />
+                            <el-option label="厘米(cm)" value="0.01" />
+                            <el-option label="英尺(feet)" value="0.3048" />
+                            <el-option label="英寸(in)" value="0.0254" />
+                        </el-select>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-form-item inline>
+                <!-- <el-col :span="11">
             </el-col>
             
             <el-col :span="11">
                 
             </el-col> -->
-            <el-button plain @click="doDepthOfField" color="#783471">计算</el-button>
+                <el-button plain @click="doDepthOfField" color="#783471">计算</el-button>
 
-        </el-form-item>
-    </el-form>
+            </el-form-item>
+        </el-form>
 
-    <el-divider></el-divider>
-    <!-- <div v-else> -->
-    <el-descriptions v-if="isShowComputedResult" title="计算结果" direction="vertical" :column="3" size="default" border>
-        <el-descriptions-item label="景深近端距离(前景深)">{{resultForm.dofNear}}</el-descriptions-item>
-        <el-descriptions-item label="景深远端距离(后景深)">{{resultForm.dofFar}}</el-descriptions-item>
-        <el-descriptions-item label="总景深">{{resultForm.dofTotal}}</el-descriptions-item>
-        <el-descriptions-item label="焦点前侧范围">{{resultForm.dofFront}}</el-descriptions-item>
-        <el-descriptions-item label="焦点后侧范围">{{resultForm.dofRear}}</el-descriptions-item>
-        <el-descriptions-item label="超焦距">{{resultForm.hyperFocal}}</el-descriptions-item>
-        <el-descriptions-item label="弥散圆直径">{{resultForm.cocused}}</el-descriptions-item>
-        <el-descriptions-item label="说明" color="#890978"><template #label>
-                <div class="cell-item">
-                    
-                    <el-tag class="ml-2" type="danger"><el-icon>
-                        <i-ep-Notification />
-                    </el-icon>说明</el-tag>
-                </div>
-            </template>景深值越小（浅），虚化效果越好</el-descriptions-item>
-    </el-descriptions>
+        <el-divider></el-divider>
+        <!-- <div v-else> -->
+        <el-descriptions v-if="isShowComputedResult" title="计算结果" direction="vertical" :column="3" size="default"
+            border>
+            <el-descriptions-item label="景深近端距离(前景深)">{{resultForm.dofNear}}</el-descriptions-item>
+            <el-descriptions-item label="景深远端距离(后景深)">{{resultForm.dofFar}}</el-descriptions-item>
+            <el-descriptions-item label="总景深">{{resultForm.dofTotal}}</el-descriptions-item>
+            <el-descriptions-item label="焦点前侧范围">{{resultForm.dofFront}}</el-descriptions-item>
+            <el-descriptions-item label="焦点后侧范围">{{resultForm.dofRear}}</el-descriptions-item>
+            <el-descriptions-item label="超焦距">{{resultForm.hyperFocal}}</el-descriptions-item>
+            <el-descriptions-item label="弥散圆直径">{{resultForm.cocused}}</el-descriptions-item>
+            <el-descriptions-item label="说明" color="#890978"><template #label>
+                    <div class="cell-item">
 
-    <div class="block text-center">
-    <el-carousel height="500px">
-      <el-carousel-item  >
-        <!-- <h3 class="small justify-center" text="2xl">{{ item }}</h3> -->
-        <el-image :src="hyperImage" fit="cover"/>
-      </el-carousel-item>
-      <el-carousel-item  >
-        <!-- <h3 class="small justify-center" text="2xl">{{ item }}</h3> -->
-        <el-image :src="hyperImage"/>
-      </el-carousel-item>
-    </el-carousel>
-  </div>
+                        <el-tag class="ml-2" type="danger">
+                            <el-icon>
+                                <i-ep-Notification />
+                            </el-icon>说明
+                        </el-tag>
+                    </div>
+                </template>景深值越小（浅），虚化效果越好</el-descriptions-item>
+        </el-descriptions>
 
-    
+        <div class="block text-center">
+            <el-carousel height="500px">
+                <el-carousel-item>
+                    <!-- <h3 class="small justify-center" text="2xl">{{ item }}</h3> -->
+                    <el-image :src="hyperImage" fit="cover" />
+                </el-carousel-item>
+                <el-carousel-item>
+                    <!-- <h3 class="small justify-center" text="2xl">{{ item }}</h3> -->
+                    <el-image :src="hyperImage" />
+                </el-carousel-item>
+            </el-carousel>
+        </div>
 
+
+    </el-scrollbar>
 </template>
 
 <style lang="scss" scoped>
-
 // 下拉框
 .tk-select-button {
     width: 100%;

@@ -7,6 +7,7 @@ import { emit, listen } from "@tauri-apps/api/event";
 import { readDir } from "@tauri-apps/api/fs";
 import { convertFileSrc } from "@tauri-apps/api/tauri";
 import ExifReader from 'exifreader';
+import { tryOnUnmounted } from "@vueuse/shared";
 
 // sidebar公共方法/值
 
@@ -26,6 +27,7 @@ const sidebarReactives = reactive({
   activeMenuId: "1-1",
   delay: 0,
   extendPadding: "",
+  curWindowHeight:0,
   //获取鼠标点击消除遮罩
   changeThisCollapse() {
     let t: NodeJS.Timeout | null = null;
@@ -247,6 +249,7 @@ const image_progress = reactive({
   image_dir_path: "",
   exif_image_path: "",
   converted_exif_path: "",
+  isHandling: false,
   increase() {
     if (this.value <= 98) {
       this.value += 2;

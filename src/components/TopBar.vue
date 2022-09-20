@@ -13,8 +13,8 @@ import WaveProgress, { drawCarbo, drawCircle, drawText } from "../scripts/wave-p
 import { objectPick } from '@vueuse/shared';
 import { Calendar, Search, SuccessFilled, WarningFilled } from '@element-plus/icons-vue'
 
-// const percentage = ref(90);
-// const progress_count = ref({ completed: 0, total: 0 });
+const percentage = ref(90);
+const progress_count = ref({ completed: 0, total: 0 });
 const inputInvalid = ref(true);
 const inputDir = ref(user_conf.latestSelectedOutputPath);
 // const inputHistory = ref<{value: string}[]>([]);
@@ -25,10 +25,10 @@ const querySearch = (queryString: string, cb: any) => {
 async function handleSelect(item: any) {
   if (await is_dir(inputDir.value)) {
     inputInvalid.value = true;
-   if ( item.value != user_conf.latestSelectedOutputPath) {
-    user_conf.updated_output_dir(item.value);
-    // backend update dir
-   }
+    if (item.value != user_conf.latestSelectedOutputPath) {
+      user_conf.updated_output_dir(item.value);
+      // backend update dir
+    }
   } else {
     inputInvalid.value = false;
   }
@@ -42,10 +42,10 @@ async function input_value_change(v: string) {
   console.log(inputDir.value);
   if (await is_dir(inputDir.value)) {
     inputInvalid.value = true;
-   if ( v != user_conf.latestSelectedOutputPath) {
-    user_conf.updated_output_dir(v);
-    // backend update dir
-   }
+    if (v != user_conf.latestSelectedOutputPath) {
+      user_conf.updated_output_dir(v);
+      // backend update dir
+    }
   } else {
     inputInvalid.value = false;
   }
@@ -105,7 +105,7 @@ const showDrawTable = () => {
 }
 
 const showPreviewWidget = () => {
-  previewwidget.inputValue = true
+  previewwidget.inputValue = (previewwidget.inputValue) ? false : true
 }
 const message = (msg: string) => {
   ElNotification({
@@ -181,6 +181,7 @@ async function process_image() {
   // control other compo
   image_progress.status_toogle();
   image_progress.process_image();
+  image_progress.isHandling = true
 };
 
 
@@ -284,6 +285,9 @@ watch([() => image_progress.count.completed, () => image_progress.count.total], 
     to: toData,
     animated: true,
   });
+  if (image_progress.isHandling && getProgress(newValue[0], newValue[1]) === 100) {
+    image_progress.isHandling = false
+  }
   // test
   waveInit11.value.setProgress({
     from: fromData,
@@ -311,17 +315,7 @@ nextTick(() => {
       <div class="photoSelector">
         <!-- <rotate-square4 v-if="image_progress.status"></rotate-square4>
         <ping-pong v-else></ping-pong> -->
-        <div class="goutou-wrapper">
-          <div class="goutou"></div>
-          <canvas ref="waveProgress" width="35" height="35" id="waveProgress"
-            style="border-radius: 48%;z-index: -1;"></canvas>
-
-        </div>
-        <canvas width="40" height="40" id="waveProgress11"></canvas>
-
-        <el-button key="button.text" :type="image_progress.status ? 'success' : 'primary'" text> {{
-        `${image_progress.count.completed}/${image_progress.count.total}`
-        }} </el-button>
+        <!-- <canvas width="40" height="40" id="waveProgress11"></canvas> -->
         <!-- <el-progress id="progress-bar" :percentage="image_progress.value" :format="format" :color="color"
           v-if="isNotTinyIcon"></el-progress> -->
         <div>
@@ -335,14 +329,13 @@ nextTick(() => {
           </div>
         </div>
         <div v-if="bigIcon">
+          <!-- <el-tooltip :content="'输入模式：' + (selectType ? '文件' : '文件夹')" placement="bottom-end" effect="light">
+            <el-switch v-model="selectType" style="--el-switch-on-color: #38D6BF; --el-switch-off-color: #D4BE94"
+              inline-prompt :active-icon="Files" :inactive-icon="FolderChecked" />
+          </el-tooltip>
           <el-tooltip :content="'选择' + (selectType ? '文件' : '文件夹')" placement="bottom-end" effect="light">
             <el-button v-if="selectType" @click="image_progress.selectFiles()">选择</el-button>
             <el-button v-else @click="image_progress.selectDirs()">选择</el-button>
-          </el-tooltip>
-          <el-tooltip :content="'输入模式：' + (selectType ? '文件' : '文件夹')" placement="bottom-end" effect="light">
-
-            <el-switch v-model="selectType" style="--el-switch-on-color: #38D6BF; --el-switch-off-color: #D4BE94"
-              inline-prompt :active-icon="Files" :inactive-icon="FolderChecked" />
           </el-tooltip>
 
           <el-button @click="user_conf.selectOutputDirs()">输出目录</el-button>
@@ -357,9 +350,18 @@ nextTick(() => {
                 <WarningFilled />
               </el-icon>
             </template>
-          </el-autocomplete>
-
-          <el-button @click="process_image" color="#de4781" size="" plain>开始处理</el-button>
+          </el-autocomplete> -->
+          <!-- <el-button class="btn" @click="showPreviewWidget">输入/输出</el-button> -->
+          <div class="left">
+            <div class="goutou-wrapper">
+              <div class="goutou"></div>
+              <canvas ref="waveProgress" width="35" height="35" id="waveProgress"
+                style="border-radius: 48%;z-index: -1;"></canvas>
+            </div>
+            <el-button key="button.text" :type="image_progress.status ? 'success' : 'primary'" text> {{
+            `${image_progress.count.completed}/${image_progress.count.total}`
+            }} </el-button>
+          </div>
 
         </div>
         <div v-else class="medium">
@@ -377,7 +379,9 @@ nextTick(() => {
     </el-col>
     <el-col :span="6" class="right">
       <div class="previewer" v-if="bigIcon">
-        <el-button class="btn" @click="showPreviewWidget">预览图片</el-button>
+        <el-button @click="process_image" color="#de4781" size="" round :loading="image_progress.isHandling">开始处理
+        </el-button>
+
       </div>
       <div v-else @click="showPreviewWidget" class="previewer-icon">
         <el-icon style="margin-right:20px">
@@ -409,6 +413,7 @@ nextTick(() => {
 
 .previewer {
   margin: 2px 15px 2px 15px;
+  display: flex;
 }
 
 .photoSelector,

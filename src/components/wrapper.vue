@@ -147,6 +147,8 @@ nextTick(() => {});
   margin-left: 50px;
 }
 
+
+
 .footer-div {
   background-color: rgb(255, 255, 255);
   display: flex;

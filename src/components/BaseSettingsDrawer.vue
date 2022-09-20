@@ -290,11 +290,13 @@ onMounted(() => {
 
 <template>
     <div @mouseenter="menuShow" @mouseleave="menuHidden">
-        <el-button @click="loadDrawer" type="primary" color="#3f8418" plain>
+        <!-- <el-button @click="loadDrawer" type="primary" color="#3f8418" plain> -->
+        <div @click="loadDrawer">
             <el-icon>
                 <i-ep-d-arrow-left />
             </el-icon>
-        </el-button>
+        </div>
+        <!-- </el-button> -->
 
     </div>
     <!-- <div @mouseenter="settingShow" @mouseleave="settingHidden">  -->
@@ -321,7 +323,7 @@ onMounted(() => {
             <el-input-number v-model="baseForm.qulity" :min="1" :max="100" controls-position="right" size="large"
                 step-strictly @change="handleChangeQulity" />
 
-            <el-slider v-model="baseForm.qulity" vertical height="200px" />
+            <el-slider v-model="baseForm.qulity" vertical height="200px" style="position: absolute;bottom: 30%;"/>
 
             <el-row>
                 <el-col :span="8">
@@ -379,15 +381,19 @@ onMounted(() => {
 
         </el-scrollbar>
 
-        <div style="margin: 10px 0 20% 0; border-bottom: 0%;">
+        <div style="" class="row">
             <el-row>
-                <el-popconfirm confirm-button-text="是" cancel-button-text="否" :icon="InfoFilled" icon-color="#626AEF"
-                    title="重置（仍未保存）" @confirm="resetConfirmEvent" @cancel="">
-                    <template #reference>
-                        <el-button type="primary" size="small" plain color="#0FCAC7">默认</el-button>
-                    </template>
-                </el-popconfirm>
-                <el-button type="primary" size="large" @click="saveSetting"> 保存 </el-button>
+                <el-col :span="12">
+                    <el-popconfirm confirm-button-text="是" cancel-button-text="否" :icon="InfoFilled"
+                        icon-color="#626AEF" title="重置（仍未保存）" @confirm="resetConfirmEvent" @cancel="">
+                        <template #reference>
+                            <el-button type="primary" size="small" plain color="#0FCAC7" class="default-btn">默认</el-button>
+                        </template>
+                    </el-popconfirm>
+                </el-col>
+                <el-col :span="12">
+                    <el-button type="primary" size="large" @click="saveSetting" class="save-btn"> 保存 </el-button>
+                </el-col>
             </el-row>
         </div>
 
@@ -400,7 +406,14 @@ onMounted(() => {
 </template>
   
 
-<style lang="scss">
+<style lang="scss" scoped>
+.row {
+    position: absolute;
+    bottom: 8px;
+    width: 100%;
+    z-index: 99;
+}
+
 .el-row {
     margin-bottom: 20px;
 }
@@ -426,6 +439,14 @@ onMounted(() => {
     --el-input-border-color: #dcdfe6;
 }
 
+.default-btn{
+    width: 100%;
+    height: 100%;
+}
+
+.svae-btn{
+    width: 100%;
+}
 // .el-input__inner {
 //     --el-input-focus-border: #b24444;
 //     --el-input-text-color: #b24444;

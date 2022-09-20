@@ -10,11 +10,11 @@
     
     //自定义指令
     const vResize = {
-        mounted: (el: any, binding: { value: (arg0: { width: number }) => void }) => {
+        mounted: (el: any, binding: { value: (arg0: { width: number}) => void }) => {
             let ResizeObserver = window.ResizeObserver;
             el._resizer = new ResizeObserver((entries) => {
                 for (const entry of entries) {
-                    // console.log(entry.contentRect.width)
+                    console.log(entry.contentRect.width)
                     binding.value({ width: entry.contentRect.width });
                 }
             });
@@ -37,7 +37,7 @@
         let domWidth = width;
         let initWidth = 63;
         dynamicWidth.value = domWidth.width > initWidth ? false : true;
-        // console.log(domWidth)
+        console.log(domWidth)
     };
     
     //路由
@@ -77,7 +77,7 @@
     <!-- <el-container> -->
         <el-aside width="50px">
             <el-menu :default-active="activeMenuId" class="elmenu" :collapse="sidebarReactives.isCollapse"
-                :delay="sidebarReactives.delay" v-resize:1="resizeSideBar">
+                :delay="sidebarReactives.delay" v-resize:1="resizeSideBar" >
                 <div style="margin-top: 30px"></div>
                 
                 <el-sub-menu index="1">

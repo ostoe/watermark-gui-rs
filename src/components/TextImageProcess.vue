@@ -4,6 +4,8 @@ import { nextTick, ref, onMounted, Ref } from "vue";
 import { elmessage, image_progress } from "../scripts/reactives";
 import { emit, listen } from "@tauri-apps/api/event";
 import { event, invoke } from "@tauri-apps/api";
+import { sidebarReactives } from "../scripts/reactives";
+
 // import { ElMessage, ElNotification } from "element-plus";
 import { open } from "@tauri-apps/api/dialog";
 import { appDir } from "@tauri-apps/api/path";
@@ -11,7 +13,13 @@ import { pictureDir } from "@tauri-apps/api/path";
 // import { watch } from "fs";
 import baseSettingsDrawerVue from "./BaseSettingsDrawer.vue";
 import ExifReader from "exifreader";
-import type { UploadFile,UploadFiles, UploadInstance, UploadProps, UploadRawFile } from 'element-plus'
+import type {
+  UploadFile,
+  UploadFiles,
+  UploadInstance,
+  UploadProps,
+  UploadRawFile,
+} from "element-plus";
 
 const isCollapse = ref(true);
 // const progress_count = ref({ completed: 0, total: 0 });
@@ -163,7 +171,7 @@ const thumbBase64 = computed(() => {
 
 // 概览
 const size = ref("small");
-const tableExifData = ref<Array<exifDetailData>>([])
+const tableExifData = ref<Array<exifDetailData>>([]);
 watch(exifTags, (newValue, oldValue) => {
   //清空对象
   for (let value of Object.values(summaryInfo.value)) {
@@ -250,7 +258,7 @@ watch(exifTags, (newValue, oldValue) => {
     } as exifDetailData);
   }
   // summaryInfo.value.date.data = [{ label: "创建时间", data: newValue.DateTime?.description } as exifDetailData]
-  tableExifData.value = []
+  tableExifData.value = [];
   var reg = "^[ ]+$";
   var re = new RegExp(reg);
   console.log(newValue);
@@ -260,7 +268,11 @@ watch(exifTags, (newValue, oldValue) => {
       console.log(typeof value.value);
     }
     // console.log(key, value);
-    if (typeof value.description === "string" && value.description != "" && !re.test(value.description)) {
+    if (
+      typeof value.description === "string" &&
+      value.description != "" &&
+      !re.test(value.description)
+    ) {
       tableExifData.value.push({ label: key, data: value.description });
     }
   }
@@ -338,28 +350,28 @@ async function selectFile(file: File) {
     elmessage("please choose a jpeg file");
   }
 }
-const upload = ref<UploadInstance>()
-const handleExceed: UploadProps['onExceed'] = (files) => {
-  upload.value!.clearFiles()
-  const file = files[0] as UploadRawFile
-  upload.value!.handleStart(file)
-  selectFile(file)
-}
-const handleOnChange: UploadProps['onChange'] = (uploadFile) => {
-  console.log(uploadFile)
-}
+const upload = ref<UploadInstance>();
+const handleExceed: UploadProps["onExceed"] = (files) => {
+  upload.value!.clearFiles();
+  const file = files[0] as UploadRawFile;
+  upload.value!.handleStart(file);
+  selectFile(file);
+};
+const handleOnChange: UploadProps["onChange"] = (uploadFile) => {
+  console.log(uploadFile);
+  selectFile(uploadFile.raw!);
+};
 
-function handleUpload(file: UploadFile, _fs: UploadFiles) {
-  console.log(file, _fs);
-  selectFile(file.raw!)
-}
+const getMaxHeight=computed(()=>{
+  return (sidebarReactives.curWindowHeight-50)
+})
 
 // :on-exceed="handleExceed"
 </script>
 <template lang="">
-  <el-row class="exifinput">
+  <el-row class="exifinput" style="margin-top:22px;margin-bottom:10px;">
     <el-col :span="20">
-      <div style="margin-left: 25px; font-size:20px;">读取信息</div>
+      <div style="margin-left: 25px;font-size: 20px;">读取信息</div>
     </el-col>
     <el-col :span="4">
       <!-- <input type="file" @change="selectedFile" /> -->
@@ -368,123 +380,131 @@ function handleUpload(file: UploadFile, _fs: UploadFiles) {
         :limit="1"
         :auto-upload="false"
         :drag="false"
-        :on-change="handleUpload"
+        :on-change="handleOnChange"
         :show-file-list="false"
       >
         <template #trigger>
-          <el-icon style="margin-right: 20px; font-size:25px;">
+          <el-icon style="margin-right: 20px; font-size: 25px">
             <i-ep-upload />
           </el-icon>
         </template>
       </el-upload>
     </el-col>
   </el-row>
-  <el-divider style="margin-top: 0px;"></el-divider>
-  <div class="thumb"></div>
-  <el-descriptions
-    class="margin-top"
-    title="概览"
-    :column="1"
-    :size="size"
-    border
-  >
-    <el-descriptions-item v-for="info in summaryInfo">
-      <template #label>
-        <div>{{ info.label }}</div>
-      </template>
-      <div>
-        <el-descriptions class="margin-top" :column="2" :size="size" border>
-          <el-descriptions-item v-for="value in info.data">
-            <template #label v-if="value.data">
-              <div>{{ value.label }}</div>
-            </template>
-            <span v-for="v in value.data" v-if="value.data">{{ v }}</span>
-          </el-descriptions-item>
-        </el-descriptions>
-      </div>
-    </el-descriptions-item>
-  </el-descriptions>
-  <el-table :data="tableExifData" stripe style="width: 100%" class="table" :default-sort="{ prop: 'label', order: 'descending' }">
-    <el-table-column prop="label" label="名称" width="380" />
-    <el-table-column prop="data" label="详细参数" width="380" class="col"/>
-  </el-table>
-  <el-container class="a-border">
-    <div id="drap-area-sq1">
-      <!-- <div style="margin: 20px 0" /> -->
-      <div style="margin: 20px 5% 20px 5%">
-        <el-input
-          v-model="text"
-          type="textarea"
-          size="large"
-          :autosize="{ minRows: 2, maxRows: 6 }"
-          placeholder="Please input"
-        />
-      </div>
-      <div>
-        <!-- <el-container direction="vertical"> -->
-        <suspense>
-          <!-- <el-col > -->
-          <el-container direction="horizontal">
-            <el-button
-              @click="send_event"
-              color="#de4781"
-              size="large"
-              :plain="isPlain"
-              >[s]测试event</el-button
-            >
-            <!-- </suspense>
+  <el-divider style="margin-top: 0px"></el-divider>
+  <el-scrollbar height="100%" :max-height="getMaxHeight">
+    <div class="thumb"></div>
+    <el-descriptions
+      class="margin-top"
+      title="概览"
+      :column="1"
+      :size="size"
+      border
+    >
+      <el-descriptions-item v-for="info in summaryInfo">
+        <template #label>
+          <div>{{ info.label }}</div>
+        </template>
+        <div>
+          <el-descriptions class="margin-top" :column="2" :size="size" border>
+            <el-descriptions-item v-for="value in info.data">
+              <template #label v-if="value.data">
+                <div>{{ value.label }}</div>
+              </template>
+              <span v-for="v in value.data" v-if="value.data">{{ v }}</span>
+            </el-descriptions-item>
+          </el-descriptions>
+        </div>
+      </el-descriptions-item>
+    </el-descriptions>
+    <el-table
+      :data="tableExifData"
+      stripe
+      style="width: 100%"
+      class="table"
+      :default-sort="{ prop: 'label', order: 'descending' }"
+    >
+      <el-table-column prop="label" label="名称" width="380" />
+      <el-table-column prop="data" label="详细参数" width="380" class="col" />
+    </el-table>
+    <el-container class="a-border">
+      <div id="drap-area-sq1">
+        <!-- <div style="margin: 20px 0" /> -->
+        <div style="margin: 20px 5% 20px 5%">
+          <el-input
+            v-model="text"
+            type="textarea"
+            size="large"
+            :autosize="{ minRows: 2, maxRows: 6 }"
+            placeholder="Please input"
+          />
+        </div>
+        <div>
+          <!-- <el-container direction="vertical"> -->
+          <suspense>
+            <!-- <el-col > -->
+            <el-container direction="horizontal">
+              <el-button
+                @click="send_event"
+                color="#de4781"
+                size="large"
+                :plain="isPlain"
+                >[s]测试event</el-button
+              >
+              <!-- </suspense>
         <suspense> -->
-            <el-button
-              @click="greetTest"
-              color="#322aef"
-              size="large"
-              :plain="isPlain"
-              >[i]测试Rust
-            </el-button>
-            <!-- </el-col> -->
-          </el-container>
-        </suspense>
-        <el-row class="left">
-          <el-col :span="24" style="margin: 15px 0 15px 0">
-            <!-- <div class="photoSelector"> -->
-            <label class="file-select">
-              <div class="select-button">
-                <span v-if="selectImage"
-                  >Selected File: {{ selectImage.name }}</span
-                >
-                <span v-else>Select File</span>
-              </div>
-              <input type="file" @change="handleFileChange" />
-            </label>
-            <div class="b-border">
-              <el-button class="btn" @click="image_progress.selectFiles()"
-                >选择文件</el-button
-              >
-              <!-- </div> -->
+              <el-button
+                @click="greetTest"
+                color="#322aef"
+                size="large"
+                :plain="isPlain"
+                >[i]测试Rust
+              </el-button>
+              <!-- </el-col> -->
+            </el-container>
+          </suspense>
+          <el-row class="left">
+            <el-col :span="24" style="margin: 15px 0 15px 0">
               <!-- <div class="photoSelector"> -->
-              <el-button class="btn" @click="image_progress.selectDirs()"
-                >选择目录</el-button
-              >
-            </div>
+              <label class="file-select">
+                <div class="select-button">
+                  <span v-if="selectImage"
+                    >Selected File: {{ selectImage.name }}</span
+                  >
+                  <span v-else>Select File</span>
+                </div>
+                <input type="file" @change="handleFileChange" />
+              </label>
+              <div class="b-border">
+                <el-button class="btn" @click="image_progress.selectFiles()"
+                  >选择文件</el-button
+                >
+                <!-- </div> -->
+                <!-- <div class="photoSelector"> -->
+                <el-button class="btn" @click="image_progress.selectDirs()"
+                  >选择目录</el-button
+                >
+              </div>
 
-            <!-- </div> -->
-          </el-col>
-          <text> {{ selectImage }}</text>
-        </el-row>
-        <!-- <button @click="greetTest" >测试调用rust</button> -->
-        <!-- </el-col> -->
+              <!-- </div> -->
+            </el-col>
+            <text> {{ selectImage }}</text>
+          </el-row>
+          <!-- <button @click="greetTest" >测试调用rust</button> -->
+          <!-- </el-col> -->
 
-        <!-- </el-container> -->
+          <!-- </el-container> -->
+        </div>
       </div>
-    </div>
-    <!-- <BaseSettingsDrawerVue /> -->
-    <!-- <div style="margin-right=10px margin:auto" >
-          
-  </div> -->
-  </el-container>
+      <!-- <BaseSettingsDrawerVue /> -->
+      <!-- <div style="margin-right=10px margin:auto" >
+      </div> -->
+    </el-container>
+  </el-scrollbar>
 </template>
 
 <style>
+
 .a-border {
   border: 1px solid rgb(8, 210, 255);
   margin: 20px 10% 20px 10%;
@@ -506,7 +526,7 @@ function handleUpload(file: UploadFile, _fs: UploadFiles) {
 </style>
 
 <style scoped>
-.file-select>.select-button {
+.file-select > .select-button {
   padding: 1rem;
   width: 10rem;
   color: white;
@@ -518,7 +538,7 @@ function handleUpload(file: UploadFile, _fs: UploadFiles) {
   display: flex;
 }
 
-.file-select>input[type="file"] {
+.file-select > input[type="file"] {
   display: none;
 }
 
@@ -528,8 +548,8 @@ function handleUpload(file: UploadFile, _fs: UploadFiles) {
   height: 100px;
 }
 
-.exifinput {}
-
+.exifinput {
+}
 
 :deep(.cell) {
   overflow: hidden;
