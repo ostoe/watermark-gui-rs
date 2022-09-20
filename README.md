@@ -53,6 +53,8 @@ event.listen('tauri://file-drop-hover', (e) => {
  - 点击关闭后关闭后台程序，默认会进入后台且无法重新调用 [v]
  - 在线更新
  - 景深计算器 [v] 景深计算器示意图 []  [ref](https://dofsimulator.net/en/)
+ - 支持平易整块水印 目标是：[todo1010](./image/todo-1010.jpg)
+ - 背景颜色更改、字体颜色自定义
 
 
 
