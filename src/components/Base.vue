@@ -1,68 +1,3 @@
-<script setup lang="ts">
-// import { defineComponent, ref } from "vue";
-
-// import TextImageProcess from "./TextImageProcess.vue";
-// import sideBar from "./SideBar.vue";
-import TopBar from "./TopBar.vue";
-// import PicList from "./PicList.vue";
-// import BaseSettingsDrawerVue from "./BaseSettingsDrawerVue.vue";
-import PreviewWidget from "./PreviewWidget.vue";
-// import { image_progress } from "../scripts/reactives";
-import { elmessage } from "../scripts/reactives";
-// const pic = convertFileSrc("/Users/dongyifan/watermark-gui-rs/src/assets/20220807-_DSC0279-3.jpg")
-// const tags = await ExifReader.load(pic);
-// console.log(`output->tags`,tags)
-
-function test_pro() {
-  console.log("fff");
-  // update_progress();
-  //
-}
-
-// const src = new URL("../assets/test.jpeg", import.meta.url).toString();
-const src =
-  'https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg'
-
-  const watermark_ratio = ref(0.1172 * 0.8)
-  const watermark_scale = ref(0.50)
-  const logo_ratio = ref(0.70)
-  const logo_spacing_ratio = ref(0.35)
-  const position_ratio = ref(0.6267)
-  const split_line_spacing = ref(30)
-  const font_scale = ref(1.0)
-
-  /* ref
-  let mut font_scale = 1.0;
-  let mut watermark_ratio = 0.1172f32 * 0.8;
-  let mut WATERMARK_SCALE = 0.50;
-  let mut logo_ratio = 0.70f32;
-  let mut logo_spacing_ratio = 0.35f32; // if nokon logo should 1
-  let mut position_ratio = 0.6267f32;
-  let mut split_line_spacing = 30u32; // px doubel = 10*/
-  // const font_path: String,
-
-const cusstyle = ref(
-  {
-    "background-color": "#898989",
-    width: "100%",
-    height: 882 * watermark_ratio.value + "px",
-  }
-)
-
-onMounted(() => {
-  console.log(cusstyle.value.height)
-  // setTimeout(() => {
-  //    // invalid: sacale.value = 0.2;
-  //   // valid
-  //   let con = document.getElementById('banner') as HTMLElement ;
-  //   con.style.height = 882 * watermark_ratio.value + "px";
-  // }, 3000);
- 
-})
-
-
-
-</script>
 
 <template>
   <el-container>
@@ -71,25 +6,124 @@ onMounted(() => {
     </el-header>
     <el-divider></el-divider>
     <el-main>
-      <div class="demo-image__placeholder">
-        <div class="block">
-          <!-- <span class="demonstration">Custom</span> -->
-          <el-image :src="src" fit="fill">
-            <template #placeholder>
-              <div class="image-slot">Loading<span class="dot">...</span></div>
-            </template>
-            
-          </el-image>
-        </div>
-      </div>
-      <div class="container">
-        <div id="banner" :style="cusstyle"></div>
-        <!-- <img :src="src" alt="Snow" style="width:100%;">
+      <el-row>
+        <el-col :span="19">
+          <div class="demo-image__placeholder">
+            <div class="block">
+              <!-- <span class="demonstration">Custom</span> -->
+              <el-image :src="src" fit="fill">
+                <template #placeholder>
+                  <div class="image-slot">Loading<span class="dot">...</span></div>
+                </template>
+
+              </el-image>
+            </div>
+          </div>
+          <div class="container">
+            <div id="banner" :style="cusstyle"></div>
+            <!-- <img :src="src" alt="Snow" style="width:100%;">
         <div background="#887863" style="width:100%;"></div> -->
-        <div class="model-device">Nikon ZFC</div>
-        <div class="date-time">2030:05:10 14:31:33</div>
-        <div class="inter-content">50mm f/1.8 iso 2000</div>
-      </div>
+            <div class="logo"></div>
+            <div class="split-line"></div>
+            <div class="model-device">Nikon ZFC</div>
+            <div class="date-time">2030:05:10 14:31:33</div>
+            <div class="inter-content">50mm f/1.8 1/2500 ISO 2000</div>
+          </div>
+
+        </el-col>
+        <el-col :span="5" style="align-items: center;">
+
+          <el-row style="margin-bottom: 2px;"><span class="demonstration">banner长宽比例：</span></el-row>
+          <el-row>
+            <el-col :span="14">
+              <el-slider v-model="watermark_WH_ratio" :step="0.001" :min="0.01" :max="0.5" @input="WH_ratio" />
+            </el-col>
+            <el-col :span="10">
+              <el-input-number v-model="watermark_WH_ratio" controls-position="right" size="default" @change="WH_ratio"
+                :step="0.001" :min="0.01" :max="0.5"></el-input-number>
+            </el-col>
+          </el-row>
+
+          <el-row style="margin-bottom: 2px;"><span class="demonstration">第一水平线</span></el-row>
+          <el-row>
+            <el-col :span="12">
+              <el-slider v-model="watermark_text_h_scale" :step="0.001" :min="0.2" :max="1.0" @input="_text_h_scale" />
+            </el-col>
+            <el-col :span="12">
+              <el-input-number v-model="watermark_text_h_scale" controls-position="right" :step="0.001" :min="0.2"
+                :max="1.0" @change="_text_h_scale"></el-input-number>
+            </el-col>
+          </el-row>
+
+          <el-row style="margin-bottom: 2px;"><span class="demonstration">第二水平线</span></el-row>
+          <el-row>
+            <el-col :span="12">
+              <el-slider v-model="datetime_scale" :step="0.001" :min="0.2" :max="1.0" @input="datetime_scale_f" />
+            </el-col>
+            <el-col :span="12">
+              <el-input-number v-model="datetime_scale" :step="0.001" :min="0.2" :max="1.0" controls-position="right"
+                size="default" @change="datetime_scale_f"></el-input-number>
+            </el-col>
+          </el-row>
+
+          <el-row style="margin-bottom: 2px;"><span class="demonstration">Logo比例</span></el-row>
+          <el-row>
+            <el-col :span="12">
+              <el-slider v-model="logo_ratio" :step="0.001" :min="0.2" :max="1.0" @input="logo_ratio_f" />
+            </el-col>
+            <el-col :span="12">
+              <el-input-number v-model="logo_ratio" size="default" :step="0.001" :min="0.2" :max="1.0"
+                controls-position="right" @change="logo_ratio_f"></el-input-number>
+            </el-col>
+          </el-row>
+
+          <el-row style="margin-bottom: 2px;"><span class="demonstration">横向位置</span></el-row>
+          <el-row>
+            <el-col :span="12">
+              <el-slider v-model="position_ratio" :step="0.001" :min="0.2" :max="1.0" @input="position_ratio_f" />
+            </el-col>
+            <el-col :span="12">
+              <el-input-number v-model="position_ratio" :step="0.001" :min="0.2" :max="1.0" size="default"
+                controls-position="right" @change="position_ratio_f"></el-input-number>
+            </el-col>
+          </el-row>
+
+          <el-row style="margin-bottom: 2px;">
+            <el-tooltip content="不要随意修改此项，固定像素，\n当图片像素为2kw or 4kw时,\n间距距会变的很小" effect="customized">
+              <span >分割线边距（像素） <el-icon>
+                <i-ep-Warning/>
+              </el-icon></span>
+             
+            </el-tooltip>
+          </el-row>
+          <el-row>
+            <el-col :span="12">
+              <el-slider v-model="split_line_spacing" :step="0.5" :min="1" :max="100" @input="split_line_spacing_f" />
+            </el-col>
+            <el-col :span="12">
+              <el-input v-model="split_line_spacing" :step="0.5" :min="1" :max="100" size="default"
+                controls-position="right" @change="split_line_spacing_f"></el-input>
+            </el-col>
+          </el-row>
+
+          <el-row style="margin-bottom: 2px;"><span class="demonstration">型号｜标注｜日期｜分隔线</span></el-row>
+          <el-row>
+            <el-col :span="6">
+              <el-color-picker v-model="camera_color" />
+            </el-col>
+            <el-col :span="6">
+              <el-color-picker v-model="focus_color" />
+            </el-col>
+            <el-col :span="6">
+              <el-color-picker v-model="datetime_color" />
+            </el-col>
+            <el-col :span="6">
+              <el-color-picker v-model="splite_line_color" />
+            </el-col>
+          </el-row>
+
+        </el-col>
+      </el-row>
       <el-container direction="vertical">
         <PreviewWidget>
           <el-image src="https://fuss10.elemecdn.com/a/3f/3302e58f9a181d2509f3dc0fa68b0jpeg.jpeg"></el-image>
@@ -107,28 +141,208 @@ onMounted(() => {
   <!-- <div></div> -->
 </template>
 
+
+
+<script setup lang="ts">
+// import { defineComponent, ref } from "vue";
+
+// import TextImageProcess from "./TextImageProcess.vue";
+// import sideBar from "./SideBar.vue";
+import TopBar from "./TopBar.vue";
+// import PicList from "./PicList.vue";
+// import BaseSettingsDrawerVue from "./BaseSettingsDrawerVue.vue";
+import PreviewWidget from "./PreviewWidget.vue";
+// import { image_progress } from "../scripts/reactives";
+import { elmessage } from "../scripts/reactives";
+import { resolve, resourceDir } from "@tauri-apps/api/path";
+import { Arrayable } from "element-plus/es/utils";
+// const pic = convertFileSrc("/Users/dongyifan/watermark-gui-rs/src/assets/20220807-_DSC0279-3.jpg")
+// const tags = await ExifReader.load(pic);
+// console.log(`output->tags`,tags)
+
+function test_pro() {
+  console.log("fff");
+  // update_progress();
+  //
+}
+
+// const src = new URL("../assets/test.jpeg", import.meta.url).toString();
+const src =
+  'https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg'
+
+const GLOBAL_WIDTH = 1024;
+const GLOBAL_WIDTH_PX = ref(GLOBAL_WIDTH + "px");
+
+const watermark_WH_ratio = ref(Math.round((0.1172 * 0.8 + Number.EPSILON) * 10000000) / 10000000);
+const watermark_text_h_scale = ref(0.5); // <----watermark_scale
+const datetime_scale = ref(0.55);
+const logo_ratio = ref(0.70);
+const logo_spacing_ratio = ref(0.35);
+const position_ratio = ref(0.6267);
+const split_line_spacing = ref(30); // fixed 30 px.
+const font_scale = ref(1.0);
+const font_size = ref(GLOBAL_WIDTH * watermark_WH_ratio.value);
+
+const font_size_device_px = ref(font_size.value * 0.25 + "px");
+const font_size_focus_px = ref(font_size.value * 0.20 + "px");
+const font_size_datetime_px = ref(font_size.value * 0.18 + "px");
+
+const device_x_shift = ref(GLOBAL_WIDTH * 0.03 + "px");
+// const watermark_WH_ratio_px = ref()
+const st_line_y_shift = ref(watermark_text_h_scale.value / 2 * 100 + "%");
+const focus_length_text_x = ref((position_ratio.value + split_line_spacing.value / GLOBAL_WIDTH) * 100 + "%");
+const datetime_scale_px = ref(datetime_scale.value * 100 + "%");
+const logo_y_ratio_px = ref((1 - logo_ratio.value) / 2 * 100 + "%");
+const logo_x_ratio_px = ref((1 - position_ratio.value + split_line_spacing.value / GLOBAL_WIDTH) * 100 + "%");
+const logo_width_px = ref(GLOBAL_WIDTH * watermark_WH_ratio.value * logo_ratio.value + "px");
+const logo_spacing_ratio_px = ref(logo_spacing_ratio.value * 100 + "%");
+const position_ratio_px = ref(position_ratio.value * 100 + "%");
+const split_line_spacing_px = ref(position_ratio.value * 100 + "%");
+const split_line_height = ref((1 - watermark_text_h_scale.value) * 100 + "%");
+const font_scale_px = ref(font_scale.value * 100 + "%");
+
+const camera_color = ref("#4A4A4A");
+const focus_color = ref("#4A4A4A");
+const datetime_color = ref("#4A4A4A");
+const splite_line_color = ref("#4A4A4A");
+const cusstyle = ref(
+  {
+    "background-color": "#757575",
+    width: "100%",
+    height: GLOBAL_WIDTH * watermark_WH_ratio.value + "px",
+  }
+)
+const font_path = ref("");
+
+async function get_font_path() {
+  const r1 = await resourceDir();
+  const _r2 = await resolve(r1, "resources", "OPPOSans-H.ttf");
+  console.log(_r2);
+  font_path.value = new URL(_r2, import.meta.url).toString();
+}
+
+function WH_ratio(value: Arrayable<number>) {
+  // console.log(value);
+  value = value as number
+  const font_size = GLOBAL_WIDTH * value;
+  font_size_device_px.value = font_size * 0.25 + "px";
+  font_size_focus_px.value = font_size * 0.20 + "px";
+  font_size_datetime_px.value = font_size * 0.18 + "px";
+  logo_width_px.value = GLOBAL_WIDTH * value * logo_ratio.value + "px";
+  cusstyle.value.height = GLOBAL_WIDTH * value + "px";
+}
+
+function _text_h_scale(value: Arrayable<number>) {
+  value = value as number;
+  st_line_y_shift.value = value / 2 * 100 + "%";
+  split_line_height.value = (1 - value) * 100 + "%";
+}
+
+function datetime_scale_f(value: Arrayable<number>) {
+  value = value as number;
+  datetime_scale_px.value = value * 100 + "%";
+}
+
+function logo_ratio_f(value: Arrayable<number>) {
+  value = value as number;
+  logo_y_ratio_px.value = (1 - value) / 2 * 100 + "%";
+  logo_width_px.value = GLOBAL_WIDTH * watermark_WH_ratio.value * logo_ratio.value + "px";
+}
+
+function position_ratio_f(value: Arrayable<number>) {
+  value = value as number;
+  focus_length_text_x.value = (value + split_line_spacing.value / GLOBAL_WIDTH) * 100 + "%";
+  logo_x_ratio_px.value = (1 - value + split_line_spacing.value / GLOBAL_WIDTH) * 100 + "%";
+  position_ratio_px.value = value * 100 + "%";
+  split_line_spacing_px.value = value * 100 + "%";
+}
+
+function split_line_spacing_f(value: Arrayable<number>) {
+  value = value as number;
+  focus_length_text_x.value = (position_ratio.value + value / GLOBAL_WIDTH) * 100 + "%";
+  logo_x_ratio_px.value = (1 - position_ratio.value + value / GLOBAL_WIDTH) * 100 + "%";
+}
+
+onMounted(() => {
+  get_font_path();
+  console.log(cusstyle.value.height);
+  // setTimeout(() => {
+  //    // invalid: sacale.value = 0.2;
+  //   // valid
+  //   let con = document.getElementById('banner') as HTMLElement ;
+  //   con.style.height =  GLOBAL_WIDTH * watermark_WH_ratio.value + "px";
+  // }, 3000);
+})
+
+
+
+</script>
+
 <style scoped>
+/* @import "../../src-tauri/resources/OPPOSans-H.ttf"; */
+@font-face {
+  font-family: OPPOSans-H;
+  src: v-bind(font_path);
+}
+
+.banner {
+  /*unuse*/
+  background-color: rgb(90, 87, 87);
+  width: 100%,
+    /* height: v-bind(), */
+
+}
+
+.logo {
+  width: v-bind(logo_width_px);
+  height: v-bind(logo_width_px);
+  background-color: rgb(0, 136, 255);
+  position: absolute;
+  right: v-bind(logo_x_ratio_px);
+  top: v-bind(logo_y_ratio_px);
+
+}
+
+.split-line {
+  width: 2px;
+  height: v-bind(split_line_height);
+  background-color: rgb(237, 233, 40);
+  position: absolute;
+  left: v-bind(split_line_spacing_px);
+  top: v-bind(st_line_y_shift);
+}
+
 .container {
-  width: 882px;
+  /* border: 1px solid rgb(8, 210, 255); */
+  font-family: 'OPPOSans-H';
+  width: v-bind(GLOBAL_WIDTH_PX);
   position: relative;
   text-align: center;
-  color: white;
+  color: rgb(255, 255, 255);
+  margin: 0px;
+  /* box-shadow: 0 0 10px rgb(79, 223, 255); */
+  /* font-size: v-bind(font_size_px); */
+}
+
+.model-device {
+  position: absolute;
+  top: v-bind(st_line_y_shift);
+  left: v-bind(device_x_shift);
+  font-size: v-bind(font_size_device_px);
 }
 
 .inter-content {
   position: absolute;
-  bottom: 60%;
-  left: 67%;
+  top: v-bind(st_line_y_shift);
+  left: v-bind(focus_length_text_x);
+  font-size: v-bind(font_size_focus_px);
 }
-.model-device {
-  position: absolute;
-  bottom: 60%;
-  left: 5%;
-}
+
 .date-time {
   position: absolute;
-  bottom: 20%;
-  left: 67%;
+  top: v-bind(datetime_scale_px);
+  left: v-bind(focus_length_text_x);
+  font-size: v-bind(font_size_datetime_px);
 }
 
 .demo-image__placeholder .block {
@@ -140,8 +354,9 @@ onMounted(() => {
   width: 100%;
   box-sizing: border-box;
   vertical-align: top;
-  max-width: 882px;
-  max-height: auto;
+  max-width: v-bind(GLOBAL_WIDTH_PX);
+  max-height: 500px;
+  /* TODO auto */
 }
 
 .demo-image__placeholder .demonstration {
@@ -170,5 +385,15 @@ onMounted(() => {
 .demo-image__placeholder .dot {
   animation: dot 2s infinite steps(3, start);
   overflow: hidden;
+}
+
+.el-popper.is-customized {
+  /* Set padding to ensure the height is 32px */
+  padding: 6px 12px;
+  background: linear-gradient(90deg, rgb(159, 229, 151), rgb(204, 229, 129));
+}
+.el-popper.is-customized .el-popper__arrow::before {
+  background: linear-gradient(45deg, #b2e68d, #bce689);
+  right: 0;
 }
 </style>
