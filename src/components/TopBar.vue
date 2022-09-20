@@ -184,7 +184,7 @@ async function process_image() {
   image_progress.isHandling = true
 };
 
-
+const handleStatus = ref(false)
 function get_image_url(value: string) {
   let ap = convertFileSrc(value);
   console.log(ap);
@@ -285,7 +285,7 @@ watch([() => image_progress.count.completed, () => image_progress.count.total], 
     to: toData,
     animated: true,
   });
-  if (image_progress.isHandling && getProgress(newValue[0], newValue[1]) === 100) {
+  if (image_progress.isHandling && getProgress(newValue[0], newValue[1]) === 100 ) {
     image_progress.isHandling = false
   }
   // test
@@ -379,7 +379,7 @@ nextTick(() => {
     </el-col>
     <el-col :span="6" class="right">
       <div class="previewer" v-if="bigIcon">
-        <el-button @click="process_image" color="#de4781" size="" round :loading="image_progress.isHandling">开始处理
+        <el-button @click="process_image" color="#de4781" size="" round :loading="image_progress.isHandling" :disabled="handleStatus">开始处理
         </el-button>
 
       </div>
