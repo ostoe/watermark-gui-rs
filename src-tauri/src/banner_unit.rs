@@ -48,16 +48,22 @@ pub enum UserSetting {
     Style(WaterMarkStyle)
 }
 
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct WaterMarkStyle {
-     pub watermark_ratio: f32,
-     #[allow(non_snake_case)]
-     pub watermark_scale: f32,
+     pub watermark_wh_ratio: f32,
+     pub watermark_text_h_scale: f32,
      pub logo_ratio: f32,
-     pub logo_spacing_ratio: f32,
+    //  pub logo_spacing_ratio: f32,
      pub position_ratio: f32,
      pub split_line_spacing: u32,
-     pub font_path: String,
+    //  pub font_path: String,
      pub font_scale: f32,
+     pub datetime_posi_percent: f32,
+     pub camera_color: String,
+     pub focus_color: String,
+     pub datetime_color: String,
+     pub  splite_line_color : String,
+     pub banner_bg_color : String,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
