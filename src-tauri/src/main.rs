@@ -4,7 +4,7 @@
 )]
 // #[macro_use]
 extern crate log;
-use app::banner_unit::{ImagesPathFromFront, Notification, UserOperation, UserSettingsJson, UserSetting};
+use app::banner_unit::{ImagesPathFromFront, Notification, UserOperation, UserSettingsJson, UserSetting, WaterMarkStyle};
 use app::image_handle::control_center_thread;
 // use app::image_processing;
 use app::notify_center::{ notification_thread, windows_send_msg};
@@ -57,6 +57,7 @@ fn main() {
             handle_front_select_files,
             handle_front_update_key,
             handle_front_update_user_data,
+            handle_front_update_senior_data,
             handle_front_select_dir,
             greet,
             send_event
@@ -185,6 +186,15 @@ fn handle_front_update_key(
     }
     return format!("error key.");
 }
+#[tauri::command]
+fn handle_front_update_senior_data(
+    user_data: WaterMarkStyle,
+    state: State<crossbeam_channel::Sender<UserOperation>>,
+) -> String {
+    state.send(UserOperation::Update(UserSetting::Style(user_data))).unwrap();
+    return format!(" seniorda ta..");
+}
+
 
 #[tauri::command]
 fn handle_front_update_user_data(

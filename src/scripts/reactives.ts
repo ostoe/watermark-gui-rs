@@ -55,12 +55,37 @@ interface ImageProps {
   count: number;
 }
 
-interface UserSettings {
+interface UserBaseSettings {
+  qulity: number,
+  autoUseBrand: boolean,
+  brand: string,
+  renameSuffix: string,
+  renamePreffix: string,
+  renameCenter: string,
+  brands: Array<{ value: string, label: string }>,
+}
+
+interface UserSendSettings {
   output_dir: string,
   qulity: number,
   auto_user_brand: boolean,
   brand: string,
   filename_pattern: Array<string>,
+}
+
+interface UserSeniorSettings {
+  watermark_WH_ratio: number,
+  watermark_text_h_scale: number,
+  datetime_posi_percent: number
+  logo_ratio: number
+  position_ratio: number
+  split_line_spacing: number
+  font_scale: number
+  camera_color: string,
+ focus_color: string,
+ datetime_color: string,
+ splite_line_color : string,
+ bannerBG_color : string,
 }
 
 type RenameType = {
@@ -95,6 +120,7 @@ type UserDataType = {
   renameSuffix: string,
   renamePreffix: string,
   renameCenter: string,
+  seniorSettings: UserSeniorSettings,
 }
 
 const user_conf = reactive({
@@ -109,6 +135,7 @@ const user_conf = reactive({
   renamePreffix: "",
   renameCenter: "",
   user_conf_path: "",
+  seniorSettings: {} as UserSeniorSettings,
   brands: [{ value: 'canon', label: "佳能" }, { value: 'nikon', label: "尼康" }, { value: 'sony', label: "索尼" },
   { value: "panasonic", label: "松下" }, { value: "fujifilm", label: "富士" }],
 
@@ -127,7 +154,7 @@ const user_conf = reactive({
     } else {
       // console.log("kong1");
       let user_data_load: UserDataType = JSON.parse(contents);
-      // console.log(user_data_load);
+      console.log(user_data_load);
       // let entries = Object.entries(user_data);
       // for (let i=0; i < entries.length; i++) {
       //   let key = entries[i][0]
@@ -145,9 +172,11 @@ const user_conf = reactive({
         user_data_load.outputPathHistory.push({value: pic_path});
       }
       this.B2A(user_conf, user_data_load);
-      
+      if ( user_data_load["seniorSettings"] == null || Object.keys(user_data_load["seniorSettings"]).length == 0) {
+          console.log("init senior settings...");
+      }
       // user_conf.update_user_data2BD("output_dir", pictureDirPath);
-      let update_data_send: UserSettings = {
+      let update_data_send: UserSendSettings = {
         output_dir: this.latestSelectedOutputPath,
         qulity: this.qulity,
         auto_user_brand: this.autoUseBrand,
@@ -166,24 +195,54 @@ const user_conf = reactive({
   // A.* <-- B.*
   B2A(A: UserDataType, B: UserDataType) {
     const properties = ["autoUseBrand", "brand", "font", "latestSelectedDirPath",
-      "latestSelectedOutputPath", "outputPathHistory", "qulity", "brands", "renameSuffix", "renamePreffix", "renameCenter"]
+      "latestSelectedOutputPath", "outputPathHistory", "qulity", "brands", "renameSuffix", "renamePreffix", "renameCenter", "seniorSettings"]
     properties.forEach((ele) => {
-      if (B[ele] != null || B[ele] == "") {
+      if (B[ele] != null && B[ele] != "" ) { // || Object.keys(B[ele]).length == 0
         A[ele] = B[ele];
       }
     });
   },
 
-  async save_user_conf(baseForm: UserDataType) {
+  load_base_setting_B2A(A: UserBaseSettings | UserDataType, B: UserBaseSettings | UserDataType) {
+    const properties = ["autoUseBrand", "brand", "qulity", "brands", "renameSuffix", "renamePreffix", "renameCenter"]
+    properties.forEach((ele) => {
+      if (B[ele] != null && B[ele] != "" ) { // || Object.keys(B[ele]).length == 0
+        A[ele] = B[ele];
+      }
+    });
+  },
+
+
+  load_senior_settings_B2A(A: UserSeniorSettings | UserDataType, B: UserSeniorSettings | UserDataType) {
+    // const properties = ["autoUseBrand", "brand", "qulity", "brands", "renameSuffix", "renamePreffix", "renameCenter"];
+    Object.keys(B).forEach((ele) => {
+      if (B[ele] != null && B[ele] != "" ) { // || Object.keys(B[ele]).length == 0
+        A[ele] = B[ele];
+      }
+    });
+  },
+
+  async save_user_conf(baseForm: UserBaseSettings, user_data: UserSendSettings) {
+
     let user_save: UserDataType = new Object as UserDataType;
-    this.B2A(user_save, baseForm);
-    this.B2A(user_conf, baseForm);
+    this.load_base_setting_B2A(this, baseForm);
+    this.B2A(user_save, this);
     let json_contents = JSON.stringify(user_save, null, 4);
+    // send banckend 
+    let res: string = await invoke("handle_front_update_user_data", { userData: user_data });
+    elmessage(res);
     await fs.writeTextFile(this.user_conf_path, json_contents);
   },
 
-  load_conf(baseForm: UserDataType) {
-    this.B2A(baseForm, user_conf);
+  async save_senior_settings(form: UserSeniorSettings) {
+    let res: string = await invoke("handle_front_update_senior_data", { userData: form });
+    elmessage(res);
+    this.load_senior_settings_B2A(this.seniorSettings, form);
+    let user_save: UserDataType = new Object as UserDataType;
+    this.B2A(user_save, this);
+    let json_contents = JSON.stringify(user_save, null, 4);
+    await fs.writeTextFile(this.user_conf_path, json_contents);
+
   },
 
   async selectOutputDirs() {
@@ -526,5 +585,5 @@ drag_event_handle();
 // })
 
 export { image_progress, sidebarReactives, previewwidget, elmessage, user_conf , is_dir};
-export type { UserDataType, UserSettings, RenameType };
+export type { UserDataType, UserSendSettings, RenameType, UserBaseSettings, UserSeniorSettings };
 

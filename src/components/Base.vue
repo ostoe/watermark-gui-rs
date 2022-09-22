@@ -9,7 +9,7 @@
       <el-col :span="14">
         <el-tooltip :content="'选择' + (selectType ? '文件' : '文件夹')" placement="bottom-end" effect="light">
           <el-button v-if="selectType" @click="image_progress.selectFiles()"
-            style="margin-left:20px; margin-right: 5px;">选择</el-button>
+            style="margin-left:20px; margin-right: 5px;"> 选择 </el-button>
           <el-button v-else @click="image_progress.selectDirs()">选择</el-button>
         </el-tooltip>
         <el-tooltip :content="'输入模式：' + (selectType ? '文件' : '文件夹')" placement="bottom-end" effect="light">
@@ -19,6 +19,9 @@
       </el-col>
       <el-col :span="10">
         <el-row>
+          <el-col :span="10">
+            <el-button @click="user_conf.selectOutputDirs()">输出目录</el-button>
+          </el-col>
           <el-col :span="14">
             <el-autocomplete v-model="inputDir" class="inline-input w-50" size="default" placeholder="Please Input"
               :fetch-suggestions="querySearch" @change="input_value_change" @select="handleSelect">
@@ -32,9 +35,7 @@
               </template>
             </el-autocomplete>
           </el-col>
-          <el-col :span="10">
-            <el-button @click="user_conf.selectOutputDirs()">输出目录</el-button>
-          </el-col>
+
         </el-row>
       </el-col>
     </el-row>
@@ -45,7 +46,7 @@
             <div class="demo-image__placeholder">
               <div class="block">
                 <!-- <span class="demonstration">Custom</span> -->
-                <el-image :src="src" fit="fill">
+                <el-image :src="src" fit="contain">
                   <template #placeholder>
                     <div class="image-slot">Loading<span class="dot">...</span></div>
                   </template>
@@ -53,17 +54,18 @@
                 </el-image>
               </div>
             </div>
-            <div class="model">
-              <div id="banner" :style="cusstyle"></div>
-              <!-- <img :src="src" alt="Snow" style="width:100%;">
-        <div background="#887863" style="width:100%;"></div> -->
-              <!-- <div class="logo"></div>
-            <div class="split-line"></div>
-            <div class="model-device">Nikon ZFC</div>
-            <div class="date-time">2030:05:10 14:31:33</div>
-            <div class="inter-content">50mm f/1.8 1/2500 ISO 2000</div>
-            <div class="model-device">Nikon ZFC</div> -->
-              <div class="wrapper">
+            <div class="container">
+              <div id="banner" :style="cusstyle">
+                <div class="logo"></div>
+              <div class="split-line"></div>
+              <div class="model-device">Nikon ZFC</div>
+              <div class="date-time">2030:05:10 14:31:33</div>
+              <div class="inter-content">50mm f/1.8 1/2500s ISO 2000</div>
+              </div>
+              <!-- <div background="#887863" style="width:100%;"></div> -->
+             
+              <!-- <div class="model-device">Nikon ZFC</div> -->
+              <!-- <div class="wrapper">
                 <div class="detail">
                   <div class="logo"></div>
                   <div class="divider"></div>
@@ -72,19 +74,19 @@
                     <div class="inter-content">50mm f/1.8 iso 2000</div>
                   </div>
                 </div>
-              </div>
+              </div> -->
 
             </div>
 
           </el-col>
-          <el-col :span="5" style="align-items: center;">
+          <el-col :span="4" style="align-items: center; margin: 0 1% 0 1%;">
 
             <el-row style="margin-bottom: 2px;"><span class="demonstration">banner长宽比例：</span></el-row>
             <el-row>
-              <el-col :span="14">
+              <el-col :span="12">
                 <el-slider v-model="watermark_WH_ratio" :step="0.001" :min="0.01" :max="0.5" @input="WH_ratio" />
               </el-col>
-              <el-col :span="10">
+              <el-col :span="12">
                 <el-input-number v-model="watermark_WH_ratio" controls-position="right" size="default"
                   @change="WH_ratio" :step="0.001" :min="0.01" :max="0.5"></el-input-number>
               </el-col>
@@ -105,11 +107,11 @@
             <el-row style="margin-bottom: 2px;"><span class="demonstration">第二水平线</span></el-row>
             <el-row>
               <el-col :span="12">
-                <el-slider v-model="datetime_scale" :step="0.001" :min="0.2" :max="1.0" @input="datetime_scale_f" />
+                <el-slider v-model="datetime_posi_percent" :step="0.001" :min="0.2" :max="1.0" @input="datetime_posi_percent_f" />
               </el-col>
               <el-col :span="12">
-                <el-input-number v-model="datetime_scale" :step="0.001" :min="0.2" :max="1.0" controls-position="right"
-                  size="default" @change="datetime_scale_f"></el-input-number>
+                <el-input-number v-model="datetime_posi_percent" :step="0.001" :min="0.2" :max="1.0" controls-position="right"
+                  size="default" @change="datetime_posi_percent_f"></el-input-number>
               </el-col>
             </el-row>
 
@@ -135,12 +137,22 @@
               </el-col>
             </el-row>
 
+            <el-row style="margin-bottom: 2px;"><span class="demonstration">字体比例</span></el-row>
+            <el-row>
+              <el-col :span="12">
+                <el-slider v-model="font_scale" :step="0.001" :min="0.2" :max="2.0" @input="font_scale_f" />
+              </el-col>
+              <el-col :span="12">
+                <el-input-number v-model="font_scale" :step="0.001" :min="0.2" :max="2.0" size="default"
+                  controls-position="right" @change="font_scale_f"></el-input-number>
+              </el-col>
+            </el-row>
+
             <el-row style="margin-bottom: 2px;">
               <el-tooltip content="不要随意修改此项，固定像素，\n当图片像素为2kw or 4kw时,\n间距距会变的很小" effect="customized">
                 <span>分割线边距（像素） <el-icon>
                     <i-ep-Warning />
                   </el-icon></span>
-
               </el-tooltip>
             </el-row>
             <el-row>
@@ -148,24 +160,41 @@
                 <el-slider v-model="split_line_spacing" :step="0.5" :min="1" :max="100" @input="split_line_spacing_f" />
               </el-col>
               <el-col :span="12">
-                <el-input v-model="split_line_spacing" :step="0.5" :min="1" :max="100" size="default"
-                  controls-position="right" @change="split_line_spacing_f"></el-input>
+                <el-input-number v-model="split_line_spacing" :step="0.5" :min="1" :max="100" size="default"
+                  controls-position="right" @change="split_line_spacing_f"></el-input-number>
               </el-col>
             </el-row>
 
-            <el-row style="margin-bottom: 2px;"><span class="demonstration">型号｜标注｜日期｜分隔线</span></el-row>
+            <el-row style="margin-bottom: 2px;"><span class="demonstration">背景｜型号｜标注｜日期｜分隔线</span></el-row>
             <el-row>
-              <el-col :span="6">
+              <el-col :span="4">
+                <el-color-picker v-model="bannerBG_color" />
+              </el-col>
+              <el-col :span="4">
                 <el-color-picker v-model="camera_color" />
               </el-col>
-              <el-col :span="6">
+              <el-col :span="4">
                 <el-color-picker v-model="focus_color" />
               </el-col>
-              <el-col :span="6">
+              <el-col :span="4">
                 <el-color-picker v-model="datetime_color" />
               </el-col>
-              <el-col :span="6">
+              <el-col :span="4">
                 <el-color-picker v-model="splite_line_color" />
+              </el-col>
+            </el-row>
+
+            <el-row style="margin-top:20px">
+              <el-col :span="12">
+                <el-popconfirm confirm-button-text="是" cancel-button-text="否" :icon="InfoFilled" icon-color="#626AEF"
+                  title="重置（仍未保存）" @confirm="resetConfirmEvent" @cancel="">
+                  <template #reference>
+                    <el-button type="primary" size="small" plain color="#0FCAC7" class="default-btn">默认</el-button>
+                  </template>
+                </el-popconfirm>
+              </el-col>
+              <el-col :span="12">
+                <el-button type="primary" size="large" @click="saveSetting" class="save-btn"> 保存 </el-button>
               </el-col>
             </el-row>
 
@@ -194,7 +223,7 @@
 // import { defineComponent, ref } from "vue";
 import { Files, FolderChecked } from '@element-plus/icons-vue'
 import { image_progress, previewwidget, user_conf, is_dir } from '../scripts/reactives';
-import { Calendar, Search, SuccessFilled, WarningFilled } from '@element-plus/icons-vue'
+import { Calendar, Search, SuccessFilled, WarningFilled, InfoFilled } from '@element-plus/icons-vue'
 import { sidebarReactives } from "../scripts/reactives";
 // import TextImageProcess from "./TextImageProcess.vue";
 // import sideBar from "./SideBar.vue";
@@ -203,7 +232,7 @@ import TopBar from "./TopBar.vue";
 // import BaseSettingsDrawerVue from "./BaseSettingsDrawerVue.vue";
 import PreviewWidget from "./PreviewWidget.vue";
 // import { image_progress } from "../scripts/reactives";
-import { elmessage } from "../scripts/reactives";
+import { elmessage, UserSeniorSettings } from "../scripts/reactives";
 import { resolve, resourceDir } from "@tauri-apps/api/path";
 import { Arrayable } from "element-plus/es/utils";
 // const pic = convertFileSrc("/Users/dongyifan/watermark-gui-rs/src/assets/20220807-_DSC0279-3.jpg")
@@ -219,44 +248,45 @@ function test_pro() {
 const selectType = ref(true);
 
 // const src = new URL("../assets/test.jpeg", import.meta.url).toString();
-const src =
-  'https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg'
+const src = 'https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg'
 
-const GLOBAL_WIDTH = 1024;
+const GLOBAL_WIDTH = 1024;  // 窗口缩放的时候，图片缩放了，但是横幅并未缩放。
 const GLOBAL_WIDTH_PX = ref(GLOBAL_WIDTH + "px");
 
 const watermark_WH_ratio = ref(Math.round((0.1172 * 0.8 + Number.EPSILON) * 10000000) / 10000000);
 const watermark_text_h_scale = ref(0.5); // <----watermark_scale
-const datetime_scale = ref(0.55);
+const datetime_posi_percent = ref(0.55);
 const logo_ratio = ref(0.70);
-const logo_spacing_ratio = ref(0.35);
+const logo_spacing_ratio = ref(0.35); // unused
 const position_ratio = ref(0.6267);
 const split_line_spacing = ref(30); // fixed 30 px.
 const font_scale = ref(1.0);
-const font_size = ref(GLOBAL_WIDTH * watermark_WH_ratio.value);
+const font_size = ref(0);
 
-const font_size_device_px = ref(font_size.value * 0.25 + "px");
-const font_size_focus_px = ref(font_size.value * 0.20 + "px");
-const font_size_datetime_px = ref(font_size.value * 0.18 + "px");
+const font_size_device_px = ref("10px");
+const font_size_focus_px = ref("10px");
+const font_size_datetime_px = ref("10px");
 
-const device_x_shift = ref(GLOBAL_WIDTH * 0.03 + "px");
+const device_x_shift = ref("10px");
 // const watermark_WH_ratio_px = ref()
-const st_line_y_shift = ref(watermark_text_h_scale.value / 2 * 100 + "%");
-const focus_length_text_x = ref((position_ratio.value + split_line_spacing.value / GLOBAL_WIDTH) * 100 + "%");
-const datetime_scale_px = ref(datetime_scale.value * 100 + "%");
-const logo_y_ratio_px = ref((1 - logo_ratio.value) / 2 * 100 + "%");
-const logo_x_ratio_px = ref((1 - position_ratio.value + split_line_spacing.value / GLOBAL_WIDTH) * 100 + "%");
-const logo_width_px = ref(GLOBAL_WIDTH * watermark_WH_ratio.value * logo_ratio.value + "px");
-const logo_spacing_ratio_px = ref(logo_spacing_ratio.value * 100 + "%");
-const position_ratio_px = ref(position_ratio.value * 100 + "%");
-const split_line_spacing_px = ref(position_ratio.value * 100 + "%");
-const split_line_height = ref((1 - watermark_text_h_scale.value) * 100 + "%");
-const font_scale_px = ref(font_scale.value * 100 + "%");
+const st_line_y_shift = ref("10%");
+// const st_line_y_shift_fixed = ref("10%");
+const focus_length_text_x = ref("10%");
+const datetime_posi_percent_px = ref("10%");
+const logo_y_ratio_px = ref("10%");
+const logo_x_ratio_px = ref("10%");
+const logo_width_px = ref("10px");
+const logo_spacing_ratio_px = ref("10%");
+const position_ratio_px = ref("10%");
+const split_line_spacing_px = ref("10%");
+const split_line_height = ref("10%");
+const font_scale_px = ref("10%");
 
 const camera_color = ref("#4A4A4A");
 const focus_color = ref("#4A4A4A");
 const datetime_color = ref("#4A4A4A");
 const splite_line_color = ref("#4A4A4A");
+const bannerBG_color = ref("#ffffff");
 const cusstyle = ref(
   {
     "background-color": "#757575",
@@ -286,13 +316,14 @@ function WH_ratio(value: Arrayable<number>) {
 
 function _text_h_scale(value: Arrayable<number>) {
   value = value as number;
-  st_line_y_shift.value = value / 2 * 100 + "%";
-  split_line_height.value = (1 - value) * 100 + "%";
+  st_line_y_shift.value = (1 - value) / 2 * font_scale.value * 100 + "%";
+  // st_line_y_shift_fixed.value = (1 - value) / 2 * font_scale.value * 100 - 2.0 + "%";
+  split_line_height.value = value * 100 + "%";
 }
 
-function datetime_scale_f(value: Arrayable<number>) {
+function datetime_posi_percent_f(value: Arrayable<number>) {
   value = value as number;
-  datetime_scale_px.value = value * 100 + "%";
+  datetime_posi_percent_px.value = value * 100 + "%";
 }
 
 function logo_ratio_f(value: Arrayable<number>) {
@@ -315,9 +346,77 @@ function split_line_spacing_f(value: Arrayable<number>) {
   logo_x_ratio_px.value = (1 - position_ratio.value + value / GLOBAL_WIDTH) * 100 + "%";
 }
 
+function font_scale_f(value: Arrayable<number>) {
+  value = value as number;
+  font_size_device_px.value = (font_size.value * value * 0.25 + "px");
+  font_size_focus_px.value = (font_size.value * value * 0.20 + "px");
+  font_size_datetime_px.value = (font_size.value * value * 0.18 + "px");
+}
+
+function resetConfirmEvent() {}
+
+function saveSetting() {
+  let sets = {
+    watermark_WH_ratio: watermark_WH_ratio.value,
+    watermark_text_h_scale: watermark_text_h_scale.value,
+    datetime_posi_percent: datetime_posi_percent.value,
+    logo_ratio: logo_ratio.value,
+    position_ratio: position_ratio.value,
+    split_line_spacing: split_line_spacing.value,
+    font_scale: font_scale.value,
+    camera_color: camera_color.value,
+    focus_color: focus_color.value,
+    datetime_color: datetime_color.value,
+    splite_line_color: splite_line_color.value,
+    bannerBG_color: bannerBG_color.value,
+  } as UserSeniorSettings
+  user_conf.save_senior_settings(sets);
+
+}
+
 onMounted(() => {
   get_font_path();
   console.log(cusstyle.value.height);
+  // init senior settings     begin----
+  watermark_WH_ratio.value = user_conf.seniorSettings.watermark_WH_ratio;
+  watermark_text_h_scale.value = user_conf.seniorSettings.watermark_text_h_scale;
+  datetime_posi_percent.value = user_conf.seniorSettings.datetime_posi_percent;
+  logo_ratio.value = user_conf.seniorSettings.logo_ratio;
+  position_ratio.value = user_conf.seniorSettings.position_ratio;
+  split_line_spacing.value = user_conf.seniorSettings.split_line_spacing;
+  font_scale.value = user_conf.seniorSettings.font_scale;
+
+  camera_color.value = user_conf.seniorSettings.camera_color;
+  focus_color.value = user_conf.seniorSettings.focus_color;
+  datetime_color.value = user_conf.seniorSettings.datetime_color;
+  splite_line_color.value = user_conf.seniorSettings.splite_line_color;
+  bannerBG_color.value = user_conf.seniorSettings.bannerBG_color;
+  // ------init senior settings end----
+  cusstyle.value.height = GLOBAL_WIDTH * watermark_WH_ratio.value + "px";
+  font_size.value = GLOBAL_WIDTH * watermark_WH_ratio.value;
+
+  font_size_device_px.value = font_size.value * font_scale.value * 0.25 + "px";
+  font_size_focus_px.value = font_size.value * font_scale.value * 0.20 + "px";
+  font_size_datetime_px.value = font_size.value * font_scale.value * 0.18 + "px";
+
+  device_x_shift.value = GLOBAL_WIDTH * 0.03 + "px";
+  //   watermark_WH_ratio_px .value = )
+  st_line_y_shift.value = (1 - watermark_text_h_scale.value) / 2 * 100 + "%";
+  // st_line_y_shift_fixed.value = (1 - watermark_text_h_scale.value) / 2 * 100 - 2.0 + "%";
+  focus_length_text_x.value = (position_ratio.value + split_line_spacing.value / GLOBAL_WIDTH) * 100 + "%";
+  datetime_posi_percent_px.value =  datetime_posi_percent.value * 100 - 1.0 + "%";
+  logo_y_ratio_px.value = (1 - logo_ratio.value) / 2 * 100 + "%";
+  logo_x_ratio_px.value = (1 - position_ratio.value + split_line_spacing.value / GLOBAL_WIDTH) * 100 + "%";
+  logo_width_px.value = GLOBAL_WIDTH * watermark_WH_ratio.value * logo_ratio.value + "px";
+  logo_spacing_ratio_px.value = logo_spacing_ratio.value * 100 + "%";
+  position_ratio_px.value = position_ratio.value * 100 + "%";
+  split_line_spacing_px.value = position_ratio.value * 100 + "%";
+  split_line_height.value = watermark_text_h_scale.value * 100 + "%";
+  font_scale_px.value = font_scale.value * 100 + "%";
+
+  // -------init data end ------
+  // console.log("111  ", font_size_device_px, font_size_focus_px, font_size_datetime_px);
+
   // setTimeout(() => {
   //    // invalid: sacale.value = 0.2;
   //   // valid
@@ -328,7 +427,9 @@ onMounted(() => {
 
 const inputInvalid = ref(true);
 const inputDir = ref(user_conf.latestSelectedOutputPath);
-
+watch([() => user_conf.latestSelectedOutputPath], (nv, ov) => {
+  inputDir.value = nv[0];
+});
 const querySearch = (queryString: string, cb: any) => {
   cb(user_conf.outputPathHistory);
 }
@@ -404,22 +505,31 @@ const getMaxHeight = computed(() => {
 }
 
 .container {
+  display: block;
+  /* font-display:calc(); */
   /* border: 1px solid rgb(8, 210, 255); */
   font-family: 'OPPOSans-H';
-  width: v-bind(GLOBAL_WIDTH_PX);
+  max-width: v-bind(GLOBAL_WIDTH_PX);
   position: relative;
   text-align: center;
   color: rgb(255, 255, 255);
   margin: 0px;
+  /* max-width: v-bind(GLOBAL_WIDTH_PX); */
+  position: relative;
+  ;
   /* box-shadow: 0 0 10px rgb(79, 223, 255); */
   /* font-size: v-bind(font_size_px); */
 }
 
 .model-device {
+  /* display: flex; */
+  vertical-align: top;
+  width: auto;
   position: absolute;
   top: v-bind(st_line_y_shift);
   left: v-bind(device_x_shift);
   font-size: v-bind(font_size_device_px);
+  line-height: v-bind(font_size_device_px);
 }
 
 .inter-content {
@@ -427,22 +537,19 @@ const getMaxHeight = computed(() => {
   top: v-bind(st_line_y_shift);
   left: v-bind(focus_length_text_x);
   font-size: v-bind(font_size_focus_px);
+  line-height: v-bind(font_size_focus_px);
 }
 
 .date-time {
+  /* display: flex; */
   position: absolute;
-  top: v-bind(datetime_scale_px);
+  top: v-bind(datetime_posi_percent_px);
   left: v-bind(focus_length_text_x);
   font-size: v-bind(font_size_datetime_px);
+  line-height: v-bind(font_size_datetime_px);
 }
 
-.date-time {
-  position: absolute;
-  top: v-bind(datetime_scale_px);
-  left: v-bind(focus_length_text_x);
-  font-size: v-bind(font_size_datetime_px);
-}
-
+ /* --------------------------------------------------------- */
 .demo-image__placeholder .block {
   position: relative;
   padding: 0px 0;
@@ -453,7 +560,7 @@ const getMaxHeight = computed(() => {
   box-sizing: border-box;
   vertical-align: top;
   max-width: v-bind(GLOBAL_WIDTH_PX);
-  max-height: 500px;
+  max-height: 300px;
   /* TODO auto */
 }
 

@@ -8,7 +8,7 @@ import { invoke } from '@tauri-apps/api';
 import { convertFileSrc } from '@tauri-apps/api/tauri';
 import { appDir, configDir, homeDir, localDataDir, logDir, resourceDir, fontDir } from '@tauri-apps/api/path';
 import { ElMessage, ElNotification } from "element-plus";
-import baseSettingsDrawer from "./baseSettingsDrawer.vue";
+import BaseSettingsDrawer from "./BaseSettingsDrawer.vue";
 import WaveProgress, { drawCarbo, drawCircle, drawText } from "../scripts/wave-progress-plugin";
 import { objectPick } from '@vueuse/shared';
 import { Calendar, Search, SuccessFilled, WarningFilled } from '@element-plus/icons-vue'
@@ -296,9 +296,6 @@ watch([() => image_progress.count.completed, () => image_progress.count.total], 
   })
 })
 
-watch([() => user_conf.latestSelectedOutputPath], (nv, ov) => {
-  inputDir.value = nv[0];
-})
 
 nextTick(() => {
   //   const ctx = document.getElementById("waveProgress")!.getContext('2d')
@@ -389,7 +386,7 @@ nextTick(() => {
         </el-icon>
       </div>
       <div class="options" @click="showDrawTable">
-        <baseSettingsDrawer></baseSettingsDrawer>
+        <BaseSettingsDrawer></BaseSettingsDrawer>
       </div>
     </el-col>
   </el-row>

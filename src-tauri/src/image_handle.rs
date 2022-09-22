@@ -36,8 +36,9 @@ pub fn control_center_thread(
         let mut watermark_ratio = 0.1172f32 * 0.8;
         #[allow(non_snake_case)]
         let mut WATERMARK_SCALE = 0.50;
+        let mut datetime_posi_percent = 0.55;
         let mut logo_ratio = 0.70f32;
-        let mut logo_spacing_ratio = 0.35f32; // if nokon logo should 1
+        let logo_spacing_ratio = 0.35f32; // if nokon logo should 1
         let mut position_ratio = 0.6267f32;
         let mut split_line_spacing = 30u32; // px doubel = 10
 
@@ -122,13 +123,14 @@ pub fn control_center_thread(
                     }
                     UserSetting::Style(s) => {
                         logo_ratio = s.logo_ratio;
-                        logo_spacing_ratio = s.logo_spacing_ratio;
+                        // logo_spacing_ratio = s.logo_spacing_ratio;
+                        datetime_posi_percent = s.datetime_posi_percent;  
                         position_ratio = s.position_ratio;
-                        WATERMARK_SCALE = s.watermark_scale;
-                        watermark_ratio = s.watermark_ratio;
+                        WATERMARK_SCALE = s.watermark_text_h_scale;
+                        watermark_ratio = s.watermark_WH_ratio;
                         split_line_spacing = s.split_line_spacing;
                         font_scale = s.font_scale;
-                        // TODO font
+                        // TODO font and corlor
                     }
                     
                 },
@@ -192,6 +194,7 @@ pub fn control_center_thread(
                             tmp_logo_spacing_ratio,
                             position_ratio,
                             logo_ratio,
+                            datetime_posi_percent,
                             split_line_spacing,
                             &index.to_string(),
                             &filename_pattern,

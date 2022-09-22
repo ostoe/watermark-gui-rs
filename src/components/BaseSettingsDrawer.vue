@@ -5,7 +5,7 @@ import { convertFileSrc } from '@tauri-apps/api/tauri';
 // import { reactive, ref } from 'vue'
 //   import { ElDrawer, ElMessageBox } from 'unp'
 import { invoke } from '@tauri-apps/api';
-import { user_conf, UserDataType, UserSettings, RenameType } from '../scripts/reactives'
+import { user_conf, UserDataType, UserSendSettings, RenameType, UserBaseSettings } from '../scripts/reactives'
 import { elmessage } from '../scripts/reactives';
 import { Ref } from 'vue';
 import { InfoFilled } from '@element-plus/icons-vue';
@@ -140,32 +140,22 @@ function get_image_url(value: string) {
     return ap;
 }
 
-const baseForm: Ref<UserDataType> = ref({
+// 
+const baseForm: Ref<UserBaseSettings> = ref({
     qulity: 0,
-    latestSelectedDirPath: "",
-    latestSelectedOutputPath: "",
-    outputPathHistory: [],
     autoUseBrand: false,
     brand: "",
-    font: "",
     renameSuffix: "",
     renamePreffix: "",
     renameCenter: "",
     brands: [],
-
 })
 
 
 
 
 
-// interface UserSettings {
-//     output_dir: string,
-//     qulity: number,
-//     auto_user_brand: boolean,
-//     brand: string,
-//     filename_pattern: Array<string>,
-// }
+
 
 async function saveSetting() {
     if (renamePreffix.value.valid && renameCenter.value.valid && renameSuffix.value.valid) {
@@ -177,12 +167,9 @@ async function saveSetting() {
         if (renameSuffix.value.value.value != "") { filename_tmp[2] = baseForm.value.renameSuffix = renameSuffix.value.value.value + renameSuffix.value.input; }
         // console.log(filename_tmp);
         // output_dir: "" means backend not update "output_dir" key.
-        let user_data: UserSettings = { output_dir: "", qulity: baseForm.value.qulity, auto_user_brand: baseForm.value.autoUseBrand, brand: baseForm.value.brand, filename_pattern: filename_tmp };
+        let user_data: UserSendSettings = { output_dir: "", qulity: baseForm.value.qulity, auto_user_brand: baseForm.value.autoUseBrand, brand: baseForm.value.brand, filename_pattern: filename_tmp };
         //   console.log(user_data);
-        let res: string = await invoke("handle_front_update_user_data", { userData: user_data });
-        user_conf.save_user_conf(baseForm.value);
-
-        elmessage(res);
+        user_conf.save_user_conf(baseForm.value, user_data);
     } else {
         ElMessage({
             showClose: true,
@@ -193,8 +180,8 @@ async function saveSetting() {
 
 }
 
-function init_saved_conf() {
-    user_conf.B2A(baseForm.value, user_conf);
+function load_saved_conf() {
+    user_conf.load_base_setting_B2A(baseForm.value, user_conf);
     // parse __custom__
     // prefix
     if (baseForm.value.renamePreffix == "") {
@@ -228,8 +215,6 @@ function init_saved_conf() {
     check_input(renamePreffix, 0);
     check_input(renameCenter, 1);
     check_input(renameSuffix, 2);
-
-
 }
 
 
@@ -254,8 +239,8 @@ function menuHidden() {
 }
 
 function loadDrawer() {
-    user_conf.load_conf(baseForm.value);
     settingsDrawer.value = true
+    load_saved_conf();
 }
 
 function settingShow() {
@@ -282,7 +267,7 @@ async function get_image_src_patten() {
 
 onMounted(() => {
     get_image_src_patten();
-    init_saved_conf();
+    load_saved_conf();
 })
 
 </script>
@@ -292,8 +277,8 @@ onMounted(() => {
     <div @mouseenter="menuShow" @mouseleave="menuHidden">
         <!-- <el-button @click="loadDrawer" type="primary" color="#3f8418" plain> -->
         <div @click="loadDrawer">
-            <el-icon>
-                <i-ep-d-arrow-left />
+            <el-icon size="large">
+                <i-ep-setting />
             </el-icon>
         </div>
         <!-- </el-button> -->

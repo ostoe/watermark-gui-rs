@@ -62,7 +62,7 @@ pub fn process_single_image(img_path: &str, output_path: &str,  font: &Font, fon
     exif_map: HashMap::<ExifTag, String>, 
     qulity: u8, watermark_ratio: f32, watermark_scale: f32, logo_spacing_ratio: f32, 
     position_ratio: f32,
-    logo_ratio: f32, split_line_spacing: u32, index: &str, file_pattern: &[String; 3]
+    logo_ratio: f32, datetime_posi_percent: f32 ,split_line_spacing: u32, index: &str, file_pattern: &[String; 3]
         ) -> image::ImageResult<()> {
     // convert to BannerStruct to draw..
     //
@@ -137,7 +137,7 @@ pub fn process_single_image(img_path: &str, output_path: &str,  font: &Font, fon
 
     // text 
     let first_text_y =  line_shift_h  as u32 + h;
-    let second_text_y =     h + ((banner_h as f32 * 0.55) as u32); // TODO ????
+    let second_text_y =     h + ((banner_h as f32 * datetime_posi_percent) as u32); // TODO ????
     let second_text_x =     (w as f32 * position_ratio) as u32 + split_line_spacing;
     let texts = vec![
         ( camera_device, banner_h * 0.25 ,((w as f32 * 0.03) as u32, first_text_y), font_scale, &font, Rgba([0u8, 0u8, 0u8, 0])),  // brand
