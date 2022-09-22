@@ -8,8 +8,7 @@
     <el-row>
       <el-col :span="14">
         <el-tooltip :content="'选择' + (selectType ? '文件' : '文件夹')" placement="bottom-end" effect="light">
-          <el-button v-if="selectType" @click="image_progress.selectFiles()"
-            style="margin-left:20px; margin-right: 5px;"> 选择 </el-button>
+          <el-button v-if="selectType" @click="image_progress.selectFiles()" style="margin-left:20px; margin-right: 5px;"> 选择 </el-button>
           <el-button v-else @click="image_progress.selectDirs()">选择</el-button>
         </el-tooltip>
         <el-tooltip :content="'输入模式：' + (selectType ? '文件' : '文件夹')" placement="bottom-end" effect="light">
@@ -84,11 +83,11 @@
             <el-row style="margin-bottom: 2px;"><span class="demonstration">banner长宽比例：</span></el-row>
             <el-row>
               <el-col :span="12">
-                <el-slider v-model="watermark_WH_ratio" :step="0.001" :min="0.01" :max="0.5" @input="WH_ratio" />
+                <el-slider v-model="watermark_wh_ratio" :step="0.001" :min="0.01" :max="0.5" @input="_wh_ratio_f" />
               </el-col>
               <el-col :span="12">
-                <el-input-number v-model="watermark_WH_ratio" controls-position="right" size="default"
-                  @change="WH_ratio" :step="0.001" :min="0.01" :max="0.5"></el-input-number>
+                <el-input-number v-model="watermark_wh_ratio" controls-position="right" size="default"
+                  @change="_wh_ratio_f" :step="0.001" :min="0.01" :max="0.5"></el-input-number>
               </el-col>
             </el-row>
 
@@ -168,7 +167,7 @@
             <el-row style="margin-bottom: 2px;"><span class="demonstration">背景｜型号｜标注｜日期｜分隔线</span></el-row>
             <el-row>
               <el-col :span="4">
-                <el-color-picker v-model="bannerBG_color" />
+                <el-color-picker v-model="banner_bg_color" />
               </el-col>
               <el-col :span="4">
                 <el-color-picker v-model="camera_color" />
@@ -235,6 +234,8 @@ import PreviewWidget from "./PreviewWidget.vue";
 import { elmessage, UserSeniorSettings } from "../scripts/reactives";
 import { resolve, resourceDir } from "@tauri-apps/api/path";
 import { Arrayable } from "element-plus/es/utils";
+import { StyleValue } from 'vue';
+import { convertFileSrc } from '@tauri-apps/api/tauri';
 // const pic = convertFileSrc("/Users/dongyifan/watermark-gui-rs/src/assets/20220807-_DSC0279-3.jpg")
 // const tags = await ExifReader.load(pic);
 // console.log(`output->tags`,tags)
@@ -253,7 +254,7 @@ const src = 'https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jp
 const GLOBAL_WIDTH = 1024;  // 窗口缩放的时候，图片缩放了，但是横幅并未缩放。
 const GLOBAL_WIDTH_PX = ref(GLOBAL_WIDTH + "px");
 
-const watermark_WH_ratio = ref(Math.round((0.1172 * 0.8 + Number.EPSILON) * 10000000) / 10000000);
+const watermark_wh_ratio = ref(Math.round((0.1172 * 0.8 + Number.EPSILON) * 10000000) / 10000000);
 const watermark_text_h_scale = ref(0.5); // <----watermark_scale
 const datetime_posi_percent = ref(0.55);
 const logo_ratio = ref(0.70);
@@ -268,7 +269,7 @@ const font_size_focus_px = ref("10px");
 const font_size_datetime_px = ref("10px");
 
 const device_x_shift = ref("10px");
-// const watermark_WH_ratio_px = ref()
+// const watermark_wh_ratio_px = ref()
 const st_line_y_shift = ref("10%");
 // const st_line_y_shift_fixed = ref("10%");
 const focus_length_text_x = ref("10%");
@@ -286,12 +287,12 @@ const camera_color = ref("#4A4A4A");
 const focus_color = ref("#4A4A4A");
 const datetime_color = ref("#4A4A4A");
 const splite_line_color = ref("#4A4A4A");
-const bannerBG_color = ref("#ffffff");
+const banner_bg_color = ref("#ffffff");
 const cusstyle = ref(
   {
     "background-color": "#757575",
     width: "100%",
-    height: GLOBAL_WIDTH * watermark_WH_ratio.value + "px",
+    height: GLOBAL_WIDTH * watermark_wh_ratio.value + "px",
   }
 )
 const font_path = ref("");
@@ -299,11 +300,13 @@ const font_path = ref("");
 async function get_font_path() {
   const r1 = await resourceDir();
   const _r2 = await resolve(r1, "resources", "OPPOSans-H.ttf");
-  console.log(_r2);
-  font_path.value = new URL(_r2, import.meta.url).toString();
+  font_path.value = `url('${convertFileSrc(_r2)}') format('ttf')`;
+
+  // font_path.value = new URL(_r2, import.meta.url).toString();
+  console.log(_r2, font_path.value); // /usr....   http://local /user///
 }
 
-function WH_ratio(value: Arrayable<number>) {
+function _wh_ratio_f(value:  any){ // Arrayable<number>) {
   // console.log(value);
   value = value as number
   const font_size = GLOBAL_WIDTH * value;
@@ -314,25 +317,25 @@ function WH_ratio(value: Arrayable<number>) {
   cusstyle.value.height = GLOBAL_WIDTH * value + "px";
 }
 
-function _text_h_scale(value: Arrayable<number>) {
+function _text_h_scale(value:  any){ // Arrayable<number>) {
   value = value as number;
   st_line_y_shift.value = (1 - value) / 2 * font_scale.value * 100 + "%";
   // st_line_y_shift_fixed.value = (1 - value) / 2 * font_scale.value * 100 - 2.0 + "%";
   split_line_height.value = value * 100 + "%";
 }
 
-function datetime_posi_percent_f(value: Arrayable<number>) {
+function datetime_posi_percent_f(value:  any){ // Arrayable<number>) {
   value = value as number;
   datetime_posi_percent_px.value = value * 100 + "%";
 }
 
-function logo_ratio_f(value: Arrayable<number>) {
+function logo_ratio_f(value: any){ // Arrayable<number>) {
   value = value as number;
   logo_y_ratio_px.value = (1 - value) / 2 * 100 + "%";
-  logo_width_px.value = GLOBAL_WIDTH * watermark_WH_ratio.value * logo_ratio.value + "px";
+  logo_width_px.value = GLOBAL_WIDTH * watermark_wh_ratio.value * logo_ratio.value + "px";
 }
 
-function position_ratio_f(value: Arrayable<number>) {
+function position_ratio_f(value: any) {
   value = value as number;
   focus_length_text_x.value = (value + split_line_spacing.value / GLOBAL_WIDTH) * 100 + "%";
   logo_x_ratio_px.value = (1 - value + split_line_spacing.value / GLOBAL_WIDTH) * 100 + "%";
@@ -340,24 +343,64 @@ function position_ratio_f(value: Arrayable<number>) {
   split_line_spacing_px.value = value * 100 + "%";
 }
 
-function split_line_spacing_f(value: Arrayable<number>) {
+function split_line_spacing_f(value:  any){ // Arrayable<number>) {
   value = value as number;
   focus_length_text_x.value = (position_ratio.value + value / GLOBAL_WIDTH) * 100 + "%";
   logo_x_ratio_px.value = (1 - position_ratio.value + value / GLOBAL_WIDTH) * 100 + "%";
 }
 
-function font_scale_f(value: Arrayable<number>) {
+function font_scale_f(value:  any){ // Arrayable<number>) {
   value = value as number;
   font_size_device_px.value = (font_size.value * value * 0.25 + "px");
   font_size_focus_px.value = (font_size.value * value * 0.20 + "px");
   font_size_datetime_px.value = (font_size.value * value * 0.18 + "px");
 }
 
-function resetConfirmEvent() {}
+function update_px_from_value() {
+  cusstyle.value.height = GLOBAL_WIDTH * watermark_wh_ratio.value + "px";
+  font_size.value = GLOBAL_WIDTH * watermark_wh_ratio.value;
+
+  font_size_device_px.value = font_size.value * font_scale.value * 0.25 + "px";
+  font_size_focus_px.value = font_size.value * font_scale.value * 0.20 + "px";
+  font_size_datetime_px.value = font_size.value * font_scale.value * 0.18 + "px";
+
+  device_x_shift.value = GLOBAL_WIDTH * 0.03 + "px";
+  //   watermark_wh_ratio_px .value = )
+  st_line_y_shift.value = (1 - watermark_text_h_scale.value) / 2 * 100 + "%";
+  // st_line_y_shift_fixed.value = (1 - watermark_text_h_scale.value) / 2 * 100 - 2.0 + "%";
+  focus_length_text_x.value = (position_ratio.value + split_line_spacing.value / GLOBAL_WIDTH) * 100 + "%";
+  datetime_posi_percent_px.value =  datetime_posi_percent.value * 100 - 1.0 + "%";
+  logo_y_ratio_px.value = (1 - logo_ratio.value) / 2 * 100 + "%";
+  logo_x_ratio_px.value = (1 - position_ratio.value + split_line_spacing.value / GLOBAL_WIDTH) * 100 + "%";
+  logo_width_px.value = GLOBAL_WIDTH * watermark_wh_ratio.value * logo_ratio.value + "px";
+  logo_spacing_ratio_px.value = logo_spacing_ratio.value * 100 + "%";
+  position_ratio_px.value = position_ratio.value * 100 + "%";
+  split_line_spacing_px.value = position_ratio.value * 100 + "%";
+  split_line_height.value = watermark_text_h_scale.value * 100 + "%";
+  font_scale_px.value = font_scale.value * 100 + "%";
+}
+
+function resetConfirmEvent() {
+  watermark_wh_ratio.value = 0.09376;
+  watermark_text_h_scale.value = 0.5;
+  datetime_posi_percent.value = 0.55;
+  logo_ratio.value = 0.7;
+  position_ratio.value = 0.6267;
+  split_line_spacing.value = 30;
+  font_scale.value = 1.0;
+
+  camera_color.value = "";
+  focus_color.value = "";
+  datetime_color.value = "";
+  splite_line_color.value = "";
+  banner_bg_color.value = "";
+  update_px_from_value();
+
+}
 
 function saveSetting() {
   let sets = {
-    watermark_WH_ratio: watermark_WH_ratio.value,
+    watermark_wh_ratio: watermark_wh_ratio.value,
     watermark_text_h_scale: watermark_text_h_scale.value,
     datetime_posi_percent: datetime_posi_percent.value,
     logo_ratio: logo_ratio.value,
@@ -368,17 +411,17 @@ function saveSetting() {
     focus_color: focus_color.value,
     datetime_color: datetime_color.value,
     splite_line_color: splite_line_color.value,
-    bannerBG_color: bannerBG_color.value,
+    banner_bg_color: banner_bg_color.value,
   } as UserSeniorSettings
   user_conf.save_senior_settings(sets);
 
 }
 
 onMounted(() => {
-  get_font_path();
+  // get_font_path();
   console.log(cusstyle.value.height);
   // init senior settings     begin----
-  watermark_WH_ratio.value = user_conf.seniorSettings.watermark_WH_ratio;
+  watermark_wh_ratio.value = user_conf.seniorSettings.watermark_wh_ratio;
   watermark_text_h_scale.value = user_conf.seniorSettings.watermark_text_h_scale;
   datetime_posi_percent.value = user_conf.seniorSettings.datetime_posi_percent;
   logo_ratio.value = user_conf.seniorSettings.logo_ratio;
@@ -390,29 +433,9 @@ onMounted(() => {
   focus_color.value = user_conf.seniorSettings.focus_color;
   datetime_color.value = user_conf.seniorSettings.datetime_color;
   splite_line_color.value = user_conf.seniorSettings.splite_line_color;
-  bannerBG_color.value = user_conf.seniorSettings.bannerBG_color;
+  banner_bg_color.value = user_conf.seniorSettings.banner_bg_color;
   // ------init senior settings end----
-  cusstyle.value.height = GLOBAL_WIDTH * watermark_WH_ratio.value + "px";
-  font_size.value = GLOBAL_WIDTH * watermark_WH_ratio.value;
-
-  font_size_device_px.value = font_size.value * font_scale.value * 0.25 + "px";
-  font_size_focus_px.value = font_size.value * font_scale.value * 0.20 + "px";
-  font_size_datetime_px.value = font_size.value * font_scale.value * 0.18 + "px";
-
-  device_x_shift.value = GLOBAL_WIDTH * 0.03 + "px";
-  //   watermark_WH_ratio_px .value = )
-  st_line_y_shift.value = (1 - watermark_text_h_scale.value) / 2 * 100 + "%";
-  // st_line_y_shift_fixed.value = (1 - watermark_text_h_scale.value) / 2 * 100 - 2.0 + "%";
-  focus_length_text_x.value = (position_ratio.value + split_line_spacing.value / GLOBAL_WIDTH) * 100 + "%";
-  datetime_posi_percent_px.value =  datetime_posi_percent.value * 100 - 1.0 + "%";
-  logo_y_ratio_px.value = (1 - logo_ratio.value) / 2 * 100 + "%";
-  logo_x_ratio_px.value = (1 - position_ratio.value + split_line_spacing.value / GLOBAL_WIDTH) * 100 + "%";
-  logo_width_px.value = GLOBAL_WIDTH * watermark_WH_ratio.value * logo_ratio.value + "px";
-  logo_spacing_ratio_px.value = logo_spacing_ratio.value * 100 + "%";
-  position_ratio_px.value = position_ratio.value * 100 + "%";
-  split_line_spacing_px.value = position_ratio.value * 100 + "%";
-  split_line_height.value = watermark_text_h_scale.value * 100 + "%";
-  font_scale_px.value = font_scale.value * 100 + "%";
+  update_px_from_value();
 
   // -------init data end ------
   // console.log("111  ", font_size_device_px, font_size_focus_px, font_size_datetime_px);
@@ -421,7 +444,7 @@ onMounted(() => {
   //    // invalid: sacale.value = 0.2;
   //   // valid
   //   let con = document.getElementById('banner') as HTMLElement ;
-  //   con.style.height =  GLOBAL_WIDTH * watermark_WH_ratio.value + "px";
+  //   con.style.height =  GLOBAL_WIDTH * watermark_wh_ratio.value + "px";
   // }, 3000);
 })
 
@@ -475,7 +498,7 @@ const getMaxHeight = computed(() => {
 /* @import "../../src-tauri/resources/OPPOSans-H.ttf"; */
 @font-face {
   font-family: OPPOSans-H;
-  src: v-bind(font_path);
+  src: url("~@asset/resources/OPPOSans-H.ttf") format("ttf")  /*v-bind(font_path);*/
 }
 
 .banner {
@@ -508,7 +531,7 @@ const getMaxHeight = computed(() => {
   display: block;
   /* font-display:calc(); */
   /* border: 1px solid rgb(8, 210, 255); */
-  font-family: 'OPPOSans-H';
+  /* font-family: 'OPPOSans-H'; */
   max-width: v-bind(GLOBAL_WIDTH_PX);
   position: relative;
   text-align: center;

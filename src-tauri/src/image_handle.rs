@@ -127,7 +127,7 @@ pub fn control_center_thread(
                         datetime_posi_percent = s.datetime_posi_percent;  
                         position_ratio = s.position_ratio;
                         WATERMARK_SCALE = s.watermark_text_h_scale;
-                        watermark_ratio = s.watermark_WH_ratio;
+                        watermark_ratio = s.watermark_wh_ratio;
                         split_line_spacing = s.split_line_spacing;
                         font_scale = s.font_scale;
                         // TODO font and corlor

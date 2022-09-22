@@ -74,7 +74,7 @@ interface UserSendSettings {
 }
 
 interface UserSeniorSettings {
-  watermark_WH_ratio: number,
+  watermark_wh_ratio: number,
   watermark_text_h_scale: number,
   datetime_posi_percent: number
   logo_ratio: number
@@ -85,7 +85,7 @@ interface UserSeniorSettings {
  focus_color: string,
  datetime_color: string,
  splite_line_color : string,
- bannerBG_color : string,
+ banner_bg_color : string,
 }
 
 type RenameType = {
