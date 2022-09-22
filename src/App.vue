@@ -106,7 +106,7 @@ nextTick(() => { });
     <!-- <el-header> -->
     <!-- <sideBar/> -->
     <!-- <el-container > -->
-    <el-aside width="50px">
+    <el-aside width="50px" class="elaside">
       <el-menu
         @select="handleSelect"
         router
@@ -216,15 +216,17 @@ nextTick(() => { });
   display: block;
   flex: 1;
   flex-basis: auto;
-  overflow: auto;
+  overflow: hidden;
   box-sizing: border-box;
   padding: var(--el-main-padding);
 }
 
-
+.elaside{
+  z-index: 94;
+}
 
 .elmenu {
-  z-index: 101;
+  z-index: 94;
   position: absolute;
   left: 0;
   height: 100%;
@@ -285,7 +287,7 @@ nextTick(() => { });
   left: 0 auto;
   width: 100%;
   height: 100%;
-  z-index: 100;
+  z-index: 92;
   background-color: #000;
   opacity: 0.7;
 }

@@ -350,28 +350,39 @@ async function selectFile(file: File) {
     elmessage("please choose a jpeg file");
   }
 }
+
+const emptyStatus = ref(true);
 const upload = ref<UploadInstance>();
 const handleExceed: UploadProps["onExceed"] = (files) => {
   upload.value!.clearFiles();
   const file = files[0] as UploadRawFile;
   upload.value!.handleStart(file);
-  selectFile(file);
+  if (file.type === "image/jpeg") {
+    emptyStatus.value = false;
+    selectFile(file);
+  }
 };
 const handleOnChange: UploadProps["onChange"] = (uploadFile) => {
-  console.log(uploadFile);
-  selectFile(uploadFile.raw!);
+  console.log(uploadFile.raw!);
+  if (uploadFile.raw!.type === "image/jpeg") {
+    emptyStatus.value = false;
+    selectFile(uploadFile.raw!);
+  } else {
+    elmessage("please choose a jpeg file");
+  }
 };
 
-const getMaxHeight=computed(()=>{
-  return (sidebarReactives.curWindowHeight-50)
-})
+const getMaxHeight = computed(() => {
+  return sidebarReactives.curWindowHeight - 50;
+});
 
-// :on-exceed="handleExceed"
+const loading= ref(true)
 </script>
 <template lang="">
-  <el-row class="exifinput" style="margin-top:22px;margin-bottom:10px;">
+  <el-row class="exifinput" style="margin-top: 22px; margin-bottom: 10px">
     <el-col :span="20">
-      <div style="margin-left: 25px;font-size: 20px;">读取信息</div>
+      <div style="margin-left: 25px; font-size: 20px">读取信息      <el-switch v-model="loading" />
+</div>
     </el-col>
     <el-col :span="4">
       <!-- <input type="file" @change="selectedFile" /> -->
@@ -380,6 +391,7 @@ const getMaxHeight=computed(()=>{
         :limit="1"
         :auto-upload="false"
         :drag="false"
+        :on-exceed="handleExceed"
         :on-change="handleOnChange"
         :show-file-list="false"
       >
@@ -389,122 +401,193 @@ const getMaxHeight=computed(()=>{
           </el-icon>
         </template>
       </el-upload>
+      <!-- <el-skeleton style="width: 240px" :loading="loading" animated>
+        <template #template>
+          <el-skeleton-item variant="text" style="width: 1%" />
+        </template>
+        <template #default>
+          <span>1111</span>
+        </template>
+      </el-skeleton> -->
     </el-col>
   </el-row>
   <el-divider style="margin-top: 0px"></el-divider>
-  <el-scrollbar height="100%" :max-height="getMaxHeight">
-    <div class="thumb"></div>
-    <el-descriptions
-      class="margin-top"
-      title="概览"
-      :column="1"
-      :size="size"
-      border
-    >
-      <el-descriptions-item v-for="info in summaryInfo">
-        <template #label>
-          <div>{{ info.label }}</div>
-        </template>
-        <div>
-          <el-descriptions class="margin-top" :column="2" :size="size" border>
-            <el-descriptions-item v-for="value in info.data">
-              <template #label v-if="value.data">
-                <div>{{ value.label }}</div>
+  <template v-if="emptyStatus">
+    <el-empty :image-size="200" description="请先上传图片" />
+  </template>
+  <el-scrollbar height="100%" :max-height="getMaxHeight" v-else>
+    <el-skeleton style="width: 100%;height:100%" :loading="loading" animated>
+      <template #template>
+        <div class="wrapper">
+          <div class="pic-skeleton">
+            <el-skeleton-item
+            variant="image"
+            style="width: 100%;height: 50%;align-self: center;"
+          />
+          </div>
+          <div class="eldescription-skeleton">
+            <div style="display:flex;flex-direction:column;width:100%;align-self:center;">
+              <div style="display:flex;margin-bottom:15px;">
+                <el-skeleton-item variant="text" style="width: 10%;margin-left:50px;" />
+                <el-skeleton-item variant="text" style="width:20%;margin-left: 16px;" />
+              </div>
+              <div style="display:flex;margin-bottom:15px;">
+                <el-skeleton-item variant="text" style="width: 10%;margin-left:50px;" />
+                <el-skeleton-item variant="text" style="width:40%;margin-left: 16px;" />
+              </div>
+              <div style="display:flex;margin-bottom:15px;">
+                <el-skeleton-item variant="text" style="width: 10%;margin-left:50px;" />
+                <el-skeleton-item variant="text" style="width:85%;margin-left: 16px;" />
+              </div>
+              <div style="display:flex;margin-bottom:15px;">
+                <el-skeleton-item variant="text" style="width: 10%;margin-left:50px;" />
+                <el-skeleton-item variant="text" style="width:45%;margin-left: 16px;" />
+              </div>
+              <div style="display:flex;margin-bottom:15px;">
+                <el-skeleton-item variant="text" style="width: 10%;margin-left:50px;" />
+                <el-skeleton-item variant="text" style="width:65%;margin-left: 16px;" />
+              </div>
+              <div style="display:flex;margin-bottom:15px;">
+                <el-skeleton-item variant="text" style="width: 10%;margin-left:50px;" />
+                <el-skeleton-item variant="text" style="width:15%;margin-left: 16px;" />
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </template>
+      <template #default>
+        <div class="wrapper">
+          <div class="pic">
+            <div class="thumb"></div>
+          </div>
+          <el-descriptions
+            class="eldescription"
+            title="概览"
+            :column="1"
+            :size="size"
+            border
+          >
+            <el-descriptions-item v-for="info in summaryInfo">
+              <template #label>
+                <div>{{ info.label }}</div>
               </template>
-              <span v-for="v in value.data" v-if="value.data">{{ v }}</span>
+              <div>
+                <el-descriptions :column="2" :size="size" border>
+                  <el-descriptions-item v-for="value in info.data">
+                    <template #label v-if="value.data">
+                      <div>{{ value.label }}</div>
+                    </template>
+                    <span v-for="v in value.data" v-if="value.data">{{
+                      v
+                    }}</span>
+                  </el-descriptions-item>
+                </el-descriptions>
+              </div>
             </el-descriptions-item>
           </el-descriptions>
         </div>
-      </el-descriptions-item>
-    </el-descriptions>
-    <el-table
-      :data="tableExifData"
-      stripe
-      style="width: 100%"
-      class="table"
-      :default-sort="{ prop: 'label', order: 'descending' }"
-    >
-      <el-table-column prop="label" label="名称" width="380" />
-      <el-table-column prop="data" label="详细参数" width="380" class="col" />
-    </el-table>
-    <el-container class="a-border">
-      <div id="drap-area-sq1">
-        <!-- <div style="margin: 20px 0" /> -->
-        <div style="margin: 20px 5% 20px 5%">
-          <el-input
-            v-model="text"
-            type="textarea"
-            size="large"
-            :autosize="{ minRows: 2, maxRows: 6 }"
-            placeholder="Please input"
+        <el-divider></el-divider>
+        <el-table
+          :data="tableExifData"
+          stripe
+          style="width: 100%"
+          class="table"
+          :default-sort="{ prop: 'label', order: 'descending' }"
+        >
+          <el-table-column
+            class="table-col"
+            prop="label"
+            label="名称"
+            resizable
+            sortable
           />
-        </div>
-        <div>
-          <!-- <el-container direction="vertical"> -->
-          <suspense>
-            <!-- <el-col > -->
-            <el-container direction="horizontal">
-              <el-button
-                @click="send_event"
-                color="#de4781"
+          <el-table-column
+            class="table-col"
+            prop="data"
+            label="详细参数"
+            resizable
+          />
+        </el-table>
+        <el-container class="a-border">
+          <div id="drap-area-sq1">
+            <!-- <div style="margin: 20px 0" /> -->
+            <div style="margin: 20px 5% 20px 5%">
+              <el-input
+                v-model="text"
+                type="textarea"
                 size="large"
-                :plain="isPlain"
-                >[s]测试event</el-button
-              >
-              <!-- </suspense>
-        <suspense> -->
-              <el-button
-                @click="greetTest"
-                color="#322aef"
-                size="large"
-                :plain="isPlain"
-                >[i]测试Rust
-              </el-button>
-              <!-- </el-col> -->
-            </el-container>
-          </suspense>
-          <el-row class="left">
-            <el-col :span="24" style="margin: 15px 0 15px 0">
-              <!-- <div class="photoSelector"> -->
-              <label class="file-select">
-                <div class="select-button">
-                  <span v-if="selectImage"
-                    >Selected File: {{ selectImage.name }}</span
+                :autosize="{ minRows: 2, maxRows: 6 }"
+                placeholder="Please input"
+              />
+            </div>
+            <div>
+              <!-- <el-container direction="vertical"> -->
+              <suspense>
+                <!-- <el-col > -->
+                <el-container direction="horizontal">
+                  <el-button
+                    @click="send_event"
+                    color="#de4781"
+                    size="large"
+                    :plain="isPlain"
+                    >[s]测试event</el-button
                   >
-                  <span v-else>Select File</span>
-                </div>
-                <input type="file" @change="handleFileChange" />
-              </label>
-              <div class="b-border">
-                <el-button class="btn" @click="image_progress.selectFiles()"
-                  >选择文件</el-button
-                >
-                <!-- </div> -->
-                <!-- <div class="photoSelector"> -->
-                <el-button class="btn" @click="image_progress.selectDirs()"
-                  >选择目录</el-button
-                >
-              </div>
+                  <!-- </suspense>
+        <suspense> -->
+                  <el-button
+                    @click="greetTest"
+                    color="#322aef"
+                    size="large"
+                    :plain="isPlain"
+                    >[i]测试Rust
+                  </el-button>
+                  <!-- </el-col> -->
+                </el-container>
+              </suspense>
+              <el-row class="left">
+                <el-col :span="24" style="margin: 15px 0 15px 0">
+                  <!-- <div class="photoSelector"> -->
+                  <label class="file-select">
+                    <div class="select-button">
+                      <span v-if="selectImage"
+                        >Selected File: {{ selectImage.name }}</span
+                      >
+                      <span v-else>Select File</span>
+                    </div>
+                    <input type="file" @change="handleFileChange" />
+                  </label>
+                  <div class="b-border">
+                    <el-button class="btn" @click="image_progress.selectFiles()"
+                      >选择文件</el-button
+                    >
+                    <!-- </div> -->
+                    <!-- <div class="photoSelector"> -->
+                    <el-button class="btn" @click="image_progress.selectDirs()"
+                      >选择目录</el-button
+                    >
+                  </div>
 
-              <!-- </div> -->
-            </el-col>
-            <text> {{ selectImage }}</text>
-          </el-row>
-          <!-- <button @click="greetTest" >测试调用rust</button> -->
-          <!-- </el-col> -->
+                  <!-- </div> -->
+                </el-col>
+                <text> {{ selectImage }}</text>
+              </el-row>
+              <!-- <button @click="greetTest" >测试调用rust</button> -->
+              <!-- </el-col> -->
 
-          <!-- </el-container> -->
-        </div>
-      </div>
-      <!-- <BaseSettingsDrawerVue /> -->
-      <!-- <div style="margin-right=10px margin:auto" >
+              <!-- </el-container> -->
+            </div>
+          </div>
+          <!-- <BaseSettingsDrawerVue /> -->
+          <!-- <div style="margin-right=10px margin:auto" >
       </div> -->
-    </el-container>
+        </el-container>
+      </template>
+    </el-skeleton>
   </el-scrollbar>
 </template>
 
 <style>
-
 .a-border {
   border: 1px solid rgb(8, 210, 255);
   margin: 20px 10% 20px 10%;
@@ -526,6 +609,22 @@ const getMaxHeight=computed(()=>{
 </style>
 
 <style scoped>
+.wrapper {
+  display: flex;
+  width: 100%;
+  height: 300px;
+  overflow: auto;
+}
+
+.eldescription, .eldescription-skeleton {
+  width: 70%;
+}
+
+.eldescription-skeleton{
+  display: flex;
+  height: 100%;
+}
+
 .file-select > .select-button {
   padding: 1rem;
   width: 10rem;
@@ -542,18 +641,40 @@ const getMaxHeight=computed(()=>{
   display: none;
 }
 
-.thumb {
-  background: v-bind(thumbBase64);
+.pic ,.pic-skeleton{
   width: 30%;
-  height: 100px;
+  height: 100%;
+  display: flex;
+}
+.pic {
+  padding: 15px;
+}
+
+.pic-skeleton{
+  margin-left: 15px;
+}
+
+.pic > .thumb {
+  width: 100%;
+  height: 50%;
+  align-self: center;
+  background: v-bind(thumbBase64);
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
 }
 
 .exifinput {
+  overflow: hidden;
 }
 
 :deep(.cell) {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.table-col {
+  width: 100%;
 }
 </style>

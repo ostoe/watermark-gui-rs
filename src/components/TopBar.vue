@@ -3,7 +3,7 @@ import { Files, FolderChecked } from '@element-plus/icons-vue'
 import { main } from '@popperjs/core';
 import { floor } from 'lodash';
 import { onMounted, ref, reactive } from 'vue';
-import { image_progress, previewwidget, user_conf, is_dir } from '../scripts/reactives';
+import { elmessage, image_progress, previewwidget, user_conf, is_dir } from '../scripts/reactives';
 import { invoke } from '@tauri-apps/api';
 import { convertFileSrc } from '@tauri-apps/api/tauri';
 import { appDir, configDir, homeDir, localDataDir, logDir, resourceDir, fontDir } from '@tauri-apps/api/path';
@@ -179,12 +179,15 @@ function colorRgb(color: string) {
 
 async function process_image() {
   // control other compo
-  image_progress.status_toogle();
-  image_progress.process_image();
-  image_progress.isHandling = true
+  if (image_progress.canIHandle) {
+    image_progress.isHandling = true
+    image_progress.status_toogle();
+    image_progress.process_image();
+  } else {
+    elmessage("please choose a picture first!")
+  }
 };
 
-const handleStatus = ref(false)
 function get_image_url(value: string) {
   let ap = convertFileSrc(value);
   console.log(ap);
@@ -211,7 +214,7 @@ const getProgress = (completed: number = image_progress.count.completed, total: 
 }
 // const waveProgressRef = ref<HTMLCanvasElement>(new Object as HTMLCanvasElement);
 const waveInit = ref<WaveProgress>(new Object as WaveProgress);
-const waveInit11 = ref<WaveProgress>(new Object as WaveProgress);
+// const waveInit11 = ref<WaveProgress>(new Object as WaveProgress);
 const setCanvasSize = (canvas: HTMLCanvasElement) => {
   canvas.width = 35;
   canvas.height = 35;
@@ -276,24 +279,40 @@ onMounted(() => {
   // })
   // waveInit11.value.render();
 });
-watch([() => image_progress.count.completed, () => image_progress.count.total], (newValue, oldValue) => {
+watch([() => image_progress.count.completed, () => image_progress.count.total, ()=>image_progress.image_dir_path], (newValue, oldValue) => {
   console.log(`output->oldValue`, oldValue);
   let fromData = getProgress(oldValue[0], oldValue[1]);
   let toData = getProgress(newValue[0], newValue[1]);
+  //判断是否是文件夹
+  if (!image_progress.selectType) {
+    console.log(image_progress.selectType)
+    //判断路径是否存在
+    if (newValue[2] != "") {
+      image_progress.canIHandle = true
+    } else {
+      image_progress.canIHandle = false
+    }
+  }else {
+    if(newValue[0]===0 && newValue[1] !=0){
+      image_progress.canIHandle = true
+    }else{
+      image_progress.canIHandle = false
+    }
+  }
   waveInit.value.setProgress({
     from: fromData,
     to: toData,
     animated: true,
   });
-  if (image_progress.isHandling && getProgress(newValue[0], newValue[1]) === 100 ) {
+  if (image_progress.isHandling && getProgress(newValue[0], newValue[1]) === 100) {
     image_progress.isHandling = false
   }
   // test
-  waveInit11.value.setProgress({
-    from: fromData,
-    to: toData,
-    animated: true,
-  })
+  // waveInit11.value.setProgress({
+  //   from: fromData,
+  //   to: toData,
+  //   animated: true,
+  // })
 })
 
 watch([() => user_conf.latestSelectedOutputPath], (nv, ov) => {
@@ -310,7 +329,7 @@ nextTick(() => {
 
 
 <template>
-  <el-row class="row" v-resize="ListenTopbarWidth">
+  <el-row class="elrow" v-resize="ListenTopbarWidth">
     <el-col :span="18" class="left">
       <div class="photoSelector">
         <!-- <rotate-square4 v-if="image_progress.status"></rotate-square4>
@@ -379,7 +398,7 @@ nextTick(() => {
     </el-col>
     <el-col :span="6" class="right">
       <div class="previewer" v-if="bigIcon">
-        <el-button @click="process_image" color="#de4781" size="" round :loading="image_progress.isHandling" :disabled="handleStatus">开始处理
+        <el-button @click="process_image" color="#de4781" size="" round :loading="image_progress.isHandling">开始处理
         </el-button>
 
       </div>
@@ -406,9 +425,8 @@ nextTick(() => {
   margin-left: 30px;
 }
 
-.row {
+.elrow {
   padding-top: 15px;
-  z-index: 99;
 }
 
 .previewer {

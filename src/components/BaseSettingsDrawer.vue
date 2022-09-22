@@ -411,7 +411,7 @@ onMounted(() => {
     position: absolute;
     bottom: 8px;
     width: 100%;
-    z-index: 99;
+    z-index: 90;
 }
 
 .el-row {

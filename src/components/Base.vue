@@ -7,13 +7,12 @@
     <el-divider></el-divider>
     <el-row>
       <el-col :span="14">
-        <el-tooltip :content="'选择' + (selectType ? '文件' : '文件夹')" placement="bottom-end" effect="light">
-          <el-button v-if="selectType" @click="image_progress.selectFiles()"
-            style="margin-left:20px; margin-right: 5px;">选择</el-button>
+        <el-tooltip :content="'选择' + (image_progress.selectType ? '文件' : '文件夹')" placement="bottom-end" effect="light">
+          <el-button v-if="image_progress.selectType" @click="image_progress.selectFiles()" style="margin-left:20px; margin-right: 5px;">选择</el-button>
           <el-button v-else @click="image_progress.selectDirs()">选择</el-button>
         </el-tooltip>
-        <el-tooltip :content="'输入模式：' + (selectType ? '文件' : '文件夹')" placement="bottom-end" effect="light">
-          <el-switch v-model="selectType" style="--el-switch-on-color: #38D6BF; --el-switch-off-color: #D4BE94"
+        <el-tooltip :content="'输入模式：' + (image_progress.selectType ? '文件' : '文件夹')" placement="bottom-end" effect="light">
+          <el-switch v-model="image_progress.selectType" style="--el-switch-on-color: #38D6BF; --el-switch-off-color: #D4BE94"
             inline-prompt :active-icon="Files" :inactive-icon="FolderChecked" />
         </el-tooltip>
       </el-col>
@@ -216,7 +215,7 @@ function test_pro() {
   //
 }
 
-const selectType = ref(true);
+// const selectType = ref(true);
 
 // const src = new URL("../assets/test.jpeg", import.meta.url).toString();
 const src =
@@ -488,6 +487,10 @@ const getMaxHeight = computed(() => {
   box-shadow: 0 0 0 0;
 }
 
+:deep(.el-input__inner){
+  border-style: solid;
+  border-width: 0 0 1px 0;
+}
 .model {
   position: relative;
   bottom: 140px;

@@ -250,6 +250,8 @@ const image_progress = reactive({
   exif_image_path: "",
   converted_exif_path: "",
   isHandling: false,
+  canIHandle:false,
+  selectType:true,
   increase() {
     if (this.value <= 98) {
       this.value += 2;
@@ -404,12 +406,9 @@ const image_progress = reactive({
       console.log(this.image_dir_path);
       let res = await invoke("handle_front_select_dir", { imageDir: this.image_dir_path });
       elmessage("处理目录: " + res);
-
     } else {
       elmessage("未选择文件或已完成");
-
     }
-
   },
 
   //
