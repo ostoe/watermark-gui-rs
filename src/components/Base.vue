@@ -27,7 +27,7 @@
       </el-col>
       <el-col :span="8">
         <el-row>
-          <el-col :span="10">
+          <el-col :span="8">
             <el-button @click="user_conf.selectOutputDirs()">输出目录</el-button>
           </el-col>
           <el-col :span="14">
@@ -88,42 +88,42 @@
 
           </el-col>
           <el-col :span="4" style="align-items: center; margin: 0 1% 0 1%;">
-
-            <el-row style="margin-bottom: 2px;"><span class="demonstration">banner长宽比例：</span></el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-slider v-model="watermark_wh_ratio" size="small" :step="0.001" :min="0.01" :max="0.5" @input="_wh_ratio_f" />
-              </el-col>
-              <el-col :span="12">
+            
+            <div style="margin-bottom: 2px;"><span class="demonstration">banner长宽比例：</span></div>
+            <div>
+              <div>
+                <el-slider v-model="watermark_wh_ratio" :step="0.001" :min="0.01" :max="0.5" @input="_wh_ratio_f" />
+              </div>
+              <div :span="12">
                 <el-input-number v-model="watermark_wh_ratio" controls-position="right" size="default"
                   @change="_wh_ratio_f" :step="0.001" :min="0.01" :max="0.5"></el-input-number>
-              </el-col>
-            </el-row>
+              </div>
+            </div>
 
-            <el-row style="margin-bottom: 2px;"><span class="demonstration">第一水平线</span></el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-slider v-model="watermark_text_h_scale" size="small" :step="0.001" :min="0.2" :max="1.0"
+            <div style="margin-bottom: 2px;"><span class="demonstration">第一水平线</span></div>
+            <div>
+              <div>
+                <el-slider v-model="watermark_text_h_scale" :step="0.001" :min="0.2" :max="1.0"
                   @input="_text_h_scale" />
-              </el-col>
-              <el-col :span="12">
+              </div>
+              <div>
                 <el-input-number v-model="watermark_text_h_scale" controls-position="right" :step="0.001" :min="0.2"
                   :max="1.0" @change="_text_h_scale"></el-input-number>
-              </el-col>
-            </el-row>
+              </div>
+            </div>
 
-            <el-row style="margin-bottom: 2px;"><span class="demonstration">第二水平线</span></el-row>
-            <el-row>
-              <el-col :span="12">
+            <div style="margin-bottom: 2px;"><span class="demonstration">第二水平线</span></div>
+            <div>
+              <div>
                 <el-slider v-model="datetime_posi_percent" :step="0.001" :min="0.2" :max="1.0" @input="datetime_posi_percent_f" />
-              </el-col>
-              <el-col :span="12">
+              </div>
+              <div>
                 <el-input-number v-model="datetime_posi_percent" :step="0.001" :min="0.2" :max="1.0" controls-position="right"
                   size="default" @change="datetime_posi_percent_f"></el-input-number>
-              </el-col>
-            </el-row>
+              </div>
+            </div>
 
-            <el-row style="margin-bottom: 2px;"><span class="demonstration">Logo比例</span></el-row>
+            <div style="margin-bottom: 2px;"><span class="demonstration">Logo比例</span></div>
             <el-row>
               <el-col :span="12">
                 <el-slider v-model="logo_ratio" :step="0.001" :min="0.2" :max="1.0" @input="logo_ratio_f" />
@@ -640,7 +640,7 @@ const getMaxHeight = computed(() => {
   box-shadow: 0 0 0 0;
 }
 
-:deep(.el-input__inner){
+:deep(.inline-input){
   border-style: solid;
   border-width: 0 0 1px 0;
 }

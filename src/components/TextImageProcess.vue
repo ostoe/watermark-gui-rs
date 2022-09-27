@@ -397,14 +397,52 @@ const handleOnChange: UploadProps["onChange"] = (uploadFile) => {
 const getMaxHeight = computed(() => {
   return sidebarReactives.curWindowHeight - 50;
 });
-
-const loading= ref(true)
+interface skeleton {
+  sideWidth: number,
+  sideMargin: number,
+  textWidth: number,
+  textMargin: number
+}
+const loading = ref(true);
+const skeletonTemplate = [{
+  sideWidth: 10,
+  sideMargin: 50,
+  textWidth: 20,
+  textMargin: 16
+}, {
+  sideWidth: 10,
+  sideMargin: 50,
+  textWidth: 40,
+  textMargin: 16
+}, {
+  sideWidth: 10,
+  sideMargin: 50,
+  textWidth: 85,
+  textMargin: 16
+}, {
+  sideWidth: 10,
+  sideMargin: 50,
+  textWidth: 45,
+  textMargin: 16
+}, {
+  sideWidth: 10,
+  sideMargin: 50,
+  textWidth: 65,
+  textMargin: 16
+}, {
+  sideWidth: 10,
+  sideMargin: 50,
+  textWidth: 15,
+  textMargin: 16
+}] as Array<skeleton>
 </script>
 <template lang="">
+  <div>{{ testData }}</div>
   <el-row class="exifinput" style="margin-top: 22px; margin-bottom: 10px">
     <el-col :span="20">
-      <div style="margin-left: 25px; font-size: 20px">读取信息      <el-switch v-model="loading" />
-</div>
+      <div style="margin-left: 25px; font-size: 20px">
+        读取信息
+      </div>
     </el-col>
     <el-col :span="4">
       <!-- <input type="file" @change="selectedFile" /> -->
@@ -438,77 +476,93 @@ const loading= ref(true)
     <el-empty :image-size="200" description="请先上传图片" />
   </template>
   <el-scrollbar height="100%" :max-height="getMaxHeight" v-else>
-    <el-skeleton style="width: 100%;height:100%" :loading="loading" animated>
+    <el-skeleton style="width: 100%; height: 100%" :loading="loading" animated :throttle="500">
       <template #template>
-        <div class="wrapper">
-          <div class="pic-skeleton">
-            <el-skeleton-item
-            variant="image"
-            style="width: 100%;height: 50%;align-self: center;"
-          />
-          </div>
-          <div class="eldescription-skeleton">
-            <div style="display:flex;flex-direction:column;width:100%;align-self:center;">
-              <div style="display:flex;margin-bottom:15px;">
-                <el-skeleton-item variant="text" style="width: 10%;margin-left:50px;" />
-                <el-skeleton-item variant="text" style="width:20%;margin-left: 16px;" />
-              </div>
-              <div style="display:flex;margin-bottom:15px;">
-                <el-skeleton-item variant="text" style="width: 10%;margin-left:50px;" />
-                <el-skeleton-item variant="text" style="width:40%;margin-left: 16px;" />
-              </div>
-              <div style="display:flex;margin-bottom:15px;">
-                <el-skeleton-item variant="text" style="width: 10%;margin-left:50px;" />
-                <el-skeleton-item variant="text" style="width:85%;margin-left: 16px;" />
-              </div>
-              <div style="display:flex;margin-bottom:15px;">
-                <el-skeleton-item variant="text" style="width: 10%;margin-left:50px;" />
-                <el-skeleton-item variant="text" style="width:45%;margin-left: 16px;" />
-              </div>
-              <div style="display:flex;margin-bottom:15px;">
-                <el-skeleton-item variant="text" style="width: 10%;margin-left:50px;" />
-                <el-skeleton-item variant="text" style="width:65%;margin-left: 16px;" />
-              </div>
-              <div style="display:flex;margin-bottom:15px;">
-                <el-skeleton-item variant="text" style="width: 10%;margin-left:50px;" />
-                <el-skeleton-item variant="text" style="width:15%;margin-left: 16px;" />
-              </div>
-
+        <el-card class="box-card">
+          <div class="wrapper">
+            <div class="pic-skeleton">
+              <el-skeleton-item
+                variant="image"
+                style="width: 100%; height: 50%; align-self: center"
+              />
             </div>
+            <div class="eldescription-skeleton">
+              <div
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  width: 100%;
+                  align-self: center;
+                "
+                v-for="value in skeletonTemplate"
+              >
+                <div style="display: flex; margin-bottom: 15px">
+                  <el-skeleton-item
+                    variant="text"
+                    :style="{'width': value.sideWidth+'%','margin-left': value.sideMargin+'px'}"
+                  />
+                  <el-skeleton-item
+                    variant="text"
+                    :style="{'width': value.textWidth+'%','margin-left': value.textMargin+'px'}"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </el-card>
+        <el-divider></el-divider>
+        <div style="display:flex;">
+          <div style="margin-bottom:18px;width:50%">
+            <div style="width:30%">
+              <el-skeleton-item variant="text" />
+            </div>
+          </div>
+          <div style="margin-bottom:18px;width:50%">
+            <div style="width:30%">
+              <el-skeleton-item variant="text" />
+            </div>
+          </div>
+        </div>
+        <div v-for="index of 6">
+          <div style="margin-bottom:28px;display:flex;">
+            <el-skeleton-item variant="text"/>
+            <el-skeleton-item variant="text" />
           </div>
         </div>
       </template>
       <template #default>
-        <div class="wrapper">
-          <div class="pic">
-            <div class="thumb"></div>
+        <el-card class="box-card">
+          <div class="wrapper">
+            <div class="pic">
+              <div class="thumb"></div>
+            </div>
+            <el-descriptions
+              class="eldescription"
+              title="概览"
+              :column="1"
+              :size="size"
+              border
+            >
+              <el-descriptions-item v-for="info in summaryInfo">
+                <template #label>
+                  <div>{{ info.label }}</div>
+                </template>
+                <div>
+                  <el-descriptions :column="2" :size="size" border>
+                    <el-descriptions-item v-for="value in info.data">
+                      <template #label v-if="value.data">
+                        <div>{{ value.label }}</div>
+                      </template>
+                      <span v-for="v in value.data" v-if="value.data">{{
+                        v
+                      }}</span>
+                    </el-descriptions-item>
+                  </el-descriptions>
+                </div>
+              </el-descriptions-item>
+            </el-descriptions>
           </div>
-          <el-descriptions
-            class="eldescription"
-            title="概览"
-            :column="1"
-            :size="size"
-            border
-          >
-            <el-descriptions-item v-for="info in summaryInfo">
-              <template #label>
-                <div>{{ info.label }}</div>
-              </template>
-              <div>
-                <el-descriptions :column="2" :size="size" border>
-                  <el-descriptions-item v-for="value in info.data">
-                    <template #label v-if="value.data">
-                      <div>{{ value.label }}</div>
-                    </template>
-                    <span v-for="v in value.data" v-if="value.data">{{
-                      v
-                    }}</span>
-                  </el-descriptions-item>
-                </el-descriptions>
-              </div>
-            </el-descriptions-item>
-          </el-descriptions>
-        </div>
+        </el-card>
         <el-divider></el-divider>
         <el-table
           :data="tableExifData"
@@ -638,16 +692,72 @@ const loading= ref(true)
   overflow: auto;
 }
 
-.eldescription, .eldescription-skeleton {
+.eldescription,
+.eldescription-skeleton {
   width: 70%;
 }
 
-.eldescription-skeleton{
+.eldescription-skeleton {
   display: flex;
+  flex-direction: column;
+  justify-content: center;
   height: 100%;
 }
 
-.file-select > .select-button {
+.pic,
+.pic-skeleton {
+  width: 30%;
+  height: 100%;
+  display: flex;
+}
+
+.pic {
+  padding: 15px;
+}
+
+.pic-skeleton {
+  margin-left: 15px;
+}
+
+.pic>.thumb {
+  width: 100%;
+  height: 50%;
+  align-self: center;
+  background: v-bind(thumbBase64);
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+
+@media (max-width:600px) {
+  .wrapper{
+    flex-direction: column;
+    height: 50%;
+    -webkit-transition: width 1s ease;
+    -moz-transition: width 1s ease;
+    -o-transition: width 1s ease;
+    -ms-transition: width 2s ease;
+    transition: width 1s ease;
+  }
+  .pic{
+    width: 100%;
+  }
+
+  .pic-skeleton{
+    width: 50%;
+  }
+  .pic,.pic-skeleton{
+    height: 190px;
+    align-self: center;
+  }
+  .eldescription{
+    width: 95%;
+    align-self: center;
+  }
+}
+
+.file-select>.select-button {
   padding: 1rem;
   width: 10rem;
   color: white;
@@ -659,31 +769,8 @@ const loading= ref(true)
   display: flex;
 }
 
-.file-select > input[type="file"] {
+.file-select>input[type="file"] {
   display: none;
-}
-
-.pic ,.pic-skeleton{
-  width: 30%;
-  height: 100%;
-  display: flex;
-}
-.pic {
-  padding: 15px;
-}
-
-.pic-skeleton{
-  margin-left: 15px;
-}
-
-.pic > .thumb {
-  width: 100%;
-  height: 50%;
-  align-self: center;
-  background: v-bind(thumbBase64);
-  background-repeat: no-repeat;
-  background-size: contain;
-  background-position: center;
 }
 
 .exifinput {
