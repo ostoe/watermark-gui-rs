@@ -5,14 +5,15 @@ import { elmessage, image_progress } from "../scripts/reactives";
 import { emit, listen } from "@tauri-apps/api/event";
 import { event, invoke } from "@tauri-apps/api";
 import { sidebarReactives } from "../scripts/reactives";
-
+import { platform, type as os_type } from '@tauri-apps/api/os';
+import { Command } from '@tauri-apps/api/shell';
 // import { ElMessage, ElNotification } from "element-plus";
 import { open } from "@tauri-apps/api/dialog";
-import { appDir } from "@tauri-apps/api/path";
+import { appDir, resolve, resourceDir } from "@tauri-apps/api/path";
 import { pictureDir } from "@tauri-apps/api/path";
 // import { watch } from "fs";
 import baseSettingsDrawerVue from "./BaseSettingsDrawer.vue";
-import ExifReader from "exifreader";
+// import ExifReader from "exifreader";
 import type {
   UploadFile,
   UploadFiles,
@@ -340,10 +341,31 @@ watch(exifTags, (newValue, oldValue) => {
 // }
 
 async function selectFile(file: File) {
-  console.log(file);
+  console.log(file, file.webkitRelativePath, );
   if (file.type === "image/jpeg") {
-    // dropzoneFile.value = document.querySelector(".dropzoneFile").files[0]; ?????
-    exifTags.value = await ExifReader.load(file);
+    const osType = await os_type(); // Returns 'Linux' 'Darwin'  'Windows_NT'
+    if (osType.includes('Darwin')) {
+      // TODO  run ./
+      const r1 = await resourceDir();
+      const exiftool_path = await resolve(r1, "resources", "exiftool");
+      //  exiftool -j ~/Pictures/100NCZ_7/DSC_0595.JPG
+      const reader = new FileReader(); // TODO精简exif的库，好多用不到
+      // reader.readAsDataURL(file);
+      console.log(exiftool_path);
+      const output = await new Command("perl-run", [ exiftool_path, "-h" , "/Users/fly/Pictures/100NCZ_7/DSC_0595.JPG"]).execute();
+      console.log(output, output.stdout,);
+      // Command::new("powershell")
+      // .args(&[
+      //   "./src/extractIcon.ps1",
+      //   file_path.as_str(),
+      //   icon_path.to_str().unwrap(),
+      // ])
+      // .creation_flags(0x08000000)
+
+    } else if(osType.includes('Windows_NT')) {
+
+    }
+    // exifTags.value = await ExifReader.load(file);
     console.log(`output->tags`, exifTags.value);
     // image_progress.selectFiles();
   } else {

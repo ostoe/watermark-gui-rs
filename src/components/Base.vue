@@ -6,24 +6,33 @@
     </el-header>
     <el-divider></el-divider>
     <el-row>
-      <el-col :span="14">
+      <el-col :span="2">
         <el-tooltip :content="'选择' + (image_progress.selectType ? '文件' : '文件夹')" placement="bottom-end" effect="light">
-          <el-button v-if="image_progress.selectType" @click="image_progress.selectFiles()" style="margin-left:20px; margin-right: 5px;">选择</el-button>
-          <el-button v-else @click="image_progress.selectDirs()">选择</el-button>
+          <el-button v-if="image_progress.selectType" @click="handleSelectInputFiles()" style="margin-left:20px; margin-right: 5px;">选择</el-button>
+          <el-button v-else @click="handleSelectInputDir()">选择</el-button>
         </el-tooltip>
+        
+      </el-col>
+      <el-col :span="1">
         <el-tooltip :content="'输入模式：' + (image_progress.selectType ? '文件' : '文件夹')" placement="bottom-end" effect="light">
           <el-switch v-model="image_progress.selectType" style="--el-switch-on-color: #38D6BF; --el-switch-off-color: #D4BE94"
             inline-prompt :active-icon="Files" :inactive-icon="FolderChecked" />
         </el-tooltip>
       </el-col>
-      <el-col :span="10">
+      <el-col :span="13">
+        <div class="flex justify-space-between mb-4 flex-wrap gap-4" style="width: auto;">
+    <el-button text type="info" >
+      {{  selectedInputContent  }}
+      </el-button></div>
+      </el-col>
+      <el-col :span="8">
         <el-row>
           <el-col :span="10">
             <el-button @click="user_conf.selectOutputDirs()">输出目录</el-button>
           </el-col>
           <el-col :span="14">
             <el-autocomplete v-model="inputDir" class="inline-input w-50" size="default" placeholder="Please Input"
-              :fetch-suggestions="querySearch" @change="input_value_change" @select="handleSelect">
+              :fetch-suggestions="querySearch" @change="input_value_change" @select="handleSelectHistoriesDir">
               <template #suffix>
                 <el-icon v-if="inputInvalid" color="#33CC33" class="el-input__icon" @click="handleIconClick">
                   <SuccessFilled />
@@ -83,7 +92,7 @@
             <el-row style="margin-bottom: 2px;"><span class="demonstration">banner长宽比例：</span></el-row>
             <el-row>
               <el-col :span="12">
-                <el-slider v-model="watermark_wh_ratio" :step="0.001" :min="0.01" :max="0.5" @input="_wh_ratio_f" />
+                <el-slider v-model="watermark_wh_ratio" size="small" :step="0.001" :min="0.01" :max="0.5" @input="_wh_ratio_f" />
               </el-col>
               <el-col :span="12">
                 <el-input-number v-model="watermark_wh_ratio" controls-position="right" size="default"
@@ -94,7 +103,7 @@
             <el-row style="margin-bottom: 2px;"><span class="demonstration">第一水平线</span></el-row>
             <el-row>
               <el-col :span="12">
-                <el-slider v-model="watermark_text_h_scale" :step="0.001" :min="0.2" :max="1.0"
+                <el-slider v-model="watermark_text_h_scale" size="small" :step="0.001" :min="0.2" :max="1.0"
                   @input="_text_h_scale" />
               </el-col>
               <el-col :span="12">
@@ -148,7 +157,7 @@
             </el-row>
 
             <el-row style="margin-bottom: 2px;">
-              <el-tooltip content="不要随意修改此项，固定像素，\n当图片像素为2kw or 4kw时,\n间距距会变的很小" effect="customized">
+              <el-tooltip content="不要随意修改此项，固定像素，当图片像素为2kw or 4kw时, 间距距会变的很小" >
                 <span>分割线边距（像素） <el-icon>
                     <i-ep-Warning />
                   </el-icon></span>
@@ -245,7 +254,7 @@ function test_pro() {
   // update_progress();
   //
 }
-
+const selectedInputContent = ref("");
 // const selectType = ref(true);
 
 // const src = new URL("../assets/test.jpeg", import.meta.url).toString();
@@ -262,7 +271,7 @@ const logo_spacing_ratio = ref(0.35); // unused
 const position_ratio = ref(0.6267);
 const split_line_spacing = ref(30); // fixed 30 px.
 const font_scale = ref(1.0);
-const font_size = ref(0);
+const font_size = ref(10);
 
 const font_size_device_px = ref("10px");
 const font_size_focus_px = ref("10px");
@@ -309,10 +318,10 @@ async function get_font_path() {
 function _wh_ratio_f(value:  any){ // Arrayable<number>) {
   // console.log(value);
   value = value as number
-  const font_size = GLOBAL_WIDTH * value;
-  font_size_device_px.value = font_size * 0.25 + "px";
-  font_size_focus_px.value = font_size * 0.20 + "px";
-  font_size_datetime_px.value = font_size * 0.18 + "px";
+  font_size.value = GLOBAL_WIDTH * value;
+  font_size_device_px.value = font_size.value *font_scale.value *  0.25 + "px";
+  font_size_focus_px.value = font_size.value * font_scale.value*0.20 + "px";
+  font_size_datetime_px.value = font_size.value *font_scale.value* 0.18 + "px";
   logo_width_px.value = GLOBAL_WIDTH * value * logo_ratio.value + "px";
   cusstyle.value.height = GLOBAL_WIDTH * value + "px";
 }
@@ -457,7 +466,20 @@ const querySearch = (queryString: string, cb: any) => {
   cb(user_conf.outputPathHistory);
 }
 
-async function handleSelect(item: any) {
+async function handleSelectInputFiles() {
+  if(await image_progress.selectFiles()) {
+    selectedInputContent.value = user_conf.latestSelectedDirPath;
+  }
+
+}
+async function handleSelectInputDir() {
+  if(await image_progress.selectDirs()) {
+    selectedInputContent.value = user_conf.latestSelectedDirPath;
+  }
+}
+
+// output dir
+async function handleSelectHistoriesDir(item: any) {
   if (await is_dir(inputDir.value)) {
     inputInvalid.value = true;
     if (item.value != user_conf.latestSelectedOutputPath) {
@@ -583,7 +605,7 @@ const getMaxHeight = computed(() => {
   box-sizing: border-box;
   vertical-align: top;
   max-width: v-bind(GLOBAL_WIDTH_PX);
-  max-height: 300px;
+  max-height: 500px;
   /* TODO auto */
 }
 

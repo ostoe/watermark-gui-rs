@@ -280,7 +280,7 @@ onMounted(() => {
   // waveInit11.value.render();
 });
 watch([() => image_progress.count.completed, () => image_progress.count.total, ()=>image_progress.image_dir_path], (newValue, oldValue) => {
-  console.log(`output->oldValue`, oldValue);
+  // console.log(`output->oldValue`, oldValue);
   let fromData = getProgress(oldValue[0], oldValue[1]);
   let toData = getProgress(newValue[0], newValue[1]);
   //判断是否是文件夹

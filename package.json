@@ -14,7 +14,7 @@
     "@iconify/json": "^2.1.106",
     "@tauri-apps/api": "^1.0.2",
     "element-plus": "^2.2.16",
-    "exifreader": "^4.5.1",
+    "exiftool-vendored": "^18.1.0",
     "path": "^0.12.7",
     "save": "^2.5.0",
     "vite-plugin-style-import": "^2.0.0",

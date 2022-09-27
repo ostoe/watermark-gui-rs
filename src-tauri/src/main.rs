@@ -149,12 +149,6 @@ fn handle_front_select_files(
         state
             .send(UserOperation::ImagePath(images_obj.image_paths.join("\n")))
             .unwrap();
-        // for x in images_obj.image_paths.iter() {
-        //TODO verify the path
-        // TODO convert univers fle format
-        // println!("image path: {}", x);
-
-        // }
     }
 
     format!("handle_front_select_files, {}!", "handling...")

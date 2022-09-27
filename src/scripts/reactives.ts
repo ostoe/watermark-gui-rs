@@ -6,7 +6,7 @@ import { BaseDirectory, dirname, pictureDir, resolve, resourceDir } from '@tauri
 import { emit, listen } from "@tauri-apps/api/event";
 import { readDir } from "@tauri-apps/api/fs";
 import { convertFileSrc } from "@tauri-apps/api/tauri";
-import ExifReader from 'exifreader';
+// import ExifReader from 'exifreader';
 import { tryOnUnmounted } from "@vueuse/shared";
 
 // sidebar公共方法/值
@@ -369,7 +369,7 @@ const image_progress = reactive({
     image_progress.update_progress(0, arr.length);
     elmessage("selected: " + this.image_paths);
   },
-
+  // input files
   async selectFiles() {
     const selected = await open({
       multiple: true,
@@ -397,6 +397,7 @@ const image_progress = reactive({
         message: "null file selected.",
         type: "warning",
       });
+      return false;
     } else if (typeof selected === "string") {
       // console.log("single fil: " + selected);
       this.image_paths = { count: 1, image_paths: [selected] };
@@ -407,6 +408,7 @@ const image_progress = reactive({
       elmessage("selected: " + this.image_paths);
       user_conf.latestSelectedDirPath = await dirname(selected);
     }
+    return true;
   },
 
   // async selectSingleFile() {
@@ -432,7 +434,7 @@ const image_progress = reactive({
   //   }
   // },
   //
-
+  // intput cir
   async selectDirs() {
     const selected = await open({
       directory: true,
@@ -445,11 +447,13 @@ const image_progress = reactive({
         message: "null dir selected.",
         type: "warning",
       });
+      return false;
     } else if (typeof selected == "string") {
       console.log("selected single dir " + selected);
       elmessage("selected single dir " + selected);
       this.image_dir_path = selected;
       user_conf.latestSelectedDirPath = selected;
+      return true;
     }
   },
 
@@ -516,6 +520,7 @@ async function backend_event_recv() {
         console.log(event.payload.message + "--- ");
         let result: NotificationBackEnd = JSON.parse(event.payload.message);
         image_progress.update_progress(0, result.jpg_file_count);
+        
         break;
       case 200:
         image_progress.increase_one();
@@ -525,6 +530,14 @@ async function backend_event_recv() {
         console.log("skip file: " + event.payload.message);
         image_progress.increase_one();
         // progress.update_progress(progress.count.completed, progress.count.total);
+        ElNotification({
+          title: '没有exif信息或者大小小于1024*1024,跳过文件：',
+          message: event.payload.message,
+          type: 'warning',
+          position: 'bottom-left',
+          // offset: 100,
+          // duration: 0,
+        });
         break;
       case 500:
         console.log("500: " + event.payload.message);
@@ -533,7 +546,7 @@ async function backend_event_recv() {
           title: '文件内容有误',
           message: event.payload.message,
           type: 'warning',
-          position: 'bottom-right',
+          position: 'bottom-left',
           // offset: 100,
           duration: 0,
         })

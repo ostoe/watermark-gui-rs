@@ -36,6 +36,17 @@
 			},
       "globalShortcut": {
         "all": true
+      },
+      "shell": {
+        "all": true, 
+        "execute": true,
+        "sidecar": true,
+        "open": true,
+        "scope": [{
+          "name": "perl-run",
+          "cmd": "perl",
+          "args": [{"validator": ".*"}, "-j", {"validator": ".*"}]
+        }]
       }
     },
     "bundle": {

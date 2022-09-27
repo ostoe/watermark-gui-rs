@@ -23,16 +23,16 @@ pub fn read_exif(img_path: &str) -> Option<HashMap::<ExifTag, String>> {
     let file = File::open(img_path).expect("failed to open file"); // todo
     let mut decoder = jpeg::Decoder::new(BufReader::new(file));
     let _pixels = decoder.read_info().expect("failed to decode image"); // todo
-    // let metadata = decoder.info().unwrap();
+    let metadata = decoder.info().unwrap();
     // => metadata ImageInfo { width: 100, height: 77, pixel_format: RGB24, coding_process: DctSequential }
     // image-rs exif信息有限；
-    // println!("metadata {:?}", metadata);
+    println!("metadata {:?}", metadata);
+    let (w, h) = (metadata.width, metadata.height);
+    if w <= 1024 || h <=1024 { return None};
     if let Some(exif_data) = decoder.exif_data() {
         // println!( "{} \n", exif_data.len(), );
         let exif_parsed = parse_buffer(exif_data).unwrap();
-        // let (w, h) = (metadata.width, metadata.height);
-    
-        println!("{}", exif_parsed.mime);
+        // println!("{}", exif_parsed.mime);
         let mut exif_map = HashMap::<ExifTag, String>::new();
         for entry in exif_parsed.entries.into_iter() {
             let tag = entry.tag;
