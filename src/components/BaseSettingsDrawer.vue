@@ -11,7 +11,6 @@ import { Ref } from 'vue';
 import { InfoFilled } from '@element-plus/icons-vue';
 
 
-
 const formLabelWidth = '80px'
 //   let timer
 const renamePreffix = ref({
@@ -64,27 +63,78 @@ function resetConfirmEvent() {
 }
 
 const preview_filename = ref(["", "", "", ".jpg"]);
-
+const inputBorder_preffix = ref("")
+const inputBorder_center = ref("")
+//预留后缀判断
+const inputBorder_suffix = ref("")
 function check_input(rename: Ref<RenameType>, preview_index: number) {
     // console.log("-----" + "value");
-
     // let a = [renamePreffix, renameCenter, renameSuffix];
     // for (let i = 0; i < 3; i++) {
+    console.log(rename.value)
     let t = rename.value;
     if (t.value.id == 2) {
         if (reg.test(t.input)) {
             t.valid = true;
             preview_filename.value[preview_index] = t.input;
+            switch(t){
+                case renamePreffix.value: 
+                    inputBorder_preffix.value = ""
+                    break
+                case renameCenter.value:
+                    inputBorder_center.value = ""
+                    break
+                case renameSuffix.value:
+                    inputBorder_suffix.value = ""
+                    break
+            }
         }
         else {
+            console.log(`output->border`)
             t.valid = false;
+            switch(t){
+                case renamePreffix.value: 
+                    inputBorder_preffix.value = "solid red"
+                    break
+                case renameCenter.value:
+                    inputBorder_center.value = "solid red"
+                    break
+                case renameSuffix.value:
+                    inputBorder_suffix.value = "solid red"
+                    break
+            }
         }
     } else if (t.value.id == 3) {
+        console.log("3333")
         if (t.input.includes("$x") && reg.test(t.input)) {
             t.valid = true;
             preview_filename.value[preview_index] = t.input.replaceAll("$x", "1");
+            switch(t){
+                case renamePreffix.value: 
+                    inputBorder_preffix.value = ""
+                    break
+                case renameCenter.value:
+                    inputBorder_center.value = ""
+                    break
+                case renameSuffix.value:
+                    inputBorder_suffix.value = ""
+                    break
+            }
         } else {
+            // console.log(`output->border`)
             t.valid = false;
+            switch(t){
+                case renamePreffix.value: 
+                    inputBorder_preffix.value = "solid red"
+                    break
+                case renameCenter.value:
+                    inputBorder_center.value = "solid red"
+                    break
+                case renameSuffix.value:
+                    inputBorder_suffix.value = "solid red"
+                    break
+            }
+
         }
     } else {
         if (preview_index == 1) {
@@ -270,6 +320,9 @@ onMounted(() => {
     load_saved_conf();
 })
 
+const extendCollapse = ref(["1","2","3"])
+
+
 </script>
     
 
@@ -285,101 +338,111 @@ onMounted(() => {
 
     </div>
     <!-- <div @mouseenter="settingShow" @mouseleave="settingHidden">  -->
-
     <el-drawer v-model="settingsDrawer" title="基本设置" :before-close="handleClose" direction="rtl" size="30%">
         <!-- <el-image style="width: 150px; height: 150px" :src="get_image_url('a')" fit="contain" loading="eager" /> -->
         <el-scrollbar wrap-class="max-height:200px">
-            <el-checkbox v-model="baseForm.autoUseBrand" label="根据exif自动设置" size="large" border />
-            <el-select v-model="baseForm.brand" :placeholder="baseForm.brands[1].label"
-                :disabled="baseForm.autoUseBrand" style="margin: 20px 0 20px 0">
-                <el-option v-for="brand in baseForm.brands" :key="brand.value" :label="brand.label"
-                    :value="brand.value">
-                    <span style="float:left">{{ brand.label }}</span>
-                    <span style="float: right;color: var(--el-text-color-secondary);font-size: 20px;">
-                        <!-- <el-image style="width: 50px; height: 50px" :src="get_image_url(brand.value)" fit="fill" loading="eager" /> -->
-                        <el-image style="width: 35px; height: 35px" :src="get_image_url(brand.value)" fit="contain"
-                            loading="eager" />
-                        <!-- <el-icon>
+            <el-collapse v-model="extendCollapse">
+                <el-collapse-item title="选择logo图片" name="1">
+                    <el-checkbox v-model="baseForm.autoUseBrand" label="根据exif自动设置" size="large" border />
+                    <el-select v-model="baseForm.brand" :placeholder="baseForm.brands[1].label"
+                        :disabled="baseForm.autoUseBrand" style="margin: 20px 0 20px 0">
+                        <el-option v-for="brand in baseForm.brands" :key="brand.value" :label="brand.label"
+                            :value="brand.value">
+                            <span style="float:left">{{ brand.label }}</span>
+                            <span style="float: right;color: var(--el-text-color-secondary);font-size: 20px;">
+                                <!-- <el-image style="width: 50px; height: 50px" :src="get_image_url(brand.value)" fit="fill" loading="eager" /> -->
+                                <el-image style="width: 35px; height: 35px" :src="get_image_url(brand.value)"
+                                    fit="contain" loading="eager" />
+                                <!-- <el-icon>
                             <i-ep-picture />
                         </el-icon> -->
-                    </span>
-                </el-option>
-            </el-select>
-            <el-input-number v-model="baseForm.qulity" :min="1" :max="100" controls-position="right" size="large"
-                step-strictly @change="handleChangeQulity" />
-
-            <el-slider v-model="baseForm.qulity" vertical height="200px" style="position: absolute;bottom: 30%;"/>
-
-            <el-row>
-                <el-col :span="8">
-                    <div class="grid-content ep-bg-purple" />
-                    <p style="margin-left: 10px">名称前缀</p>
-                    <el-select v-model="renamePreffix.value" class="m-2" placeholder="Select" value-key="id"
-                        size="large" :change="check_select_prefix()">
-                        <el-option v-for="item in renamePreffix.SD" :key="item.id" :label="item.label" :value="item" />
+                            </span>
+                        </el-option>
                     </el-select>
+                </el-collapse-item>
+                <el-collapse-item title="选择图片质量" name="2">
+                    <div class="quality">
+                        <el-slider v-model="baseForm.qulity" height="200px" />
+                        <el-input-number v-model="baseForm.qulity" :min="1" :max="100" controls-position="right"
+                            size="medium" step-strictly @change="handleChangeQulity" />
+                    </div>
+                </el-collapse-item>
+                <el-collapse-item title="选择图片名" name="3">
+                    <el-row>
+                        <el-col :span="8">
+                            <div class="grid-content ep-bg-purple" />
+                            <p style="margin-left: 10px">名称前缀</p>
+                            <el-select v-model="renamePreffix.value" class="m-2" placeholder="Select" value-key="id"
+                                size="large" :change="check_select_prefix()">
+                                <el-option v-for="item in renamePreffix.SD" :key="item.id" :label="item.label"
+                                    :value="item" />
+                            </el-select>
 
-                </el-col>
-                <el-col :span="8">
-                    <div class="grid-content ep-bg-purple-light" />
-                    <p style="margin-left: 10px">名称中间</p>
-                    <el-select v-model="renameCenter.value" class="m-2" placeholder="Select" value-key="id" size="large"
-                        :change="check_select_center()">
-                        <el-option v-for="item in renameCenter.SD" :key="item.id" :label="item.label" :value="item" />
-                    </el-select>
-                </el-col>
-                <el-col :span="8">
-                    <div class="grid-content ep-bg-purple" />
-                    <p style="margin-left: 10px">名称后缀</p>
-                    <el-select v-model="renameSuffix.value" class="m-2" placeholder="Select" value-key="id" size="large"
-                        :change="check_select_suffix()">
-                        <el-option v-for="item in renameSuffix.SD" :key="item.id" :label="item.label" :value="item" />
-                    </el-select>
-                </el-col>
-            </el-row>
-            <el-row>
-                <el-col :span="8">
-                    <div class="grid-content ep-bg-purple" />
-                    <el-input v-model="renamePreffix.input" :disabled="renamePreffix.value.id == 1"
-                        :blur="check_input_prefix()"> "自定义后缀"
-                    </el-input>
+                        </el-col>
+                        <el-col :span="8">
+                            <div class="grid-content ep-bg-purple-light" />
+                            <p style="margin-left: 10px">名称中间</p>
+                            <el-select v-model="renameCenter.value" class="m-2" placeholder="Select" value-key="id"
+                                size="large" :change="check_select_center()">
+                                <el-option v-for="item in renameCenter.SD" :key="item.id" :label="item.label"
+                                    :value="item" />
+                            </el-select>
+                        </el-col>
+                        <el-col :span="8">
+                            <div class="grid-content ep-bg-purple" />
+                            <p style="margin-left: 10px">名称后缀</p>
+                            <el-select v-model="renameSuffix.value" class="m-2" placeholder="Select" value-key="id"
+                                size="large" :change="check_select_suffix()">
+                                <el-option v-for="item in renameSuffix.SD" :key="item.id" :label="item.label"
+                                    :value="item" />
+                            </el-select>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="8">
+                            <div class="grid-content ep-bg-purple" />
+                            <el-input class="elinput preffix" v-model="renamePreffix.input" :disabled="renamePreffix.value.id == 1"
+                                :blur="check_input_prefix()" :style="{'border':inputBorder_preffix+' 1px'}"> "自定义后缀"
+                            </el-input>
 
-                </el-col>
-                <el-col :span="8">
-                    <div class="grid-content ep-bg-purple-light" />
-                    <el-input v-model="renameCenter.input" :disabled="renameCenter.value.id == 1"
-                        :blur="check_input_center()">
-                        "自定义后缀" </el-input>
+                        </el-col>
+                        <el-col :span="8">
+                            <div class="grid-content ep-bg-purple-light" />
+                            <el-input class="elinput center" v-model="renameCenter.input" :disabled="renameCenter.value.id == 1"
+                                :blur="check_input_center()" :style="{'border':inputBorder_center+' 1px'}">
+                                "自定义后缀" </el-input>
 
-                </el-col>
-                <el-col :span="8" id="invalidInputCss">
-                    <div class="grid-content ep-bg-purple" />
-                    <el-input v-model="renameSuffix.input" :disabled="renameSuffix.value.id == 1"
-                        :blur="check_input_suffix()">
-                        "自定义后缀" </el-input>
-                </el-col>
-            </el-row>
-            <el-row>
-                <el-button key="button.text" type="primary" text> {{ preview_filename.join("") }} </el-button>
+                        </el-col>
+                        <el-col :span="8" id="invalidInputCss">
+                            <div class="grid-content ep-bg-purple" />
+                            <el-input class="elinput suffix" v-model="renameSuffix.input" :disabled="renameSuffix.value.id == 1"
+                                :blur="check_input_suffix()" :style="{'border':inputBorder_suffix+' 1px'}">
+                                "自定义后缀" </el-input>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-button key="button.text" type="primary" text> {{ preview_filename.join("") }} </el-button>
 
-            </el-row>
-
+                    </el-row>
+                </el-collapse-item>
+            </el-collapse>
         </el-scrollbar>
 
         <div style="" class="row">
-            <el-row>
-                <el-col :span="12">
+            <div class="container">
+                <div class="btn">
                     <el-popconfirm confirm-button-text="是" cancel-button-text="否" :icon="InfoFilled"
                         icon-color="#626AEF" title="重置（仍未保存）" @confirm="resetConfirmEvent" @cancel="">
                         <template #reference>
-                            <el-button type="primary" size="small" plain color="#0FCAC7" class="default-btn">默认</el-button>
+                            <el-button type="primary" size="large" plain color="#0FCAC7" class="default-btn">默认
+                            </el-button>
                         </template>
                     </el-popconfirm>
-                </el-col>
-                <el-col :span="12">
+                </div>
+                <div class="btn">
                     <el-button type="primary" size="large" @click="saveSetting" class="save-btn"> 保存 </el-button>
-                </el-col>
-            </el-row>
+                </div>
+            </div>
         </div>
 
         <!-- <el-button type="primary" :loading="loading" @click="onClick">{{
@@ -413,7 +476,7 @@ onMounted(() => {
 
 .grid-content {
     border-radius: 4px;
-    min-height: 36px;
+    // min-height: 36px;
 }
 
 #invalidInputCss .el-input {
@@ -424,14 +487,44 @@ onMounted(() => {
     --el-input-border-color: #dcdfe6;
 }
 
-.default-btn{
+.row .container{
+    display: inline-flex;
+    width: 86%;
+}
+.row .container .btn{
+    width: 50%;
+}
+.default-btn {
     width: 100%;
     height: 100%;
 }
 
-.svae-btn{
+.save-btn {
     width: 100%;
+    height: 100%;
 }
+
+.quality {
+    display: inline-flex;
+    width: 97%;
+}
+
+.elinput{
+    border-radius: 4px;
+}
+
+// :deep(.elinput, .preffix) {
+//     border: v-bind(inputBorder_preffix);
+// }
+
+// :deep(.elinput, .center) {
+//     border: v-bind(inputBorder_center);
+// }
+
+// :deep(.elinput, .suffix) {
+//     border: v-bind(inputBorder_suffix);
+// }
+
 // .el-input__inner {
 //     --el-input-focus-border: #b24444;
 //     --el-input-text-color: #b24444;
