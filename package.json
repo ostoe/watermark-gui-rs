@@ -17,6 +17,7 @@
     "exiftool-vendored": "^18.1.0",
     "path": "^0.12.7",
     "save": "^2.5.0",
+    "save-dev": "^0.0.1-security",
     "vite-plugin-style-import": "^2.0.0",
     "vue": "^3.2.37",
     "vue-router": "^4.1.4"

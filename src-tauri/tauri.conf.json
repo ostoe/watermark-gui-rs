@@ -46,7 +46,14 @@
           "name": "perl-run",
           "cmd": "perl",
           "args": [{"validator": ".*"}, "-j", {"validator": ".*"}]
-        }]
+        },{
+          "name": "resources/exiftool", "sidecar":true, "args": [ "-j", {"validator": ".*"}]
+        },{
+          "name": "win-exif-run",
+          "cmd": ".\\resources\\exiftool-x86_64-pc-windows-msvc.exe",
+          "args": [ "-j", {"validator": ".*"}]
+        }
+      ]
       }
     },
     "bundle": {
@@ -56,7 +63,7 @@
       "deb": {
         "depends": []
       },
-      "externalBin": [],
+      "externalBin": ["resources/exiftool"],
       "icon": [
         "icons/32x32.png",
         "icons/128x128.png",

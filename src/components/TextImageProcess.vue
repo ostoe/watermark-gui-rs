@@ -352,7 +352,8 @@ async function selectFile(file: File) {
       const reader = new FileReader(); // TODO精简exif的库，好多用不到
       // reader.readAsDataURL(file);
       console.log(exiftool_path);
-      const output = await new Command("perl-run", [ exiftool_path, "-h" , "/Users/fly/Pictures/100NCZ_7/DSC_0595.JPG"]).execute();
+      // const output = await Command.sidecar("resources/exiftool",  [ exiftool_path, "-j" , "/Users/fly/Pictures/100NCZ_7/DSC_0595.JPG"]).execute();
+      const output = await new Command("win-exif-run", [ exiftool_path, "-j" , "/Users/fly/Pictures/100NCZ_7/DSC_0595.JPG"]).execute();
       console.log(output, output.stdout,);
       // Command::new("powershell")
       // .args(&[
@@ -363,7 +364,12 @@ async function selectFile(file: File) {
       // .creation_flags(0x08000000)
 
     } else if(osType.includes('Windows_NT')) {
-
+      const r1 = await resourceDir();
+      const exiftool_path = await resolve(r1, "resources", "exiftool.exe");
+      console.log(exiftool_path);
+      // const output = await Command.sidecar("resources/exiftool",  [ "-j",  "X:\\Z7\\001\\2022_07_19_016_DSC_0610.JPG"]).execute();
+      const output = await new Command("win-exif-run", [ "-j" , "X:\\Z7\\001\\2022_07_19_016_DSC_0610.JPG"]).execute();
+      console.log(output, output.stdout,);
     }
     // exifTags.value = await ExifReader.load(file);
     console.log(`output->tags`, exifTags.value);
