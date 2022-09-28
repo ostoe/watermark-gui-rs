@@ -1,22 +1,18 @@
 <script setup lang="ts">
-import { nextTick, ref, onMounted, Ref } from "vue";
+import { nextTick, ref, onMounted } from "vue";
 // import { image_progress } from "../main";
-import { elmessage, image_progress } from "../scripts/reactives";
-import { emit, listen } from "@tauri-apps/api/event";
-import { event, invoke } from "@tauri-apps/api";
+import { elmessage } from "../scripts/reactives";
+import { listen } from "@tauri-apps/api/event";
+import { invoke } from "@tauri-apps/api";
 import { sidebarReactives } from "../scripts/reactives";
-import { platform, type as os_type } from '@tauri-apps/api/os';
+import { type as os_type } from '@tauri-apps/api/os';
 import { Command } from '@tauri-apps/api/shell';
 // import { ElMessage, ElNotification } from "element-plus";
 import { open } from "@tauri-apps/api/dialog";
-import { appDir, resolve, resourceDir } from "@tauri-apps/api/path";
-import { pictureDir } from "@tauri-apps/api/path";
+import { resolve, resourceDir } from "@tauri-apps/api/path";
 // import { watch } from "fs";
-import baseSettingsDrawerVue from "./BaseSettingsDrawer.vue";
 // import ExifReader from "exifreader";
 import type {
-  UploadFile,
-  UploadFiles,
   UploadInstance,
   UploadProps,
   UploadRawFile,
@@ -109,9 +105,9 @@ onMounted(() => {
   // init_output_dir();
 });
 
-// test event
 
-const exifTags = ref<ExifReader.Tags>({});
+// let exifTags = reactive({});
+const thumbBase64Data = reactive({ "image": "" })
 interface exifDetailData {
   label?: string;
   data?: string;
@@ -129,6 +125,7 @@ interface summaryData {
   focal: exifData;
   color: exifData;
   date: exifData;
+  shutterCount: exifData;
 }
 const summaryTemplate = {
   models: {
@@ -155,16 +152,20 @@ const summaryTemplate = {
     label: "时间",
     data: [],
   },
+  shutterCount: {
+    label: "快门数",
+    data: [],
+  }
 } as summaryData;
 const summaryInfo = ref<summaryData>(summaryTemplate);
 // 缩略图
 const thumbBase64 = computed(() => {
-  if (!exifTags.value.Thumbnail?.base64) {
+  if (!thumbBase64Data.image) {
     return "";
   } else {
     return (
-      "url(data:image/png;base64," +
-      exifTags.value.Thumbnail!.base64 +
+      "url(data:image/jpeg;base64," +
+      thumbBase64Data.image +
       ") no-repeat"
     );
   }
@@ -173,92 +174,15 @@ const thumbBase64 = computed(() => {
 // 概览
 const size = ref("small");
 const tableExifData = ref<Array<exifDetailData>>([]);
-watch(exifTags, (newValue, oldValue) => {
+/*
+  watch(exifTags, (newValue, oldValue) => {
   //清空对象
+  console.log(newValue);
   for (let value of Object.values(summaryInfo.value)) {
     value.data = [];
   }
-  if (newValue.Model?.value[0]) {
-    summaryInfo.value.models.data.push({
-      label: "相机",
-      data: newValue.Model?.value[0],
-    } as exifDetailData);
-  }
-  if (newValue.LensModel?.value) {
-    summaryInfo.value.models.data.push({
-      label: "详细",
-      data: newValue.LensModel?.description,
-    } as exifDetailData);
-  }
-  // summaryInfo.value.models.data = [{ label: "相机", data: newValue.Model?.value[0] } as exifDetailData, { label: "详细", data: newValue.LensModel?.value } as exifDetailData]
-  if (newValue.ExposureProgram?.description) {
-    summaryInfo.value.exposure.data.push({
-      label: "曝光模式",
-      data: newValue.ExposureProgram?.description,
-    } as exifDetailData);
-  }
-  if (newValue.MeteringMode?.description) {
-    summaryInfo.value.exposure.data.push({
-      label: "测光模式",
-      data: newValue.MeteringMode?.description,
-    } as exifDetailData);
-  }
-  if (newValue.ExposureBiasValue?.description) {
-    let parseExposureBiasValue = parseFloat(
-      exifTags.value.ExposureBiasValue!.description
-    ).toFixed(2);
-    summaryInfo.value.exposure.data.push({
-      label: "曝光补偿",
-      data: parseExposureBiasValue,
-    } as exifDetailData);
-  }
-  // summaryInfo.value.exposure.data = [{ label: "曝光模式", data: newValue.ExposureProgram?.description } as exifDetailData, { label: "测光模式", data: newValue.MeteringMode?.description } as exifDetailData, { label: "曝光补偿", data: newValue.ExposureBiasValue?.description } as exifDetailData]
-  if (newValue.ApertureValue?.description) {
-    summaryInfo.value.speed.data.push({
-      label: "光圈",
-      data: newValue.ApertureValue?.description,
-    } as exifDetailData);
-  }
-  if (newValue.ShutterSpeedValue?.description) {
-    summaryInfo.value.speed.data.push({
-      label: "快门",
-      data: newValue.ShutterSpeedValue?.description,
-    } as exifDetailData);
-  }
-  if (newValue.ISOSpeedRatings?.description) {
-    summaryInfo.value.speed.data.push({
-      label: "ISO",
-      data: newValue.ISOSpeedRatings?.description.toString(),
-    } as exifDetailData);
-  }
-  // summaryInfo.value.speed.data = [{ label: "光圈", data: newValue.ApertureValue?.description } as exifDetailData, { label: "快门", data: newValue.ShutterSpeedValue?.description } as exifDetailData, { label: "ISO", data: newValue.ISOSpeedRatings?.description.toString() } as exifDetailData]
-  if (newValue.FocalLength?.description) {
-    summaryInfo.value.focal.data.push({
-      label: "焦距",
-      data: newValue.FocalLength?.description,
-    } as exifDetailData);
-  }
-  // summaryInfo.value.focal.data = [{ label: "焦距", data: newValue.FocalLength?.description } as exifDetailData ]
-  if (newValue.WhiteBalance?.description) {
-    summaryInfo.value.color.data.push({
-      label: "白平衡",
-      data: newValue.WhiteBalance?.description,
-    } as exifDetailData);
-  }
-  if (newValue.ColorSpace?.description) {
-    summaryInfo.value.color.data.push({
-      label: "色彩空间",
-      data: newValue.ColorSpace?.description,
-    } as exifDetailData);
-  }
-  // summaryInfo.value.color.data = [{ label: "白平衡", data: newValue.WhiteBalance?.description } as exifDetailData, { label: "色彩空间", data: newValue.ColorSpace?.description } as exifDetailData]
-  if (newValue.DateTime?.description) {
-    summaryInfo.value.date.data.push({
-      label: "创建时间",
-      data: newValue.DateTime?.description,
-    } as exifDetailData);
-  }
-  // summaryInfo.value.date.data = [{ label: "创建时间", data: newValue.DateTime?.description } as exifDetailData]
+
+
   tableExifData.value = [];
   var reg = "^[ ]+$";
   var re = new RegExp(reg);
@@ -278,6 +202,7 @@ watch(exifTags, (newValue, oldValue) => {
     }
   }
 });
+*/
 
 // const summaryInfo = computed(() => {
 //   return {
@@ -341,45 +266,18 @@ watch(exifTags, (newValue, oldValue) => {
 // }
 
 async function selectFile(file: File) {
-  console.log(file, file.webkitRelativePath, );
+  console.log(file, file.webkitRelativePath,);
   if (file.type === "image/jpeg") {
-    const osType = await os_type(); // Returns 'Linux' 'Darwin'  'Windows_NT'
-    if (osType.includes('Darwin')) {
-      // TODO  run ./
-      const r1 = await resourceDir();
-      const exiftool_path = await resolve(r1, "resources", "exiftool");
-      //  exiftool -j ~/Pictures/100NCZ_7/DSC_0595.JPG
-      const reader = new FileReader(); // TODO精简exif的库，好多用不到
-      // reader.readAsDataURL(file);
-      console.log(exiftool_path);
-      // const output = await Command.sidecar("resources/exiftool",  [ exiftool_path, "-j" , "/Users/fly/Pictures/100NCZ_7/DSC_0595.JPG"]).execute();
-      const output = await new Command("win-exif-run", [ exiftool_path, "-j" , "/Users/fly/Pictures/100NCZ_7/DSC_0595.JPG"]).execute();
-      console.log(output, output.stdout,);
-      // Command::new("powershell")
-      // .args(&[
-      //   "./src/extractIcon.ps1",
-      //   file_path.as_str(),
-      //   icon_path.to_str().unwrap(),
-      // ])
-      // .creation_flags(0x08000000)
 
-    } else if(osType.includes('Windows_NT')) {
-      const r1 = await resourceDir();
-      const exiftool_path = await resolve(r1, "resources", "exiftool.exe");
-      console.log(exiftool_path);
-      // const output = await Command.sidecar("resources/exiftool",  [ "-j",  "X:\\Z7\\001\\2022_07_19_016_DSC_0610.JPG"]).execute();
-      const output = await new Command("win-exif-run", [ "-j" , "X:\\Z7\\001\\2022_07_19_016_DSC_0610.JPG"]).execute();
-      console.log(output, output.stdout,);
-    }
     // exifTags.value = await ExifReader.load(file);
-    console.log(`output->tags`, exifTags.value);
+    console.log(`output->tags`, exifTags);
     // image_progress.selectFiles();
   } else {
     elmessage("please choose a jpeg file");
   }
 }
 
-const emptyStatus = ref(true);
+const emptyStatus = ref(false);
 const upload = ref<UploadInstance>();
 const handleExceed: UploadProps["onExceed"] = (files) => {
   upload.value!.clearFiles();
@@ -390,8 +288,122 @@ const handleExceed: UploadProps["onExceed"] = (files) => {
     selectFile(file);
   }
 };
-const handleOnChange: UploadProps["onChange"] = (uploadFile) => {
-  console.log(uploadFile.raw!);
+
+
+async function handleOnChange() {
+  const selected = await open({
+    multiple: false,
+    directory: false,
+  });
+  if (typeof selected === "string") {
+    const osType = await os_type(); // Returns 'Linux' 'Darwin'  'Windows_NT'
+    let exifTags = {};
+    if (osType.includes('Darwin')) {
+      // TODO  run ./
+      // const r1 = await resourceDir();
+      // const exiftool_path = await resolve(r1, "resources", "exiftool");
+      //  exiftool -j ~/Pictures/100NCZ_7/DSC_0595.JPG
+      // const reader = new FileReader(); // TODO精简exif的库，好多用不到
+      // reader.readAsDataURL(file);
+      // console.log(exiftool_path);
+      // const output = await Command.sidecar("resources/exiftool",  [ exiftool_path, "-j" , "/Users/fly/Pictures/100NCZ_7/DSC_0595.JPG"]).execute();
+      const output = await new Command("perl-run", ["resources/exiftool", "-j", "-b", selected]).execute();
+      // console.log(output);
+      exifTags = JSON.parse(output.stdout)[0];
+      console.log(exifTags);
+      // Command::new("powershell")
+      // .args(&[
+      //   "./src/extractIcon.ps1",
+      //   file_path.as_str(),
+      //   icon_path.to_str().unwrap(),
+      // ])
+      // .creation_flags(0x08000000)
+
+    } else if (osType.includes('Windows_NT')) {
+      const r1 = await resourceDir();
+      const exiftool_path = await resolve(r1, "resources", "exiftool.exe");
+      // console.log(exiftool_path);
+      // const output = await Command.sidecar("resources/exiftool",  [ "-j",  "X:\\Z7\\001\\2022_07_19_016_DSC_0610.JPG"]).execute();
+      const output = await new Command("win-exif-run", ["-j -b", "X:\\Z7\\001\\2022_07_19_016_DSC_0610.JPG"]).execute();
+      // console.log(output, output.stdout,);
+    }
+    let hasPreviewImage = false;
+    if (exifTags["PreviewImage"] != null) {
+      thumbBase64Data.image = exifTags["PreviewImage"].split(":")[1];
+      exifTags["PreviewImage"] = `(Binary data ${thumbBase64Data.image.length} bytes or length)`
+      hasPreviewImage = true;
+    }
+    if (exifTags["ThumbnailImage"] != null) {
+      if (!hasPreviewImage) {
+        thumbBase64Data.image = exifTags["ThumbnailImage"].split(":")[1];
+      }
+      // thumbBase64Data.image = thumbBase64Data.image.split(":")[1];
+      exifTags["ThumbnailImage"] = `(Binary data ${thumbBase64Data.image.length} bytes or length)`
+    }
+    console.log("hasPreviewImage:", hasPreviewImage);
+
+    if (exifTags["MPImage3"] != null) {
+      // thumbBase64Data.value = exifTags["ThumbnailImage"];
+      exifTags["MPImage3"] = `(Binary data)`
+    }
+
+    console.log(summaryInfo.value);
+    const targetTag = [["相机", "Model", "models"], ["镜头", "LensModel", "models"], ["曝光模式", "ExposureProgram", "exposure"],
+    ["测光模式", "MeteringMode", "exposure"], ["曝光补偿", "ExposureBiasValue", "exposure"],
+    ["光圈", "ApertureValue", "speed"], ["光圈", "Aperture", "speed"], ["快门", "ExposureTime", "speed"], ["ISO", "ISO", "speed"], ["焦距", "FocalLength", "focal"],
+    ["白平衡", "WhiteBalance", "color"], ["色彩空间", "ColorSpace", "color"],
+    ["拍摄时间", "DateTimeOriginal", "date"], ["快门数", "ShutterCount", "shutterCount"], ["机械快门数", "MechanicalShutterCount", "shutterCount"]];
+    summaryInfo.value = summaryTemplate;
+    // 清空对象
+    for (let value of Object.values(summaryInfo.value)) {
+      value.data = [];
+    }
+    for (let i = 0; i < targetTag.length; i++) {
+      const tagld = targetTag[i];
+      if (exifTags[tagld[1]] != null) {
+        summaryInfo.value[tagld[2]].data.push({
+          label: tagld[0],
+          data: exifTags[tagld[1]].toString(),
+        } as exifDetailData);
+      }
+    }
+    console.log(summaryInfo.value);
+    emptyStatus.value = false;
+    tableExifData.value = [];
+    for (const [key, value] of Object.entries<string>(exifTags)) {
+      tableExifData.value.push({ label: key, data: value.toString() })
+      // console.log(`${key}: ${value}`);
+    }
+
+
+  } else if (selected === null) {
+    // user cancelled the selection
+    ElMessage({
+      message: "null file selected.",
+      type: "warning",
+    });
+  }
+}
+
+const detailTableRowClassName = ({ row, rowIndex }: { row: exifDetailData, rowIndex: number }) => {
+  return (rowIndex % 2 === 1) ? 'warning-row' : 'success-row'
+}
+
+const search = ref("")
+
+const filterTableData = computed(() =>
+  tableExifData.value.filter(
+    (obj) =>
+      !search.value ||
+      obj.label?.toLowerCase().includes(search.value.toLowerCase()) || obj.data?.toLocaleLowerCase().includes(search.value.toLowerCase())
+  )
+)
+
+const handleOnChange1: UploadProps["onChange"] = (uploadFile) => {
+
+
+
+  console.log(uploadFile.raw!, uploadFile);
   if (uploadFile.raw!.type === "image/jpeg") {
     emptyStatus.value = false;
     selectFile(uploadFile.raw!);
@@ -409,7 +421,7 @@ interface skeleton {
   textWidth: number,
   textMargin: number
 }
-const loading = ref(true);
+const loading = ref(false);
 const skeletonTemplate = [{
   sideWidth: 10,
   sideMargin: 50,
@@ -443,7 +455,7 @@ const skeletonTemplate = [{
 }] as Array<skeleton>
 </script>
 <template lang="">
-  <div>{{ testData }}</div>
+  <!-- <div>{{ testData }}</div> -->
   <el-row class="exifinput" style="margin-top: 22px; margin-bottom: 10px">
     <el-col :span="20">
       <div style="margin-left: 25px; font-size: 20px">
@@ -452,6 +464,11 @@ const skeletonTemplate = [{
     </el-col>
     <el-col :span="4">
       <!-- <input type="file" @change="selectedFile" /> -->
+      <el-button @click="handleOnChange">
+        <el-icon>
+          <i-ep-upload></i-ep-upload>
+        </el-icon>
+      </el-button>
       <el-upload
         ref="upload"
         :limit="1"
@@ -570,12 +587,19 @@ const skeletonTemplate = [{
           </div>
         </el-card>
         <el-divider></el-divider>
+        <el-button text> 
+          <el-input v-model="search" size="small" placeholder="搜索">
+            <template #prepend><el-icon><i-ep-search/></el-icon></template>
+            
+          </el-input>
+        </el-button>
         <el-table
-          :data="tableExifData"
+          :data="filterTableData"
           stripe
           style="width: 100%"
           class="table"
-          :default-sort="{ prop: 'label', order: 'descending' }"
+          :default-sort="{ prop: 'label', order: 'ascending' }"
+          :row-class-name="detailTableRowClassName"
         >
           <el-table-column
             class="table-col"
@@ -589,7 +613,7 @@ const skeletonTemplate = [{
             prop="data"
             label="详细参数"
             resizable
-          />
+          ></el-table-column>
         </el-table>
         <el-container class="a-border">
           <div id="drap-area-sq1">
@@ -737,7 +761,7 @@ const skeletonTemplate = [{
 
 
 @media (max-width:600px) {
-  .wrapper{
+  .wrapper {
     flex-direction: column;
     height: 50%;
     -webkit-transition: width 1s ease;
@@ -746,18 +770,22 @@ const skeletonTemplate = [{
     -ms-transition: width 2s ease;
     transition: width 1s ease;
   }
-  .pic{
+
+  .pic {
     width: 100%;
   }
 
-  .pic-skeleton{
+  .pic-skeleton {
     width: 50%;
   }
-  .pic,.pic-skeleton{
+
+  .pic,
+  .pic-skeleton {
     height: 190px;
     align-self: center;
   }
-  .eldescription{
+
+  .eldescription {
     width: 95%;
     align-self: center;
   }
@@ -787,6 +815,14 @@ const skeletonTemplate = [{
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.el-table .warning-row {
+  --el-table-tr-bg-color: var(--el-color-warning-light-9);
+}
+
+.el-table .success-row {
+  --el-table-tr-bg-color: var(--el-color-success-light-9);
 }
 
 .table-col {

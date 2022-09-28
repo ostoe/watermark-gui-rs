@@ -45,7 +45,7 @@
         "scope": [{
           "name": "perl-run",
           "cmd": "perl",
-          "args": [{"validator": ".*"}, "-j", {"validator": ".*"}]
+          "args": [{"validator": ".*"}, "-j", "-b", {"validator": ".*"}]
         },{
           "name": "resources/exiftool", "sidecar":true, "args": [ "-j", {"validator": ".*"}]
         },{
@@ -63,7 +63,7 @@
       "deb": {
         "depends": []
       },
-      "externalBin": ["resources/exiftool"],
+      "externalBin": null,
       "icon": [
         "icons/32x32.png",
         "icons/128x128.png",
