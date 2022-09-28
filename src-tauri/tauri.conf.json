@@ -45,7 +45,7 @@
         "scope": [{
           "name": "perl-run",
           "cmd": "perl",
-          "args": [{"validator": ".*"}, "-j", {"validator": ".*"}]
+          "args": [{"validator": ".*"}, "-j", "-b", {"validator": ".*"}]
         },{
           "name": "resources/exiftool", "sidecar":true, "args": [ "-j", {"validator": ".*"}]
         },{

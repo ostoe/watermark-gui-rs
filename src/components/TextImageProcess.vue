@@ -1,22 +1,18 @@
 <script setup lang="ts">
-import { nextTick, ref, onMounted, Ref } from "vue";
+import { nextTick, ref, onMounted } from "vue";
 // import { image_progress } from "../main";
-import { elmessage, image_progress } from "../scripts/reactives";
-import { emit, listen } from "@tauri-apps/api/event";
-import { event, invoke } from "@tauri-apps/api";
+import { elmessage } from "../scripts/reactives";
+import { listen } from "@tauri-apps/api/event";
+import { invoke } from "@tauri-apps/api";
 import { sidebarReactives } from "../scripts/reactives";
-import { platform, type as os_type } from '@tauri-apps/api/os';
+import { type as os_type } from '@tauri-apps/api/os';
 import { Command } from '@tauri-apps/api/shell';
 // import { ElMessage, ElNotification } from "element-plus";
 import { open } from "@tauri-apps/api/dialog";
-import { appDir, resolve, resourceDir } from "@tauri-apps/api/path";
-import { pictureDir } from "@tauri-apps/api/path";
+import { resolve, resourceDir } from "@tauri-apps/api/path";
 // import { watch } from "fs";
-import baseSettingsDrawerVue from "./BaseSettingsDrawer.vue";
 // import ExifReader from "exifreader";
 import type {
-  UploadFile,
-  UploadFiles,
   UploadInstance,
   UploadProps,
   UploadRawFile,
@@ -107,10 +103,11 @@ onMounted(() => {
   // drag_event_handle();
   // // this.set_drap_hover_evet(); // e.x e.y invalid.
   // init_output_dir();
-}); 
+});
 
 
-let exifTags = reactive({});
+// let exifTags = reactive({});
+const thumbBase64Data = reactive({ "image": "" })
 interface exifDetailData {
   label?: string;
   data?: string;
@@ -163,12 +160,12 @@ const summaryTemplate = {
 const summaryInfo = ref<summaryData>(summaryTemplate);
 // 缩略图
 const thumbBase64 = computed(() => {
-  if (!exifTags.Thumbnail?.base64) {
+  if (!thumbBase64Data.image) {
     return "";
   } else {
     return (
-      "url(data:image/png;base64," +
-      exifTags.Thumbnail!.base64 +
+      "url(data:image/jpeg;base64," +
+      thumbBase64Data.image +
       ") no-repeat"
     );
   }
@@ -280,7 +277,7 @@ async function selectFile(file: File) {
   }
 }
 
-const emptyStatus = ref(true);
+const emptyStatus = ref(false);
 const upload = ref<UploadInstance>();
 const handleExceed: UploadProps["onExceed"] = (files) => {
   upload.value!.clearFiles();
@@ -310,7 +307,7 @@ async function handleOnChange() {
       // reader.readAsDataURL(file);
       // console.log(exiftool_path);
       // const output = await Command.sidecar("resources/exiftool",  [ exiftool_path, "-j" , "/Users/fly/Pictures/100NCZ_7/DSC_0595.JPG"]).execute();
-      const output = await new Command("perl-run", ["resources/exiftool", "-j", selected]).execute();
+      const output = await new Command("perl-run", ["resources/exiftool", "-j", "-b", selected]).execute();
       // console.log(output);
       exifTags = JSON.parse(output.stdout)[0];
       console.log(exifTags);
@@ -325,23 +322,42 @@ async function handleOnChange() {
     } else if (osType.includes('Windows_NT')) {
       const r1 = await resourceDir();
       const exiftool_path = await resolve(r1, "resources", "exiftool.exe");
-      console.log(exiftool_path);
+      // console.log(exiftool_path);
       // const output = await Command.sidecar("resources/exiftool",  [ "-j",  "X:\\Z7\\001\\2022_07_19_016_DSC_0610.JPG"]).execute();
-      const output = await new Command("win-exif-run", ["-j", "X:\\Z7\\001\\2022_07_19_016_DSC_0610.JPG"]).execute();
-      console.log(output, output.stdout,);
+      const output = await new Command("win-exif-run", ["-j -b", "X:\\Z7\\001\\2022_07_19_016_DSC_0610.JPG"]).execute();
+      // console.log(output, output.stdout,);
+    }
+    let hasPreviewImage = false;
+    if (exifTags["PreviewImage"] != null) {
+      thumbBase64Data.image = exifTags["PreviewImage"].split(":")[1];
+      exifTags["PreviewImage"] = `(Binary data ${thumbBase64Data.image.length} bytes or length)`
+      hasPreviewImage = true;
+    }
+    if (exifTags["ThumbnailImage"] != null) {
+      if (!hasPreviewImage) {
+        thumbBase64Data.image = exifTags["ThumbnailImage"].split(":")[1];
+      }
+      // thumbBase64Data.image = thumbBase64Data.image.split(":")[1];
+      exifTags["ThumbnailImage"] = `(Binary data ${thumbBase64Data.image.length} bytes or length)`
+    }
+    console.log("hasPreviewImage:", hasPreviewImage);
+
+    if (exifTags["MPImage3"] != null) {
+      // thumbBase64Data.value = exifTags["ThumbnailImage"];
+      exifTags["MPImage3"] = `(Binary data)`
     }
 
     console.log(summaryInfo.value);
     const targetTag = [["相机", "Model", "models"], ["镜头", "LensModel", "models"], ["曝光模式", "ExposureProgram", "exposure"],
     ["测光模式", "MeteringMode", "exposure"], ["曝光补偿", "ExposureBiasValue", "exposure"],
-    ["光圈", "ApertureValue", "speed"], ["快门", "ShutterSpeedValue", "speed"], ["ISO", "ISOSpeedRatings", "speed"], ["焦距", "FocalLength", "focal"],
+    ["光圈", "ApertureValue", "speed"], ["光圈", "Aperture", "speed"], ["快门", "ExposureTime", "speed"], ["ISO", "ISO", "speed"], ["焦距", "FocalLength", "focal"],
     ["白平衡", "WhiteBalance", "color"], ["色彩空间", "ColorSpace", "color"],
-    ["创建时间", "DateTime", "date"], ["快门数", "ShutterCount", "shutterCount"], ["机械快门数", "MechanicalShutterCount", "shutterCount"]];
+    ["拍摄时间", "DateTimeOriginal", "date"], ["快门数", "ShutterCount", "shutterCount"], ["机械快门数", "MechanicalShutterCount", "shutterCount"]];
     summaryInfo.value = summaryTemplate;
     // 清空对象
     for (let value of Object.values(summaryInfo.value)) {
-    value.data = [];
-  }
+      value.data = [];
+    }
     for (let i = 0; i < targetTag.length; i++) {
       const tagld = targetTag[i];
       if (exifTags[tagld[1]] != null) {
@@ -355,10 +371,10 @@ async function handleOnChange() {
     emptyStatus.value = false;
     tableExifData.value = [];
     for (const [key, value] of Object.entries<string>(exifTags)) {
-      tableExifData.value.push({label: key, data: value.toString()})
+      tableExifData.value.push({ label: key, data: value.toString() })
       // console.log(`${key}: ${value}`);
-}
-    
+    }
+
 
   } else if (selected === null) {
     // user cancelled the selection
@@ -368,6 +384,20 @@ async function handleOnChange() {
     });
   }
 }
+
+const detailTableRowClassName = ({ row, rowIndex }: { row: exifDetailData, rowIndex: number }) => {
+  return (rowIndex % 2 === 1) ? 'warning-row' : 'success-row'
+}
+
+const search = ref("")
+
+const filterTableData = computed(() =>
+  tableExifData.value.filter(
+    (obj) =>
+      !search.value ||
+      obj.label?.toLowerCase().includes(search.value.toLowerCase()) || obj.data?.toLocaleLowerCase().includes(search.value.toLowerCase())
+  )
+)
 
 const handleOnChange1: UploadProps["onChange"] = (uploadFile) => {
 
@@ -557,12 +587,19 @@ const skeletonTemplate = [{
           </div>
         </el-card>
         <el-divider></el-divider>
+        <el-button text> 
+          <el-input v-model="search" size="small" placeholder="搜索">
+            <template #prepend><el-icon><i-ep-search/></el-icon></template>
+            
+          </el-input>
+        </el-button>
         <el-table
-          :data="tableExifData"
+          :data="filterTableData"
           stripe
           style="width: 100%"
           class="table"
-          :default-sort="{ prop: 'label', order: 'descending' }"
+          :default-sort="{ prop: 'label', order: 'ascending' }"
+          :row-class-name="detailTableRowClassName"
         >
           <el-table-column
             class="table-col"
@@ -576,7 +613,7 @@ const skeletonTemplate = [{
             prop="data"
             label="详细参数"
             resizable
-          />
+          ></el-table-column>
         </el-table>
         <el-container class="a-border">
           <div id="drap-area-sq1">
@@ -778,6 +815,14 @@ const skeletonTemplate = [{
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.el-table .warning-row {
+  --el-table-tr-bg-color: var(--el-color-warning-light-9);
+}
+
+.el-table .success-row {
+  --el-table-tr-bg-color: var(--el-color-success-light-9);
 }
 
 .table-col {
