@@ -10,7 +10,7 @@
 import router from "./router/router";
 // import { Context } from "vm";
 import { sidebarReactives, image_progress } from "./scripts/reactives";
-import { convertFileSrc } from "@tauri-apps/api/tauri";
+// import { convertFileSrc } from "@tauri-apps/api/tauri";
 
 // import { sidebarReactives } from "../scripts/reactives";
 //dark mode
