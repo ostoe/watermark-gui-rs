@@ -3,7 +3,7 @@ import { getVersion } from '@tauri-apps/api/app';
 const appVersion = ref("aaa");
 async function getMyVersion() { appVersion.value = await getVersion() };
 
-const size = ref('')
+const size = ref('small')
 const blockMargin = computed(() => {
   const marginMap = {
     large: '32px',
@@ -31,7 +31,7 @@ onMounted(() => {
     <el-icon>
         <i-ep-camera-filled></i-ep-camera-filled>
     </el-icon>
-    <el-descriptions title="Watermark-gui" :column="4" :size="size" direction="vertical"
+    <el-descriptions title="Watermark-gui" :column="4" size="" direction="vertical"
         :style="blockMargin">
         <el-descriptions-item label="Name" :span="2">watermark-gui</el-descriptions-item>
         <el-descriptions-item label="Remarks">

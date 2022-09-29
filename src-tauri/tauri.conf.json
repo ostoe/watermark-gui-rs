@@ -47,11 +47,11 @@
           "cmd": "perl",
           "args": [{"validator": ".*"}, "-j", "-b", {"validator": ".*"}]
         },{
-          "name": "resources/exiftool", "sidecar":true, "args": [ "-j", {"validator": ".*"}]
+          "name": "win-ps", "cmd": "powershell", "args": [ ".\\resources\\win-run.ps1", "-j", "-b", {"validator": ".*"}]
         },{
           "name": "win-exif-run",
-          "cmd": ".\\resources\\exiftool-x86_64-pc-windows-msvc.exe",
-          "args": [ "-j", {"validator": ".*"}]
+          "cmd": ".\\resources\\exiftool.exe",
+          "args": [ "-j", "-b", {"validator": ".*"}]
         }
       ]
       }

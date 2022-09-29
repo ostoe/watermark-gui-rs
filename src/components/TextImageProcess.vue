@@ -270,7 +270,7 @@ async function selectFile(file: File) {
   if (file.type === "image/jpeg") {
 
     // exifTags.value = await ExifReader.load(file);
-    console.log(`output->tags`, exifTags);
+    // console.log(`output->tags`, exifTags);
     // image_progress.selectFiles();
   } else {
     elmessage("please choose a jpeg file");
@@ -299,33 +299,16 @@ async function handleOnChange() {
     const osType = await os_type(); // Returns 'Linux' 'Darwin'  'Windows_NT'
     let exifTags = {};
     if (osType.includes('Darwin')) {
-      // TODO  run ./
-      // const r1 = await resourceDir();
-      // const exiftool_path = await resolve(r1, "resources", "exiftool");
-      //  exiftool -j ~/Pictures/100NCZ_7/DSC_0595.JPG
-      // const reader = new FileReader(); // TODO精简exif的库，好多用不到
-      // reader.readAsDataURL(file);
-      // console.log(exiftool_path);
       // const output = await Command.sidecar("resources/exiftool",  [ exiftool_path, "-j" , "/Users/fly/Pictures/100NCZ_7/DSC_0595.JPG"]).execute();
       const output = await new Command("perl-run", ["resources/exiftool", "-j", "-b", selected]).execute();
       // console.log(output);
       exifTags = JSON.parse(output.stdout)[0];
       console.log(exifTags);
-      // Command::new("powershell")
-      // .args(&[
-      //   "./src/extractIcon.ps1",
-      //   file_path.as_str(),
-      //   icon_path.to_str().unwrap(),
-      // ])
-      // .creation_flags(0x08000000)
-
     } else if (osType.includes('Windows_NT')) {
-      const r1 = await resourceDir();
-      const exiftool_path = await resolve(r1, "resources", "exiftool.exe");
-      // console.log(exiftool_path);
-      // const output = await Command.sidecar("resources/exiftool",  [ "-j",  "X:\\Z7\\001\\2022_07_19_016_DSC_0610.JPG"]).execute();
-      const output = await new Command("win-exif-run", ["-j -b", "X:\\Z7\\001\\2022_07_19_016_DSC_0610.JPG"]).execute();
+      const output = await new Command("win-ps", [".\\resources\\win-run.ps1", "-j", "-b", selected]).execute();
       // console.log(output, output.stdout,);
+      exifTags = JSON.parse(output.stdout)[0];
+      console.log(exifTags);
     }
     let hasPreviewImage = false;
     if (exifTags["PreviewImage"] != null) {
