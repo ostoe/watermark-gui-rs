@@ -31,7 +31,7 @@ onMounted(() => {
     <el-icon>
         <i-ep-camera-filled></i-ep-camera-filled>
     </el-icon>
-    <el-descriptions title="Watermark-gui" :column="4" :size="size" direction="vertical"
+    <el-descriptions title="Watermark-gui" :column="4" size="default" direction="vertical"
         :style="blockMargin">
         <el-descriptions-item label="Name" :span="2">watermark-gui</el-descriptions-item>
         <el-descriptions-item label="Remarks">

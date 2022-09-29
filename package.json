@@ -1,10 +1,12 @@
 {
   "name": "watermark-app",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "adev": "node scripts/adev.mjs  && tauri dev && node scripts/clearFile.mjs",
+    "abuild": "node scripts/abuild.mjs && tauri build && node scripts/clearFile.mjs",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
     "tauri": "tauri"
@@ -13,6 +15,7 @@
     "@element-plus/icons-vue": "^2.0.9",
     "@iconify/json": "^2.1.106",
     "@tauri-apps/api": "^1.0.2",
+    "adm-zip": "^0.5.9",
     "element-plus": "^2.2.16",
     "exiftool-vendored": "^18.1.0",
     "path": "^0.12.7",

@@ -270,7 +270,7 @@ async function selectFile(file: File) {
   if (file.type === "image/jpeg") {
 
     // exifTags.value = await ExifReader.load(file);
-    console.log(`output->tags`, exifTags);
+    // console.log(`output->tags`, exifTags);
     // image_progress.selectFiles();
   } else {
     elmessage("please choose a jpeg file");
@@ -307,7 +307,7 @@ async function handleOnChange() {
       // reader.readAsDataURL(file);
       // console.log(exiftool_path);
       // const output = await Command.sidecar("resources/exiftool",  [ exiftool_path, "-j" , "/Users/fly/Pictures/100NCZ_7/DSC_0595.JPG"]).execute();
-      const output = await new Command("perl-run", ["resources/exiftool", "-j", "-b", selected]).execute();
+      const output = await new Command("perl-run", ["darwinBin/exiftool", "-j", "-b", selected]).execute();
       // console.log(output);
       exifTags = JSON.parse(output.stdout)[0];
       console.log(exifTags);
