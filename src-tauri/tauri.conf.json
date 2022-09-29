@@ -14,34 +14,66 @@
     "allowlist": {
       "all": true,
       "dialog": {
-        "all": true, 
-        "open": true, 
-        "save": true 
+        "all": true,
+        "open": true,
+        "save": true
       },
       "fs": {
-				"all": true,
-				"copyFile": true,
-				"createDir": true,
-				"readDir": true,
-				"removeDir": true,
-				"removeFile": true,
-				"renameFile": true,
-				"writeFile": true,
-        "scope":["*"]
-			},
-			"protocol": {
-				"all": true,
-				"asset": true,
-				"assetScope": ["*"]
-			},
+        "all": true,
+        "copyFile": true,
+        "createDir": true,
+        "readDir": true,
+        "removeDir": true,
+        "removeFile": true,
+        "renameFile": true,
+        "writeFile": true,
+        "scope": [
+          "*"
+        ]
+      },
+      "protocol": {
+        "all": true,
+        "asset": true,
+        "assetScope": [
+          "*"
+        ]
+      },
       "globalShortcut": {
         "all": true
       },
       "shell": {
-        "all": true, 
+        "all": true,
         "execute": true,
         "sidecar": true,
         "open": true,
+        "scope": [
+          {
+            "name": "perl-run",
+            "cmd": "perl",
+            "args": [
+              {
+                "validator": ".*"
+              },
+              "-j",
+              "-b",
+              {
+                "validator": ".*"
+              }
+            ]
+          },
+          {
+            "name": "darwinBin/exiftool",
+            "sidecar": true,
+            "args": [
+              "-j",
+              {
+                "validator": ".*"
+              }
+            ]
+          },
+          {"name": "win-ps", "cmd": "powershell", "args": [ ".\\resources\\win-run.ps1", "-j", "-b", {"validator": ".*"}]}
+        ],
+<<<<<<< HEAD
         "scope": [{
           "name": "perl-run",
           "cmd": "perl",
@@ -54,6 +86,44 @@
           "args": [ "-j", "-b", {"validator": ".*"}]
         }
       ]
+=======
+        "scope": [
+          {
+            "name": "perl-run",
+            "cmd": "perl",
+            "args": [
+              {
+                "validator": ".*"
+              },
+              "-j",
+              "-b",
+              {
+                "validator": ".*"
+              }
+            ]
+          },
+          {
+            "name": "darwinBin/exiftool",
+            "sidecar": true,
+            "args": [
+              "-j",
+              {
+                "validator": ".*"
+              }
+            ]
+          },
+          {
+            "name": "win-exif-run",
+            "cmd": ".\\winBin\\exiftool.exe",
+            "args": [
+              "-j",
+              {
+                "validator": ".*"
+              }
+            ]
+          }
+        ]
+>>>>>>> 7faaa57925649d9f6be6784b8526cdb9e345c5ad
       }
     },
     "bundle": {
@@ -80,9 +150,15 @@
         "providerShortName": null,
         "signingIdentity": null
       },
-      "resources": ["resources"],
+      "resources": [
+        "resources",
+        "darwinBin"
+      ],
       "shortDescription": "",
-      "targets": "all",
+      "targets": [
+        "dmg",
+        "msi"
+      ],
       "windows": {
         "certificateThumbprint": null,
         "digestAlgorithm": "sha256",
@@ -105,16 +181,16 @@
         "resizable": true,
         "title": "Wartermark",
         "width": 1200,
-        "visible": true 
+        "visible": true
       },
       {
-         "width": 320,
-          "height": 240,
-          "decorations": false,
-          "url": "../src/assets/splashscreen.html",
-          "label": "splashscreen",
-          "visible": false 
-        }
+        "width": 320,
+        "height": 240,
+        "decorations": false,
+        "url": "../src/assets/splashscreen.html",
+        "label": "splashscreen",
+        "visible": false
+      }
     ]
   }
 }

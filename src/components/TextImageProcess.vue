@@ -300,7 +300,7 @@ async function handleOnChange() {
     let exifTags = {};
     if (osType.includes('Darwin')) {
       // const output = await Command.sidecar("resources/exiftool",  [ exiftool_path, "-j" , "/Users/fly/Pictures/100NCZ_7/DSC_0595.JPG"]).execute();
-      const output = await new Command("perl-run", ["resources/exiftool", "-j", "-b", selected]).execute();
+      const output = await new Command("perl-run", ["darwinBin/exiftool", "-j", "-b", selected]).execute();
       // console.log(output);
       exifTags = JSON.parse(output.stdout)[0];
       console.log(exifTags);
