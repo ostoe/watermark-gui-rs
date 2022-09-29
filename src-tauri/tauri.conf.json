@@ -112,7 +112,7 @@
       },
       "resources": [
         "resources",
-        "darwinBin"
+        "winBin/exiftool.exe"
       ],
       "shortDescription": "",
       "targets": [
