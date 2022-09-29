@@ -71,59 +71,19 @@
               }
             ]
           },
-          {"name": "win-ps", "cmd": "powershell", "args": [ ".\\resources\\win-run.ps1", "-j", "-b", {"validator": ".*"}]}
-        ],
-<<<<<<< HEAD
-        "scope": [{
-          "name": "perl-run",
-          "cmd": "perl",
-          "args": [{"validator": ".*"}, "-j", "-b", {"validator": ".*"}]
-        },{
-          "name": "win-ps", "cmd": "powershell", "args": [ ".\\resources\\win-run.ps1", "-j", "-b", {"validator": ".*"}]
-        },{
-          "name": "win-exif-run",
-          "cmd": ".\\resources\\exiftool.exe",
-          "args": [ "-j", "-b", {"validator": ".*"}]
-        }
-      ]
-=======
-        "scope": [
           {
-            "name": "perl-run",
-            "cmd": "perl",
+            "name": "win-ps",
+            "cmd": "powershell",
             "args": [
-              {
-                "validator": ".*"
-              },
+              ".\\resources\\win-run.ps1",
               "-j",
               "-b",
               {
                 "validator": ".*"
               }
             ]
-          },
-          {
-            "name": "darwinBin/exiftool",
-            "sidecar": true,
-            "args": [
-              "-j",
-              {
-                "validator": ".*"
-              }
-            ]
-          },
-          {
-            "name": "win-exif-run",
-            "cmd": ".\\winBin\\exiftool.exe",
-            "args": [
-              "-j",
-              {
-                "validator": ".*"
-              }
-            ]
           }
         ]
->>>>>>> 7faaa57925649d9f6be6784b8526cdb9e345c5ad
       }
     },
     "bundle": {
