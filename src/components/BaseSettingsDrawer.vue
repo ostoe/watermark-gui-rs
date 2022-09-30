@@ -67,6 +67,36 @@ const inputBorder_preffix = ref("")
 const inputBorder_center = ref("")
 //预留后缀判断
 const inputBorder_suffix = ref("")
+function chooseInput(t: RenameType, status: Boolean) {
+    if (status) {
+        switch (t) {
+            case renamePreffix.value:
+                inputBorder_preffix.value = ""
+                break
+            case renameCenter.value:
+                inputBorder_center.value = ""
+                break
+            case renameSuffix.value:
+                inputBorder_suffix.value = ""
+                break
+        }
+
+    } else {
+        switch (t) {
+            case renamePreffix.value:
+                inputBorder_preffix.value = "solid red"
+                break
+            case renameCenter.value:
+                inputBorder_center.value = "solid red"
+                break
+            case renameSuffix.value:
+                inputBorder_suffix.value = "solid red"
+                break
+        }
+
+    }
+
+}
 function check_input(rename: Ref<RenameType>, preview_index: number) {
     // console.log("-----" + "value");
     // let a = [renamePreffix, renameCenter, renameSuffix];
@@ -77,69 +107,27 @@ function check_input(rename: Ref<RenameType>, preview_index: number) {
         if (reg.test(t.input)) {
             t.valid = true;
             preview_filename.value[preview_index] = t.input;
-            switch(t){
-                case renamePreffix.value: 
-                    inputBorder_preffix.value = ""
-                    break
-                case renameCenter.value:
-                    inputBorder_center.value = ""
-                    break
-                case renameSuffix.value:
-                    inputBorder_suffix.value = ""
-                    break
-            }
+            chooseInput(t,true)
         }
         else {
-            console.log(`output->border`)
             t.valid = false;
-            switch(t){
-                case renamePreffix.value: 
-                    inputBorder_preffix.value = "solid red"
-                    break
-                case renameCenter.value:
-                    inputBorder_center.value = "solid red"
-                    break
-                case renameSuffix.value:
-                    inputBorder_suffix.value = "solid red"
-                    break
-            }
+            chooseInput(t,false)
         }
     } else if (t.value.id == 3) {
-        console.log("3333")
         if (t.input.includes("$x") && reg.test(t.input)) {
             t.valid = true;
             preview_filename.value[preview_index] = t.input.replaceAll("$x", "1");
-            switch(t){
-                case renamePreffix.value: 
-                    inputBorder_preffix.value = ""
-                    break
-                case renameCenter.value:
-                    inputBorder_center.value = ""
-                    break
-                case renameSuffix.value:
-                    inputBorder_suffix.value = ""
-                    break
-            }
+            chooseInput(t,true)
         } else {
             // console.log(`output->border`)
             t.valid = false;
-            switch(t){
-                case renamePreffix.value: 
-                    inputBorder_preffix.value = "solid red"
-                    break
-                case renameCenter.value:
-                    inputBorder_center.value = "solid red"
-                    break
-                case renameSuffix.value:
-                    inputBorder_suffix.value = "solid red"
-                    break
-            }
-
+            chooseInput(t,false)
         }
     } else {
         if (preview_index == 1) {
             preview_filename.value[preview_index] = "basename";
         }
+        chooseInput(t,true)
         // == 1 ???
     }
     // }
@@ -320,7 +308,7 @@ onMounted(() => {
     load_saved_conf();
 })
 
-const extendCollapse = ref(["1","2","3"])
+const extendCollapse = ref(["1", "2", "3"])
 
 
 </script>
@@ -329,7 +317,7 @@ const extendCollapse = ref(["1","2","3"])
 <template>
     <div @mouseenter="menuShow" @mouseleave="menuHidden">
         <!-- <el-button @click="loadDrawer" type="primary" color="#3f8418" plain> -->
-        <div @click="loadDrawer">
+        <div @click="loadDrawer" style="height:18px">
             <el-icon size="large">
                 <i-ep-setting />
             </el-icon>
@@ -401,22 +389,25 @@ const extendCollapse = ref(["1","2","3"])
                     <el-row>
                         <el-col :span="8">
                             <div class="grid-content ep-bg-purple" />
-                            <el-input class="elinput preffix" v-model="renamePreffix.input" :disabled="renamePreffix.value.id == 1"
-                                :blur="check_input_prefix()" :style="{'border':inputBorder_preffix+' 1px'}"> "自定义后缀"
+                            <el-input class="elinput preffix" v-model="renamePreffix.input"
+                                :disabled="renamePreffix.value.id == 1" :blur="check_input_prefix()"
+                                :style="{'border':inputBorder_preffix+' 1px'}"> "自定义后缀"
                             </el-input>
 
                         </el-col>
                         <el-col :span="8">
                             <div class="grid-content ep-bg-purple-light" />
-                            <el-input class="elinput center" v-model="renameCenter.input" :disabled="renameCenter.value.id == 1"
-                                :blur="check_input_center()" :style="{'border':inputBorder_center+' 1px'}">
+                            <el-input class="elinput center" v-model="renameCenter.input"
+                                :disabled="renameCenter.value.id == 1" :blur="check_input_center()"
+                                :style="{'border':inputBorder_center+' 1px'}">
                                 "自定义后缀" </el-input>
 
                         </el-col>
                         <el-col :span="8" id="invalidInputCss">
                             <div class="grid-content ep-bg-purple" />
-                            <el-input class="elinput suffix" v-model="renameSuffix.input" :disabled="renameSuffix.value.id == 1"
-                                :blur="check_input_suffix()" :style="{'border':inputBorder_suffix+' 1px'}">
+                            <el-input class="elinput suffix" v-model="renameSuffix.input"
+                                :disabled="renameSuffix.value.id == 1" :blur="check_input_suffix()"
+                                :style="{'border':inputBorder_suffix+' 1px'}">
                                 "自定义后缀" </el-input>
                         </el-col>
                     </el-row>
@@ -487,13 +478,15 @@ const extendCollapse = ref(["1","2","3"])
     --el-input-border-color: #dcdfe6;
 }
 
-.row .container{
+.row .container {
     display: inline-flex;
     width: 86%;
 }
-.row .container .btn{
+
+.row .container .btn {
     width: 50%;
 }
+
 .default-btn {
     width: 100%;
     height: 100%;
@@ -509,7 +502,7 @@ const extendCollapse = ref(["1","2","3"])
     width: 97%;
 }
 
-.elinput{
+.elinput {
     border-radius: 4px;
 }
 
