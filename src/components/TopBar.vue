@@ -279,7 +279,7 @@ onMounted(() => {
   // })
   // waveInit11.value.render();
 });
-watch([() => image_progress.count.completed, () => image_progress.count.total, ()=>image_progress.image_dir_path], (newValue, oldValue) => {
+watch([() => image_progress.count.completed, () => image_progress.count.total, () => image_progress.image_dir_path], (newValue, oldValue) => {
   // console.log(`output->oldValue`, oldValue);
   let fromData = getProgress(oldValue[0], oldValue[1]);
   let toData = getProgress(newValue[0], newValue[1]);
@@ -292,10 +292,10 @@ watch([() => image_progress.count.completed, () => image_progress.count.total, (
     } else {
       image_progress.canIHandle = false
     }
-  }else {
-    if(newValue[0]===0 && newValue[1] !=0){
+  } else {
+    if (newValue[0] === 0 && newValue[1] != 0) {
       image_progress.canIHandle = true
-    }else{
+    } else {
       image_progress.canIHandle = false
     }
   }
@@ -327,25 +327,24 @@ nextTick(() => {
 
 <template>
   <el-row class="elrow" v-resize="ListenTopbarWidth">
-    <el-col :span="18" class="left">
+    <el-col :span="16" class="left">
       <div class="photoSelector">
         <!-- <rotate-square4 v-if="image_progress.status"></rotate-square4>
         <ping-pong v-else></ping-pong> -->
         <!-- <canvas width="40" height="40" id="waveProgress11"></canvas> -->
         <!-- <el-progress id="progress-bar" :percentage="image_progress.value" :format="format" :color="color"
           v-if="isNotTinyIcon"></el-progress> -->
-        <div>
-          <div v-if="bigIcon">
-            <!-- <el-button @click="image_progress.increase()"> + </el-button> -->
-          </div>
+        <!-- <div> -->
+        <!-- <div v-if="bigIcon"> -->
+        <!-- <el-button @click="image_progress.increase()"> + </el-button> -->
+        <!-- </div>
           <div v-else class="increase">
             <el-icon>
               <i-ep-circle-plus @click="image_progress.increase()" />
             </el-icon>
           </div>
-        </div>
-        <div v-if="bigIcon">
-          <!-- <el-tooltip :content="'输入模式：' + (selectType ? '文件' : '文件夹')" placement="bottom-end" effect="light">
+        </div> -->
+        <!-- <el-tooltip :content="'输入模式：' + (selectType ? '文件' : '文件夹')" placement="bottom-end" effect="light">
             <el-switch v-model="selectType" style="--el-switch-on-color: #38D6BF; --el-switch-off-color: #D4BE94"
               inline-prompt :active-icon="Files" :inactive-icon="FolderChecked" />
           </el-tooltip>
@@ -367,8 +366,10 @@ nextTick(() => {
               </el-icon>
             </template>
           </el-autocomplete> -->
-          <!-- <el-button class="btn" @click="showPreviewWidget">输入/输出</el-button> -->
-          <div class="left">
+        <!-- <el-button class="btn" @click="showPreviewWidget">输入/输出</el-button> -->
+        <div class="left">
+          <div class="font">基础</div>
+          <div class="progress">
             <div class="goutou-wrapper">
               <div class="goutou"></div>
               <canvas ref="waveProgress" width="35" height="35" id="waveProgress"
@@ -378,34 +379,23 @@ nextTick(() => {
             `${image_progress.count.completed}/${image_progress.count.total}`
             }} </el-button>
           </div>
-
-        </div>
-        <div v-else class="medium">
-          <el-icon style="margin-right:20px">
-            <i-ep-document-add @click="image_progress.selectFiles()" />
-          </el-icon>
-          <el-icon style="margin-right:20px">
-            <i-ep-folder-add @click="user_conf.selectOutputDirs()" />
-          </el-icon>
-          <el-icon style="margin-right:20px">
-            <i-ep-full-screen @click="process_image" />
-          </el-icon>
         </div>
       </div>
     </el-col>
-    <el-col :span="6" class="right">
-      <div class="previewer" v-if="bigIcon">
-        <el-button @click="process_image" color="#de4781" size="" round :loading="image_progress.isHandling">开始处理
-        </el-button>
-
-      </div>
-      <div v-else @click="showPreviewWidget" class="previewer-icon">
-        <el-icon style="margin-right:20px">
-          <i-ep-picture />
-        </el-icon>
-      </div>
-      <div class="options" @click="showDrawTable">
-        <BaseSettingsDrawer></BaseSettingsDrawer>
+    <el-col :span="8" class="right">
+      <div class="wrapper" style="padding-right: 15px;">
+        <div class="previewer" v-if="bigIcon">
+          <el-button @click="process_image" color="#de4781" size="" round :loading="image_progress.isHandling">开始处理
+          </el-button>
+        </div>
+        <div v-else @click="showPreviewWidget" class="previewer-icon">
+          <el-icon style="margin-right:20px">
+            <i-ep-picture />
+          </el-icon>
+        </div>
+        <div class="options" @click="showDrawTable">
+          <BaseSettingsDrawer></BaseSettingsDrawer>
+        </div>
       </div>
     </el-col>
   </el-row>
@@ -415,27 +405,49 @@ nextTick(() => {
 
 <style scoped>
 .left {
+  width: 100%;
   display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .left .photoSelector {
   margin-left: 30px;
+  width: 37%;
 }
 
-.elrow {
-  padding-top: 15px;
+@media(max-width:600px){
+.left>.font{
+  display: none;
+}
+}
+
+.left>.font {
+  font-size: 20px;
+}
+
+.left >.progress{
+  display: flex;
+  align-items: center;
 }
 
 .previewer {
-  margin: 2px 15px 2px 15px;
   display: flex;
 }
 
 .photoSelector,
 .right {
   display: flex;
-  justify-content: center;
   flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.right>.wrapper {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
 }
 
 .el-progress--line {
@@ -447,8 +459,6 @@ nextTick(() => {
 .options {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  margin-left: 60px;
 }
 
 .increase,
@@ -473,5 +483,9 @@ nextTick(() => {
   background-color: white;
 }
 
-.goutou-wrapper {}
+.progress> .goutou-wrapper{
+  margin-right: 3px;
+  display: flex;
+  align-items: center;
+}
 </style>

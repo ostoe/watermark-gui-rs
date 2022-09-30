@@ -1,56 +1,174 @@
 
 <template>
   <el-container>
-    <el-header height="40px">
-      <TopBar />
+    <el-header height="65px" class="elheader">
+      <div style="width:100%">
+        <TopBar />
+      </div>
     </el-header>
-    <el-divider></el-divider>
-    <el-row>
-      <el-col :span="2">
-        <el-tooltip :content="'选择' + (image_progress.selectType ? '文件' : '文件夹')" placement="bottom-end" effect="light">
-          <el-button v-if="image_progress.selectType" @click="handleSelectInputFiles()" style="margin-left:20px; margin-right: 5px;">选择</el-button>
-          <el-button v-else @click="handleSelectInputDir()">选择</el-button>
-        </el-tooltip>
-        
-      </el-col>
-      <el-col :span="1">
-        <el-tooltip :content="'输入模式：' + (image_progress.selectType ? '文件' : '文件夹')" placement="bottom-end" effect="light">
-          <el-switch v-model="image_progress.selectType" style="--el-switch-on-color: #38D6BF; --el-switch-off-color: #D4BE94"
-            inline-prompt :active-icon="Files" :inactive-icon="FolderChecked" />
-        </el-tooltip>
-      </el-col>
-      <el-col :span="13">
-        <div class="flex justify-space-between mb-4 flex-wrap gap-4" style="width: auto;">
-    <el-button text type="info" >
-      {{  selectedInputContent  }}
-      </el-button></div>
-      </el-col>
-      <el-col :span="8">
-        <el-row>
-          <el-col :span="8">
-            <el-button @click="user_conf.selectOutputDirs()">输出目录</el-button>
-          </el-col>
-          <el-col :span="14">
-            <el-autocomplete v-model="inputDir" class="inline-input w-50" size="default" placeholder="Please Input"
-              :fetch-suggestions="querySearch" @change="input_value_change" @select="handleSelectHistoriesDir">
-              <template #suffix>
-                <el-icon v-if="inputInvalid" color="#33CC33" class="el-input__icon" @click="handleIconClick">
-                  <SuccessFilled />
-                </el-icon>
-                <el-icon v-else class="el-input__icon" color="#FF3333" @click="handleIconClick">
-                  <WarningFilled />
-                </el-icon>
-              </template>
-            </el-autocomplete>
-          </el-col>
-
-        </el-row>
-      </el-col>
-    </el-row>
+    <div style="padding-top: 8px;background: #f9f9f9;padding-bottom: 5px;">
+      <el-row>
+        <el-col :span="15">
+          <div class="left">
+            <el-tooltip :content="'选择' + (image_progress.selectType ? '文件' : '文件夹')" placement="bottom-end"
+              effect="light">
+              <el-button v-if="image_progress.selectType" @click="handleSelectInputFiles()"
+                style="margin-left:20px; margin-right: 5px;">选择</el-button>
+              <el-button v-else @click="handleSelectInputDir()">选择</el-button>
+            </el-tooltip>
+            <el-tooltip :content="'输入模式：' + (image_progress.selectType ? '文件' : '文件夹')" placement="bottom-end"
+              effect="light">
+              <el-switch v-model="image_progress.selectType"
+                style="--el-switch-on-color: #38D6BF; --el-switch-off-color: #D4BE94" inline-prompt :active-icon="Files"
+                :inactive-icon="FolderChecked" />
+            </el-tooltip>
+            <div style="width: auto;">
+              <el-button text type="info">
+                {{ selectedInputContent }}
+              </el-button>
+            </div>
+          </div>
+        </el-col>
+        <el-col :span="9">
+          <div class="right">
+            <div>
+              <el-button @click="user_conf.selectOutputDirs()">输出目录</el-button>
+            </div>
+            <div>
+              <el-autocomplete v-model="inputDir" class="inline-input w-50" size="default" placeholder="Please Input"
+                :fetch-suggestions="querySearch" @change="input_value_change" @select="handleSelectHistoriesDir">
+                <template #suffix>
+                  <el-icon v-if="inputInvalid" color="#33CC33" class="el-input__icon" @click="handleIconClick">
+                    <SuccessFilled />
+                  </el-icon>
+                  <el-icon v-else class="el-input__icon" color="#FF3333" @click="handleIconClick">
+                    <WarningFilled />
+                  </el-icon>
+                </template>
+              </el-autocomplete>
+            </div>
+          </div>
+        </el-col>
+      </el-row>
+    </div>
     <el-scrollbar height="100%" :max-height="getMaxHeight">
-      <el-main>
-        <el-row>
-          <el-col :span="19">
+      <el-main class="elmain">
+        <div class="grid-wrapper">
+          <el-card class="slider-wrapper">
+            <div class="card" style="display:flex;flex-direction:column;">
+              <div class="slide">
+                <div class="font">banner长宽比例</div>
+                <div class="wrapper">
+                  <div style="display:flex;width: 50%;">
+                    <div style="width:100%">
+                      <el-slider v-model="watermark_wh_ratio" :step="0.001" :min="0.01" :max="0.5"
+                        @input="_wh_ratio_f" />
+                    </div>
+                  </div>
+                  <div style="width:50%">
+                    <el-input-number v-model="watermark_wh_ratio" controls-position="right" size="small"
+                      @change="_wh_ratio_f" :step="0.001" :min="0.01" :max="0.5"></el-input-number>
+                  </div>
+                </div>
+              </div>
+              <div class="slide">
+                <div class="font">第一水平线</div>
+                <div class="wrapper">
+                  <div style="display:flex;width: 50%;">
+                    <div style="width:100%">
+                      <el-slider v-model="watermark_text_h_scale" :step="0.001" :min="0.2" :max="1.0"
+                        @input="_text_h_scale" />
+                    </div>
+                  </div>
+                  <div style="width:50%">
+                    <el-input-number v-model="watermark_text_h_scale" controls-position="right" :step="0.001" :min="0.2"
+                      :max="1.0" @change="_text_h_scale" size="small"></el-input-number>
+                  </div>
+                </div>
+              </div>
+              <div class="slide">
+                <div class="font">第二水平线</div>
+                <div class="wrapper">
+                  <div style="display:flex;width: 50%;">
+                    <div style="width:100%">
+                      <el-slider v-model="datetime_posi_percent" :step="0.001" :min="0.2" :max="1.0"
+                        @input="datetime_posi_percent_f" />
+                    </div>
+                  </div>
+                  <div style="width:50%">
+                    <el-input-number v-model="datetime_posi_percent" :step="0.001" :min="0.2" :max="1.0"
+                      controls-position="right" size="small" @change="datetime_posi_percent_f">
+                    </el-input-number>
+                  </div>
+                </div>
+              </div>
+              <div class="slide">
+                <div class="font">Logo比例</div>
+                <div class="wrapper">
+                  <div style="display:flex;width: 50%;">
+                    <div style="width:100%">
+                      <el-slider v-model="logo_ratio" :step="0.001" :min="0.2" :max="1.0" @input="logo_ratio_f" />
+                    </div>
+                  </div>
+                  <div style="width:50%">
+                    <el-input-number v-model="logo_ratio" size="small" :step="0.001" :min="0.2" :max="1.0"
+                      controls-position="right" @change="logo_ratio_f"></el-input-number>
+                  </div>
+                </div>
+              </div>
+              <div class="slide">
+                <div class="font">横向位置</div>
+                <div class="wrapper">
+                  <div style="display:flex;width: 50%;">
+                    <div style="width:100%">
+                      <el-slider v-model="position_ratio" :step="0.001" :min="0.2" :max="1.0"
+                        @input="position_ratio_f" />
+                    </div>
+                  </div>
+                  <div style="width:50%">
+                    <el-input-number v-model="position_ratio" :step="0.001" :min="0.2" :max="1.0" size="small"
+                      controls-position="right" @change="position_ratio_f"></el-input-number>
+                  </div>
+                </div>
+              </div>
+              <div class="slide">
+                <div class="font">字体比例</div>
+                <div class="wrapper">
+                  <div style="display:flex;width: 50%;">
+                    <div style="width:100%">
+                      <el-slider v-model="font_scale" :step="0.001" :min="0.2" :max="2.0" @input="font_scale_f" />
+                    </div>
+                  </div>
+                  <div style="width:50%">
+                    <el-input-number v-model="font_scale" :step="0.001" :min="0.2" :max="2.0" size="small"
+                      controls-position="right" @change="font_scale_f"></el-input-number>
+                  </div>
+                </div>
+              </div>
+              <div class="slide">
+                <div class="font">间距
+                  <el-tooltip content="不要随意修改此项，固定像素，当图片像素为2kw or 4kw时, 间距距会变的很小">
+                    <el-icon>
+                      <i-ep-Warning />
+                    </el-icon>
+                  </el-tooltip>
+                </div>
+                <div class="wrapper">
+                  <div style="display:flex;width: 50%;">
+                    <div style="width:100%">
+                      <el-slider v-model="split_line_spacing" :step="0.5" :min="1" :max="100"
+                        @input="split_line_spacing_f" />
+                    </div>
+                  </div>
+                  <div style="width:50%">
+                    <el-input-number v-model="split_line_spacing" :step="0.5" :min="1" :max="100" size="small"
+                      controls-position="right" @change="split_line_spacing_f"></el-input-number>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </el-card>
+          <div class="watermask">
             <div class="demo-image__placeholder">
               <div class="block">
                 <!-- <span class="demonstration">Custom</span> -->
@@ -65,13 +183,13 @@
             <div class="container">
               <div id="banner" :style="cusstyle">
                 <div class="logo"></div>
-              <div class="split-line"></div>
-              <div class="model-device">Nikon ZFC</div>
-              <div class="date-time">2030:05:10 14:31:33</div>
-              <div class="inter-content">50mm f/1.8 1/2500s ISO 2000</div>
+                <div class="split-line"></div>
+                <div class="model-device">Nikon ZFC</div>
+                <div class="date-time">2030:05:10 14:31:33</div>
+                <div class="inter-content">50mm f/1.8 1/2500s ISO 2000</div>
               </div>
               <!-- <div background="#887863" style="width:100%;"></div> -->
-             
+
               <!-- <div class="model-device">Nikon ZFC</div> -->
               <!-- <div class="wrapper">
                 <div class="detail">
@@ -82,132 +200,69 @@
                     <div class="inter-content">50mm f/1.8 iso 2000</div>
                   </div>
                 </div>
-              </div> -->
-
+                </div> -->
             </div>
-
-          </el-col>
-          <el-col :span="4" style="align-items: center; margin: 0 1% 0 1%;">
-            
-            <div style="margin-bottom: 2px;"><span class="demonstration">banner长宽比例：</span></div>
-            <div>
-              <div>
-                <el-slider v-model="watermark_wh_ratio" :step="0.001" :min="0.01" :max="0.5" @input="_wh_ratio_f" />
+          </div>
+          <div class="selector">
+            <!-- 颜色选择器 -->
+            <el-card class="color">
+              <div class="card-font">颜色选择器</div>
+              <div class="colorpicker">
+                <div class="color-wrapper">
+                  <div class="font">
+                    <div>背景</div>
+                  </div>
+                  <el-color-picker v-model="banner_bg_color" />
+                </div>
+                <div class="color-wrapper">
+                  <div class="font">
+                    <div>型号</div>
+                  </div>
+                  <el-color-picker v-model="camera_color" />
+                </div>
+                <div class="color-wrapper">
+                  <div class="font">
+                    <div>标注</div>
+                  </div>
+                  <el-color-picker v-model="focus_color" />
+                </div>
+                <div class="color-wrapper">
+                  <div class="font">
+                    <div>日期</div>
+                  </div>
+                  <el-color-picker v-model="datetime_color" />
+                </div>
+                <div class="color-wrapper">
+                  <div class="font">
+                    <div>分割线</div>
+                  </div>
+                  <el-color-picker v-model="splite_line_color" />
+                </div>
               </div>
-              <div :span="12">
-                <el-input-number v-model="watermark_wh_ratio" controls-position="right" size="default"
-                  @change="_wh_ratio_f" :step="0.001" :min="0.01" :max="0.5"></el-input-number>
+            </el-card>
+            <!-- 设置 -->
+            <el-card class="set">
+              <div class="setup">
+                <el-collapse v-model="extendCollapse">
+                  <el-collapse-item title="设置" name="1">
+                    <div class="save-btn">
+                      <el-popconfirm confirm-button-text="是" cancel-button-text="否" :icon="InfoFilled"
+                        icon-color="#626AEF" title="重置（仍未保存）" @confirm="resetConfirmEvent" @cancel="">
+                        <template #reference>
+                          <el-button type="primary" size="small" plain color="#0FCAC7" class="default-btn">默认
+                          </el-button>
+                        </template>
+                      </el-popconfirm>
+                      <!-- 此处防止两个按钮碰撞 -->
+                      <div style="margin-top:5px;"></div>
+                      <el-button type="primary" size="large" @click="saveSetting" class="save-btn"> 保存 </el-button>
+                    </div>
+                  </el-collapse-item>
+                </el-collapse>
               </div>
-            </div>
-
-            <div style="margin-bottom: 2px;"><span class="demonstration">第一水平线</span></div>
-            <div>
-              <div>
-                <el-slider v-model="watermark_text_h_scale" :step="0.001" :min="0.2" :max="1.0"
-                  @input="_text_h_scale" />
-              </div>
-              <div>
-                <el-input-number v-model="watermark_text_h_scale" controls-position="right" :step="0.001" :min="0.2"
-                  :max="1.0" @change="_text_h_scale"></el-input-number>
-              </div>
-            </div>
-
-            <div style="margin-bottom: 2px;"><span class="demonstration">第二水平线</span></div>
-            <div>
-              <div>
-                <el-slider v-model="datetime_posi_percent" :step="0.001" :min="0.2" :max="1.0" @input="datetime_posi_percent_f" />
-              </div>
-              <div>
-                <el-input-number v-model="datetime_posi_percent" :step="0.001" :min="0.2" :max="1.0" controls-position="right"
-                  size="default" @change="datetime_posi_percent_f"></el-input-number>
-              </div>
-            </div>
-
-            <div style="margin-bottom: 2px;"><span class="demonstration">Logo比例</span></div>
-            <el-row>
-              <el-col :span="12">
-                <el-slider v-model="logo_ratio" :step="0.001" :min="0.2" :max="1.0" @input="logo_ratio_f" />
-              </el-col>
-              <el-col :span="12">
-                <el-input-number v-model="logo_ratio" size="default" :step="0.001" :min="0.2" :max="1.0"
-                  controls-position="right" @change="logo_ratio_f"></el-input-number>
-              </el-col>
-            </el-row>
-
-            <el-row style="margin-bottom: 2px;"><span class="demonstration">横向位置</span></el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-slider v-model="position_ratio" :step="0.001" :min="0.2" :max="1.0" @input="position_ratio_f" />
-              </el-col>
-              <el-col :span="12">
-                <el-input-number v-model="position_ratio" :step="0.001" :min="0.2" :max="1.0" size="default"
-                  controls-position="right" @change="position_ratio_f"></el-input-number>
-              </el-col>
-            </el-row>
-
-            <el-row style="margin-bottom: 2px;"><span class="demonstration">字体比例</span></el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-slider v-model="font_scale" :step="0.001" :min="0.2" :max="2.0" @input="font_scale_f" />
-              </el-col>
-              <el-col :span="12">
-                <el-input-number v-model="font_scale" :step="0.001" :min="0.2" :max="2.0" size="default"
-                  controls-position="right" @change="font_scale_f"></el-input-number>
-              </el-col>
-            </el-row>
-
-            <el-row style="margin-bottom: 2px;">
-              <el-tooltip content="不要随意修改此项，固定像素，当图片像素为2kw or 4kw时, 间距距会变的很小" >
-                <span>分割线边距（像素） <el-icon>
-                    <i-ep-Warning />
-                  </el-icon></span>
-              </el-tooltip>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-slider v-model="split_line_spacing" :step="0.5" :min="1" :max="100" @input="split_line_spacing_f" />
-              </el-col>
-              <el-col :span="12">
-                <el-input-number v-model="split_line_spacing" :step="0.5" :min="1" :max="100" size="default"
-                  controls-position="right" @change="split_line_spacing_f"></el-input-number>
-              </el-col>
-            </el-row>
-
-            <el-row style="margin-bottom: 2px;"><span class="demonstration">背景｜型号｜标注｜日期｜分隔线</span></el-row>
-            <el-row>
-              <el-col :span="4">
-                <el-color-picker v-model="banner_bg_color" />
-              </el-col>
-              <el-col :span="4">
-                <el-color-picker v-model="camera_color" />
-              </el-col>
-              <el-col :span="4">
-                <el-color-picker v-model="focus_color" />
-              </el-col>
-              <el-col :span="4">
-                <el-color-picker v-model="datetime_color" />
-              </el-col>
-              <el-col :span="4">
-                <el-color-picker v-model="splite_line_color" />
-              </el-col>
-            </el-row>
-
-            <el-row style="margin-top:20px">
-              <el-col :span="12">
-                <el-popconfirm confirm-button-text="是" cancel-button-text="否" :icon="InfoFilled" icon-color="#626AEF"
-                  title="重置（仍未保存）" @confirm="resetConfirmEvent" @cancel="">
-                  <template #reference>
-                    <el-button type="primary" size="small" plain color="#0FCAC7" class="default-btn">默认</el-button>
-                  </template>
-                </el-popconfirm>
-              </el-col>
-              <el-col :span="12">
-                <el-button type="primary" size="large" @click="saveSetting" class="save-btn"> 保存 </el-button>
-              </el-col>
-            </el-row>
-
-          </el-col>
-        </el-row>
+            </el-card>
+          </div>
+        </div>
         <el-container direction="vertical">
           <PreviewWidget>
             <el-image src="https://fuss10.elemecdn.com/a/3f/3302e58f9a181d2509f3dc0fa68b0jpeg.jpeg"></el-image>
@@ -218,7 +273,6 @@
           <!-- <TextImageProcess /> -->
           <!-- </el-row> -->
         </el-container>
-
       </el-main>
     </el-scrollbar>
   </el-container>
@@ -315,30 +369,30 @@ async function get_font_path() {
   console.log(_r2, font_path.value); // /usr....   http://local /user///
 }
 
-function _wh_ratio_f(value:  any){ // Arrayable<number>) {
+function _wh_ratio_f(value: any) { // Arrayable<number>) {
   // console.log(value);
   value = value as number
   font_size.value = GLOBAL_WIDTH * value;
-  font_size_device_px.value = font_size.value *font_scale.value *  0.25 + "px";
-  font_size_focus_px.value = font_size.value * font_scale.value*0.20 + "px";
-  font_size_datetime_px.value = font_size.value *font_scale.value* 0.18 + "px";
+  font_size_device_px.value = font_size.value * font_scale.value * 0.25 + "px";
+  font_size_focus_px.value = font_size.value * font_scale.value * 0.20 + "px";
+  font_size_datetime_px.value = font_size.value * font_scale.value * 0.18 + "px";
   logo_width_px.value = GLOBAL_WIDTH * value * logo_ratio.value + "px";
   cusstyle.value.height = GLOBAL_WIDTH * value + "px";
 }
 
-function _text_h_scale(value:  any){ // Arrayable<number>) {
+function _text_h_scale(value: any) { // Arrayable<number>) {
   value = value as number;
   st_line_y_shift.value = (1 - value) / 2 * font_scale.value * 100 + "%";
   // st_line_y_shift_fixed.value = (1 - value) / 2 * font_scale.value * 100 - 2.0 + "%";
   split_line_height.value = value * 100 + "%";
 }
 
-function datetime_posi_percent_f(value:  any){ // Arrayable<number>) {
+function datetime_posi_percent_f(value: any) { // Arrayable<number>) {
   value = value as number;
   datetime_posi_percent_px.value = value * 100 + "%";
 }
 
-function logo_ratio_f(value: any){ // Arrayable<number>) {
+function logo_ratio_f(value: any) { // Arrayable<number>) {
   value = value as number;
   logo_y_ratio_px.value = (1 - value) / 2 * 100 + "%";
   logo_width_px.value = GLOBAL_WIDTH * watermark_wh_ratio.value * logo_ratio.value + "px";
@@ -352,13 +406,13 @@ function position_ratio_f(value: any) {
   split_line_spacing_px.value = value * 100 + "%";
 }
 
-function split_line_spacing_f(value:  any){ // Arrayable<number>) {
+function split_line_spacing_f(value: any) { // Arrayable<number>) {
   value = value as number;
   focus_length_text_x.value = (position_ratio.value + value / GLOBAL_WIDTH) * 100 + "%";
   logo_x_ratio_px.value = (1 - position_ratio.value + value / GLOBAL_WIDTH) * 100 + "%";
 }
 
-function font_scale_f(value:  any){ // Arrayable<number>) {
+function font_scale_f(value: any) { // Arrayable<number>) {
   value = value as number;
   font_size_device_px.value = (font_size.value * value * 0.25 + "px");
   font_size_focus_px.value = (font_size.value * value * 0.20 + "px");
@@ -378,7 +432,7 @@ function update_px_from_value() {
   st_line_y_shift.value = (1 - watermark_text_h_scale.value) / 2 * 100 + "%";
   // st_line_y_shift_fixed.value = (1 - watermark_text_h_scale.value) / 2 * 100 - 2.0 + "%";
   focus_length_text_x.value = (position_ratio.value + split_line_spacing.value / GLOBAL_WIDTH) * 100 + "%";
-  datetime_posi_percent_px.value =  datetime_posi_percent.value * 100 - 1.0 + "%";
+  datetime_posi_percent_px.value = datetime_posi_percent.value * 100 - 1.0 + "%";
   logo_y_ratio_px.value = (1 - logo_ratio.value) / 2 * 100 + "%";
   logo_x_ratio_px.value = (1 - position_ratio.value + split_line_spacing.value / GLOBAL_WIDTH) * 100 + "%";
   logo_width_px.value = GLOBAL_WIDTH * watermark_wh_ratio.value * logo_ratio.value + "px";
@@ -467,13 +521,13 @@ const querySearch = (queryString: string, cb: any) => {
 }
 
 async function handleSelectInputFiles() {
-  if(await image_progress.selectFiles()) {
+  if (await image_progress.selectFiles()) {
     selectedInputContent.value = user_conf.latestSelectedDirPath;
   }
 
 }
 async function handleSelectInputDir() {
-  if(await image_progress.selectDirs()) {
+  if (await image_progress.selectDirs()) {
     selectedInputContent.value = user_conf.latestSelectedDirPath;
   }
 }
@@ -511,7 +565,8 @@ const getMaxHeight = computed(() => {
   return (sidebarReactives.curWindowHeight - 89)
 })
 
-
+// 展开手风琴
+const extendCollapse = ref(["1"])
 
 </script>
 
@@ -520,7 +575,38 @@ const getMaxHeight = computed(() => {
 /* @import "../../src-tauri/resources/OPPOSans-H.ttf"; */
 @font-face {
   font-family: OPPOSans-H;
-  src: url("~@asset/resources/OPPOSans-H.ttf") format("ttf")  /*v-bind(font_path);*/
+  src: url("~@asset/resources/OPPOSans-H.ttf") format("ttf")
+    /*v-bind(font_path);*/
+}
+
+.elheader {
+  display: flex;
+  align-items: center;
+  padding: 0;
+  /** #dcdfe6 **/
+  border-bottom: 1px var(--el-border-color);
+  border-bottom-style: solid;
+}
+
+:deep(.elmain) {
+  --el-main-padding: 20px;
+  display: block;
+  flex: 1;
+  flex-basis: auto;
+  overflow: hidden;
+  box-sizing: border-box;
+  padding: var(--el-main-padding);
+}
+
+.right,
+.left {
+  display: flex;
+  flex-direction: row;
+}
+
+.right {
+  justify-content: right;
+  margin-right: 15px;
 }
 
 .banner {
@@ -594,7 +680,74 @@ const getMaxHeight = computed(() => {
   line-height: v-bind(font_size_datetime_px);
 }
 
- /* --------------------------------------------------------- */
+/* --------------------------------------------------------- */
+
+.grid-wrapper {
+  display: grid;
+  grid-auto-flow: column;
+  grid-gap: 10px;
+  grid-template-columns: 20% 60% 20%;
+}
+
+.selector {
+  width: 90%;
+}
+
+.selector .set{
+  margin-top: 10px;
+}
+
+.colorpicker {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.card-font {
+  font-size: 8px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.color-wrapper {
+  width: 50px;
+  flex-grow: 1;
+  border: solid #f3f3f3 1px;
+
+  display: flex;
+  flex-direction: column;
+
+}
+
+.color-wrapper .font {
+  font-size: 10px;
+  color: #858585;
+}
+
+:deep(.el-color-picker) {
+  display: flex;
+  justify-content: center;
+}
+
+.setup .save-btn {
+  display: grid;
+}
+
+.slide .wrapper {
+  display: flex;
+}
+
+.slide .font {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 10px;
+}
+
+.el-input-number--small {
+  width: 80px;
+}
+
 .demo-image__placeholder .block {
   position: relative;
   padding: 0px 0;
@@ -640,10 +793,11 @@ const getMaxHeight = computed(() => {
   box-shadow: 0 0 0 0;
 }
 
-:deep(.inline-input){
+:deep(.inline-input) {
   border-style: solid;
   border-width: 0 0 1px 0;
 }
+
 .model {
   position: relative;
   bottom: 140px;

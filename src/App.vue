@@ -20,12 +20,18 @@ import { useRoute, useRouter } from "vue-router";
 
 //自定义指令
 const vResize = {
-  mounted: (el: any, binding: { value: (arg0: { width: number, height: number }) => void }) => {
+  mounted: (
+    el: any,
+    binding: { value: (arg0: { width: number; height: number }) => void }
+  ) => {
     let ResizeObserver = window.ResizeObserver;
     el._resizer = new ResizeObserver((entries) => {
       for (const entry of entries) {
         // console.log(entry.contentRect.height)
-        binding.value({ width: entry.contentRect.width, height: entry.contentRect.height });
+        binding.value({
+          width: entry.contentRect.width,
+          height: entry.contentRect.height,
+        });
       }
     });
     el._resizer.observe(el);
@@ -46,7 +52,7 @@ const dynamicWidth = ref(false);
 const resizeSideBar = (curSize: any) => {
   let domWidth = curSize.width;
   let initWidth = 63;
-  sidebarReactives.curWindowHeight = curSize.height
+  sidebarReactives.curWindowHeight = curSize.height;
   dynamicWidth.value = domWidth > initWidth ? false : true;
   // console.log(domWidth)
 };
@@ -97,7 +103,7 @@ const handleOpen = (key: string, keyPath: string[]) => {
 const handleClose = (key: string, keyPath: string[]) => {
   console.log(key, keyPath);
 };
-nextTick(() => { });
+nextTick(() => {});
 // const picSrc = ref("https://github.com/tauri-apps/tauri/blob/dev/.github/splash.png")
 </script>
 
@@ -134,7 +140,8 @@ nextTick(() => { });
             v-if="item.children && item.children.length > 0"
             :index="index"
             :key="'item-' + index"
-            :show-timeout="0" :hide-timeout="0"
+            :show-timeout="0"
+            :hide-timeout="0"
           >
             <template #title>
               <!-- <el-icon class="i-ep-menu"></el-icon> -->
@@ -185,11 +192,13 @@ nextTick(() => { });
     </el-aside>
     <!-- </el-container> -->
     <!-- </el-header> -->
-    <div
-      v-if="!sidebarReactives.isCollapse"
-      class="shadowmask"
-      @click="changeThisCollapse"
-    ></div>
+    <div>
+      <div
+        v-if="!sidebarReactives.isCollapse"
+        class="shadowmask"
+        @click="changeThisCollapse"
+      ></div>
+    </div>
     <el-container class="elmain2">
       <el-main class="elmain">
         <!-- <transition name="el-fade-in-linear" mode="out-in"> -->
@@ -212,7 +221,7 @@ nextTick(() => { });
     font-family: "FiraCode-Bold";
   } */
 :deep(.elmain) {
-  --el-main-padding: 0px 20px 20px 20px;
+  --el-main-padding: 0px 0px 20px 15px;
   display: block;
   flex: 1;
   flex-basis: auto;
@@ -221,7 +230,7 @@ nextTick(() => { });
   padding: var(--el-main-padding);
 }
 
-.elaside{
+.elaside {
   z-index: 94;
 }
 
@@ -265,16 +274,6 @@ nextTick(() => { });
 
 .elcontainer {
   margin-left: 50px;
-}
-
-.footer-div {
-  background-color: rgb(255, 255, 255);
-  display: flex;
-  height: 4vh;
-  width: 100%;
-  bottom: 0;
-  right: 0;
-  align-items: center;
 }
 
 /* .el-container {
