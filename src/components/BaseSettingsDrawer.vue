@@ -352,7 +352,7 @@ const extendCollapse = ref(["1", "2", "3"])
                     <div class="quality">
                         <el-slider v-model="baseForm.qulity" height="200px" />
                         <el-input-number v-model="baseForm.qulity" :min="1" :max="100" controls-position="right"
-                            size="medium" step-strictly @change="handleChangeQulity" />
+                            size="default" step-strictly @change="handleChangeQulity" />
                     </div>
                 </el-collapse-item>
                 <el-collapse-item title="选择图片名" name="3">
