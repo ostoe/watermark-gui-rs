@@ -27,8 +27,8 @@ const renameCenter = ref({
 });
 const renameSuffix = ref({
     SD: [{ id: 1, label: "空", value: "" }, { id: 2, label: "自定义", value: "__custom__" }, { id: 3, label: "自定义+【序号】", value: "__serial_number__" }],
-    value: { id: 2, label: "自定义", value: "__custom__" },
-    input: "-WM",
+    value: { id: 3, label: "自定义", value: "__serial_number__-后缀[$x]" },
+    input: "-后缀[$x]",
     valid: true,
 });
 
@@ -412,8 +412,10 @@ const extendCollapse = ref(["1", "2", "3"])
                         </el-col>
                     </el-row>
                     <el-row>
-                        <el-button key="button.text" type="primary" text> {{ preview_filename.join("") }} </el-button>
-
+                        <el-button key="button.text" type="primary" text>文件名预览： {{ preview_filename.join("") }} </el-button>
+                        <el-button text size="small">提示： 自定义+序号 默认替换“$x” 为序号 1、2、3……</el-button>
+                        <el-button text size="small">尝试在后缀自定义+序号中输入[$x] 预览</el-button>
+                        <!-- <el-button text size="small"></el-button> -->
                     </el-row>
                 </el-collapse-item>
             </el-collapse>

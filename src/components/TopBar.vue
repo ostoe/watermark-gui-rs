@@ -368,7 +368,7 @@ nextTick(() => {
           </el-autocomplete> -->
         <!-- <el-button class="btn" @click="showPreviewWidget">输入/输出</el-button> -->
         <div class="left">
-          <div class="font">基础</div>
+          <div class="font">添加水印</div>
           <div class="progress">
             <div class="goutou-wrapper">
               <div class="goutou"></div>

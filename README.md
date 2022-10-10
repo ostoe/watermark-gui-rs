@@ -1,36 +1,35 @@
-# tauri + rust + vue3 + vite
+# 使用Rust + Tauri框架编写的自动根据图片的exif信息添加下边框水印App，本软件无广告、无需联网、永久开源免费。
+
+## 支持的功能：
+### 1. 自动/批量添加类似于小米11 风格水印的图片
+### 2. 目前支持的品牌：索尼、佳能、尼康、富士、松下，其他品牌后续会添加
+### 3. 支持设置输入输入文件夹，支持拖动文件，支持输出自定义文件名和图片质量
+### 4. 支持设置水印图片大小、字体位置、logo大小、字体比例大小等（Try it!）
+### 5. 支持Exif信息查询（含快门数）
+### 6. 景深计算器
+##### 软件界面 ![image](./image/WX20221010-101533@2x.png)
+##### 水印图预览![image](./image/jpg%E9%A2%84%E8%A7%88%E5%9B%BE.jpg)
+
+##### 
+# 平台支持：
+ - windows10 
+ - macos
+--------
+
+## 尚未支持（后续添加）：
+### 1. 自定义颜色
+### 2. 自定义logo图片
+### 3. 自定义字体
 
 
-ref tauri event:
-```js
-  async listen(event: 'tauri://scale-change', handler: EventCallback<ScaleFactorChanged>): Promise<UnlistenFn>
-  async listen(event: 'tauri://menu', handler: EventCallback<string>): Promise<UnlistenFn>
-  async listen(event: 'tauri://file-drop', handler: EventCallback<{ type: 'drop', paths: string[] }>): Promise<UnlistenFn>
-  async listen(event: 'tauri://file-drop-hover', handler: EventCallback<{ type: 'hover', paths: string[] }>): Promise<UnlistenFn>
-  async listen(event: 'tauri://file-drop-cancelled', handler: EventCallback<{ type: 'cancel' }>): Promise<UnlistenFn>
-  async listen(event: 'tauri://theme-changed', handler: EventCallback<Theme>): Promise<UnlistenFn>
-  async listen(event: 'tauri://close-requested', handler: EventCallback<CloseRequestedEvent>): Promise<UnlistenFn>
-  async listen<T>(event: EventName, handler: EventCallback<T>): Promise<UnlistenFn> {
-     // actual implementation
-  }
 
 
+## 技术栈：`tauri + rust + vue3 + vite`
 
-import { event } from '@tauri-apps/api';
+## 如果您遇到任何使用问题请联系我 `qq: 1131562995`
 
-const dropzoneElement = document.querySelector(/* ... */);
-
-event.listen('tauri://file-drop-hover', (e) => {
-  const hoveredElement = document.elementFromPoint(e.x, e.y);
-
-  if (dropzoneElement.contains(hoveredElement)) {
-    // ...
-  }
-});
-
-
-```
-
+-----------
+自用部分（请忽略）
 
 ## TODO [list]
  - 图片logo位置和比例优化下 [v]
@@ -92,6 +91,33 @@ coc ref: https://en.wikipedia.org/wiki/Zeiss_formula  对角线距离43.25 / 150
  - "含$x"   : 序号+自定义：解析$x 比如 [$x]
 
 #### 中间
- - "\_\_keep\_\_"   :   保持原名字
- - "\_\_today\_\_"   :  今天的日期
  - "不含$x"   : 自定义
+
+
+ref tauri event:
+```js
+  async listen(event: 'tauri://scale-change', handler: EventCallback<ScaleFactorChanged>): Promise<UnlistenFn>
+  async listen(event: 'tauri://menu', handler: EventCallback<string>): Promise<UnlistenFn>
+  async listen(event: 'tauri://file-drop', handler: EventCallback<{ type: 'drop', paths: string[] }>): Promise<UnlistenFn>
+  async listen(event: 'tauri://file-drop-hover', handler: EventCallback<{ type: 'hover', paths: string[] }>): Promise<UnlistenFn>
+  async listen(event: 'tauri://file-drop-cancelled', handler: EventCallback<{ type: 'cancel' }>): Promise<UnlistenFn>
+  async listen(event: 'tauri://theme-changed', handler: EventCallback<Theme>): Promise<UnlistenFn>
+  async listen(event: 'tauri://close-requested', handler: EventCallback<CloseRequestedEvent>): Promise<UnlistenFn>
+  async listen<T>(event: EventName, handler: EventCallback<T>): Promise<UnlistenFn> {
+     // actual implementation
+  }
+
+  import { event } from '@tauri-apps/api';
+
+const dropzoneElement = document.querySelector(/* ... */);
+
+event.listen('tauri://file-drop-hover', (e) => {
+  const hoveredElement = document.elementFromPoint(e.x, e.y);
+
+  if (dropzoneElement.contains(hoveredElement)) {
+    // ...
+  }
+});
+
+
+```
