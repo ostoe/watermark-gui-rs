@@ -5,14 +5,18 @@ import { elmessage } from "../scripts/reactives";
 import { listen } from "@tauri-apps/api/event";
 import { invoke } from "@tauri-apps/api";
 import { sidebarReactives } from "../scripts/reactives";
-import { type as os_type } from "@tauri-apps/api/os";
-import { Command } from "@tauri-apps/api/shell";
+import { type as os_type } from '@tauri-apps/api/os';
+import { Command } from '@tauri-apps/api/shell';
 // import { ElMessage, ElNotification } from "element-plus";
 import { open } from "@tauri-apps/api/dialog";
 import { resolve, resourceDir } from "@tauri-apps/api/path";
 // import { watch } from "fs";
 // import ExifReader from "exifreader";
-import type { UploadInstance, UploadProps, UploadRawFile } from "element-plus";
+import type {
+  UploadInstance,
+  UploadProps,
+  UploadRawFile,
+} from "element-plus";
 
 const isCollapse = ref(true);
 // const progress_count = ref({ completed: 0, total: 0 });
@@ -101,26 +105,27 @@ onMounted(() => {
   // init_output_dir();
 });
 
+
 // let exifTags = reactive({});
-const thumbBase64Data = reactive({ image: "" });
+const thumbBase64Data = reactive({ "image": "" })
 interface exifDetailData {
-  label?: string,
-  data?: string
+  label?: string;
+  data?: string;
 }
 
 interface exifData {
-  label: string,
-  data: Array<exifDetailData>
+  label: string;
+  data: Array<exifDetailData>;
 }
 
 interface summaryData {
-  models: exifData,
-  exposure: exifData,
-  speed: exifData,
-  focal: exifData,
-  color: exifData,
-  date: exifData,
-  shutterCount: exifData
+  models: exifData;
+  exposure: exifData;
+  speed: exifData;
+  focal: exifData;
+  color: exifData;
+  date: exifData;
+  shutterCount: exifData;
 }
 const summaryTemplate = {
   models: {
@@ -150,7 +155,7 @@ const summaryTemplate = {
   shutterCount: {
     label: "快门数",
     data: [],
-  },
+  }
 } as summaryData;
 const summaryInfo = ref<summaryData>(summaryTemplate);
 // 缩略图
@@ -159,7 +164,9 @@ const thumbBase64 = computed(() => {
     return "";
   } else {
     return (
-      "url(data:image/jpeg;base64," + thumbBase64Data.image + ") no-repeat"
+      "url(data:image/jpeg;base64," +
+      thumbBase64Data.image +
+      ") no-repeat"
     );
   }
 });
@@ -259,8 +266,9 @@ const tableExifData = ref<Array<exifDetailData>>([]);
 // }
 
 async function selectFile(file: File) {
-  console.log(file, file.webkitRelativePath);
+  console.log(file, file.webkitRelativePath,);
   if (file.type === "image/jpeg") {
+
     // exifTags.value = await ExifReader.load(file);
     // console.log(`output->tags`, exifTags);
     // image_progress.selectFiles();
@@ -281,6 +289,7 @@ const handleExceed: UploadProps["onExceed"] = (files) => {
   }
 };
 
+
 async function handleOnChange() {
   const selected = await open({
     multiple: false,
@@ -288,56 +297,26 @@ async function handleOnChange() {
   });
   if (typeof selected === "string") {
     const osType = await os_type(); // Returns 'Linux' 'Darwin'  'Windows_NT'
-    loading.value = true
     let exifTags = {};
-    if (osType.includes("Darwin")) {
-      // TODO  run ./
-      // const r1 = await resourceDir();
-      // const exiftool_path = await resolve(r1, "resources", "exiftool");
-      //  exiftool -j ~/Pictures/100NCZ_7/DSC_0595.JPG
-      // const reader = new FileReader(); // TODO精简exif的库，好多用不到
-      // reader.readAsDataURL(file);
-      // console.log(exiftool_path);
+    if (osType.includes('Darwin')) {
       // const output = await Command.sidecar("resources/exiftool",  [ exiftool_path, "-j" , "/Users/fly/Pictures/100NCZ_7/DSC_0595.JPG"]).execute();
-      const output = await new Command("perl-run", [
-        "resources/exiftool",
-        "-j",
-        "-b",
-        selected,
-      ]).execute();
+      const output = await new Command("perl-run", ["darwinBin/exiftool", "-j", "-b", selected]).execute();
       // console.log(output);
       exifTags = JSON.parse(output.stdout)[0];
       console.log(exifTags);
-      // 测试用
-      setTimeout(() => {
-        loading.value = false
-      }, 900)
-      // Command::new("powershell")
-      // .args(&[
-      //   "./src/extractIcon.ps1",
-      //   file_path.as_str(),
-      //   icon_path.to_str().unwrap(),
-      // ])
-      // .creation_flags(0x08000000)
-    } else if (osType.includes("Windows_NT")) {
-      const r1 = await resourceDir();
-      if (r1) {
-        const exiftool_path = await resolve(r1, "resources", "exiftool.exe");
-        // console.log(exiftool_path);
-        // const output = await Command.sidecar("resources/exiftool",  [ "-j",  "X:\\Z7\\001\\2022_07_19_016_DSC_0610.JPG"]).execute();
-        const output = await new Command("win-exif-run", [
-          "-j -b",
-          "X:\\Z7\\001\\2022_07_19_016_DSC_0610.JPG",
-        ]).execute();
-        // console.log(output, output.stdout,);
-      }
+    } else if (osType.includes('Windows_NT')) {
+      const output = await new Command("win-ps", [".\\resources\\win-run.ps1", "-j", "-b", selected]).execute();
+      // console.log(output, output.stdout,);
+      exifTags = JSON.parse(output.stdout)[0];
+      console.log(exifTags);
     }
     let hasPreviewImage = false;
+    if (Object.keys(exifTags).length != 0) {
+      emptyStatus.value = true;
+    }
     if (exifTags["PreviewImage"] != null) {
       thumbBase64Data.image = exifTags["PreviewImage"].split(":")[1];
-      exifTags[
-        "PreviewImage"
-      ] = `(Binary data ${thumbBase64Data.image.length} bytes or length)`;
+      exifTags["PreviewImage"] = `(Binary data ${thumbBase64Data.image.length} bytes or length)`
       hasPreviewImage = true;
     }
     if (exifTags["ThumbnailImage"] != null) {
@@ -345,35 +324,21 @@ async function handleOnChange() {
         thumbBase64Data.image = exifTags["ThumbnailImage"].split(":")[1];
       }
       // thumbBase64Data.image = thumbBase64Data.image.split(":")[1];
-      exifTags[
-        "ThumbnailImage"
-      ] = `(Binary data ${thumbBase64Data.image.length} bytes or length)`;
+      exifTags["ThumbnailImage"] = `(Binary data ${thumbBase64Data.image.length} bytes or length)`
     }
     console.log("hasPreviewImage:", hasPreviewImage);
 
     if (exifTags["MPImage3"] != null) {
       // thumbBase64Data.value = exifTags["ThumbnailImage"];
-      exifTags["MPImage3"] = `(Binary data)`;
+      exifTags["MPImage3"] = `(Binary data)`
     }
 
     console.log(summaryInfo.value);
-    const targetTag = [
-      ["相机", "Model", "models"],
-      ["镜头", "LensModel", "models"],
-      ["曝光模式", "ExposureProgram", "exposure"],
-      ["测光模式", "MeteringMode", "exposure"],
-      ["曝光补偿", "ExposureBiasValue", "exposure"],
-      ["光圈", "ApertureValue", "speed"],
-      ["光圈", "Aperture", "speed"],
-      ["快门", "ExposureTime", "speed"],
-      ["ISO", "ISO", "speed"],
-      ["焦距", "FocalLength", "focal"],
-      ["白平衡", "WhiteBalance", "color"],
-      ["色彩空间", "ColorSpace", "color"],
-      ["拍摄时间", "DateTimeOriginal", "date"],
-      ["快门数", "ShutterCount", "shutterCount"],
-      ["机械快门数", "MechanicalShutterCount", "shutterCount"],
-    ];
+    const targetTag = [["相机", "Model", "models"], ["镜头", "LensModel", "models"], ["曝光模式", "ExposureProgram", "exposure"],
+    ["测光模式", "MeteringMode", "exposure"], ["曝光补偿", "ExposureBiasValue", "exposure"],
+    ["光圈", "ApertureValue", "speed"], ["光圈", "Aperture", "speed"], ["快门", "ExposureTime", "speed"], ["ISO", "ISO", "speed"], ["焦距", "FocalLength", "focal"],
+    ["白平衡", "WhiteBalance", "color"], ["色彩空间", "ColorSpace", "color"],
+    ["拍摄时间", "DateTimeOriginal", "date"], ["快门数", "ShutterCount", "shutterCount"], ["机械快门数", "MechanicalShutterCount", "shutterCount"]];
     summaryInfo.value = summaryTemplate;
     // 清空对象
     for (let value of Object.values(summaryInfo.value)) {
@@ -392,13 +357,10 @@ async function handleOnChange() {
     emptyStatus.value = false;
     tableExifData.value = [];
     for (const [key, value] of Object.entries<string>(exifTags)) {
-      tableExifData.value.push({ label: key, data: value.toString() });
+      tableExifData.value.push({ label: key, data: value.toString() })
       // console.log(`${key}: ${value}`);
     }
-    // 测试用
-    setTimeout(() => {
-      loading.value = false
-    }, 900)
+
 
   } else if (selected === null) {
     // user cancelled the selection
@@ -407,31 +369,26 @@ async function handleOnChange() {
       type: "warning",
     });
   }
-
 }
 
-const detailTableRowClassName = ({
-  row,
-  rowIndex,
-}: {
-  row: exifDetailData;
-  rowIndex: number;
-}) => {
-  return rowIndex % 2 === 1 ? "warning-row" : "success-row";
-};
+const detailTableRowClassName = ({ row, rowIndex }: { row: exifDetailData, rowIndex: number }) => {
+  return (rowIndex % 2 === 1) ? 'warning-row' : 'success-row'
+}
 
-const search = ref("");
+const search = ref("")
 
 const filterTableData = computed(() =>
   tableExifData.value.filter(
     (obj) =>
       !search.value ||
-      obj.label?.toLowerCase().includes(search.value.toLowerCase()) ||
-      obj.data?.toLocaleLowerCase().includes(search.value.toLowerCase())
+      obj.label?.toLowerCase().includes(search.value.toLowerCase()) || obj.data?.toLocaleLowerCase().includes(search.value.toLowerCase())
   )
-);
+)
 
 const handleOnChange1: UploadProps["onChange"] = (uploadFile) => {
+
+
+
   console.log(uploadFile.raw!, uploadFile);
   if (uploadFile.raw!.type === "image/jpeg") {
     emptyStatus.value = false;
@@ -450,58 +407,55 @@ interface skeleton {
   textWidth: number,
   textMargin: number
 }
-const loading = ref(true);
-const skeletonTemplate = [
-  {
-    sideWidth: 10,
-    sideMargin: 50,
-    textWidth: 20,
-    textMargin: 16,
-  },
-  {
-    sideWidth: 10,
-    sideMargin: 50,
-    textWidth: 40,
-    textMargin: 16,
-  },
-  {
-    sideWidth: 10,
-    sideMargin: 50,
-    textWidth: 85,
-    textMargin: 16,
-  },
-  {
-    sideWidth: 10,
-    sideMargin: 50,
-    textWidth: 45,
-    textMargin: 16,
-  },
-  {
-    sideWidth: 10,
-    sideMargin: 50,
-    textWidth: 65,
-    textMargin: 16,
-  },
-  {
-    sideWidth: 10,
-    sideMargin: 50,
-    textWidth: 15,
-    textMargin: 16,
-  },
-] as Array<skeleton>;
+const loading = ref(false);
+const skeletonTemplate = [{
+  sideWidth: 10,
+  sideMargin: 50,
+  textWidth: 20,
+  textMargin: 16
+}, {
+  sideWidth: 10,
+  sideMargin: 50,
+  textWidth: 40,
+  textMargin: 16
+}, {
+  sideWidth: 10,
+  sideMargin: 50,
+  textWidth: 85,
+  textMargin: 16
+}, {
+  sideWidth: 10,
+  sideMargin: 50,
+  textWidth: 45,
+  textMargin: 16
+}, {
+  sideWidth: 10,
+  sideMargin: 50,
+  textWidth: 65,
+  textMargin: 16
+}, {
+  sideWidth: 10,
+  sideMargin: 50,
+  textWidth: 15,
+  textMargin: 16
+}] as Array<skeleton>
 </script>
 <template lang="">
   <!-- <div>{{ testData }}</div> -->
   <el-row class="exifinput" style="margin-top: 22px; margin-bottom: 10px">
     <el-col :span="20">
-      <div style="margin-left: 25px; font-size: 20px">读取信息</div>
+      <div style="margin-left: 25px; font-size: 20px">
+        读取信息
+      </div>
     </el-col>
     <el-col :span="4">
       <!-- <input type="file" @change="selectedFile" /> -->
-      <el-icon @click="handleOnChange" style="font-size:25px">
-        <i-ep-upload></i-ep-upload>
-      </el-icon>
-      <!-- <el-upload
+      <el-button @click="handleOnChange">
+        <el-icon>
+          <i-ep-upload></i-ep-upload>
+        </el-icon>
+      </el-button>
+      <el-upload
         ref="upload"
         :limit="1"
         :auto-upload="false"
@@ -515,7 +469,7 @@ const skeletonTemplate = [
             <i-ep-upload />
           </el-icon>
         </template>
-      </el-upload> -->
+      </el-upload>
       <!-- <el-skeleton style="width: 240px" :loading="loading" animated>
         <template #template>
           <el-skeleton-item variant="text" style="width: 1%" />
@@ -531,11 +485,7 @@ const skeletonTemplate = [
     <el-empty :image-size="200" description="请先上传图片" />
   </template>
   <el-scrollbar height="100%" :max-height="getMaxHeight" v-else>
-    <el-skeleton
-      style="width: 100%; height: 100%"
-      :loading="loading"
-      animated
-    >
+    <el-skeleton style="width: 100%; height: 100%" :loading="loading" animated :throttle="500">
       <template #template>
         <el-card class="box-card">
           <div class="wrapper">
@@ -558,17 +508,11 @@ const skeletonTemplate = [
                 <div style="display: flex; margin-bottom: 15px">
                   <el-skeleton-item
                     variant="text"
-                    :style="{
-                      width: value.sideWidth + '%',
-                      'margin-left': value.sideMargin + 'px',
-                    }"
+                    :style="{'width': value.sideWidth+'%','margin-left': value.sideMargin+'px'}"
                   />
                   <el-skeleton-item
                     variant="text"
-                    :style="{
-                      width: value.textWidth + '%',
-                      'margin-left': value.textMargin + 'px',
-                    }"
+                    :style="{'width': value.textWidth+'%','margin-left': value.textMargin+'px'}"
                   />
                 </div>
               </div>
@@ -576,21 +520,21 @@ const skeletonTemplate = [
           </div>
         </el-card>
         <el-divider></el-divider>
-        <div style="display: flex">
-          <div style="margin-bottom: 18px; width: 50%">
-            <div style="width: 30%">
+        <div style="display:flex;">
+          <div style="margin-bottom:18px;width:50%">
+            <div style="width:30%">
               <el-skeleton-item variant="text" />
             </div>
           </div>
-          <div style="margin-bottom: 18px; width: 50%">
-            <div style="width: 30%">
+          <div style="margin-bottom:18px;width:50%">
+            <div style="width:30%">
               <el-skeleton-item variant="text" />
             </div>
           </div>
         </div>
         <div v-for="index of 6">
-          <div style="margin-bottom: 28px; display: flex">
-            <el-skeleton-item variant="text" />
+          <div style="margin-bottom:28px;display:flex;">
+            <el-skeleton-item variant="text"/>
             <el-skeleton-item variant="text" />
           </div>
         </div>
@@ -618,7 +562,9 @@ const skeletonTemplate = [
                       <template #label v-if="value.data">
                         <div>{{ value.label }}</div>
                       </template>
-                      <span>{{ value.data }}</span>
+                      <span v-for="v in value.data" v-if="value.data">{{
+                        v
+                      }}</span>
                     </el-descriptions-item>
                   </el-descriptions>
                 </div>
@@ -627,11 +573,10 @@ const skeletonTemplate = [
           </div>
         </el-card>
         <el-divider></el-divider>
-        <el-button text>
+        <el-button text> 
           <el-input v-model="search" size="small" placeholder="搜索">
-            <template #prepend
-              ><el-icon><i-ep-search /></el-icon
-            ></template>
+            <template #prepend><el-icon><i-ep-search/></el-icon></template>
+            
           </el-input>
         </el-button>
         <el-table
@@ -641,14 +586,12 @@ const skeletonTemplate = [
           class="table"
           :default-sort="{ prop: 'label', order: 'ascending' }"
           :row-class-name="detailTableRowClassName"
-          flexible
         >
           <el-table-column
             class="table-col"
             prop="label"
             label="名称"
             resizable
-            show-overflow-tooltip
             sortable
           />
           <el-table-column
@@ -656,7 +599,6 @@ const skeletonTemplate = [
             prop="data"
             label="详细参数"
             resizable
-            show-overflow-tooltip
           ></el-table-column>
         </el-table>
         <el-container class="a-border">
@@ -761,9 +703,9 @@ const skeletonTemplate = [
 <style scoped>
 .wrapper {
   display: flex;
-  /* width: 100%;
+  width: 100%;
   height: 300px;
-  overflow: auto; */
+  overflow: auto;
 }
 
 .eldescription,
@@ -781,6 +723,7 @@ const skeletonTemplate = [
 .pic,
 .pic-skeleton {
   width: 30%;
+  height: 100%;
   display: flex;
 }
 
@@ -802,7 +745,8 @@ const skeletonTemplate = [
   background-position: center;
 }
 
-@media (max-width: 600px) {
+
+@media (max-width:600px) {
   .wrapper {
     flex-direction: column;
     height: 50%;
