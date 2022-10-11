@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [macos-latest, windows-latest]
+        platform: [macos-latest] # windows-latest]
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Checkout repository
@@ -31,14 +31,16 @@ jobs:
         run: |
           echo "ls ${{ github.workspace }}"
       - run: |
-          echo "pwd"
+          echo `pwd`
       - run: |
-          echo "ls ${{ github.workspace }}/src-tauri/winBin/"
+          echo `ls ${{ github.workspace }}/src-tauri/winBin/`
       - run: |
-          echo "ls ${{ github.workspace }}/src-tauri/darwinBin/"
+          echo `ls ${{ github.workspace }}/src-tauri/darwinBin/`
 
       - name: Build the app
         uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tagName: v__VERSION__ # tauri-action replaces \_\_VERSION\_\_ with the app version
           releaseName: "Watermark-Gui v__VERSION__"
