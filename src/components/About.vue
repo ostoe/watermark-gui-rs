@@ -38,6 +38,7 @@ onMounted(() => {
             <el-tag size="small">version</el-tag>
             <span>{{appVersion}}</span>
         </el-descriptions-item>
+        <el-descriptions-item>有问题请联系QQ：1131562995</el-descriptions-item>
     </el-descriptions>
 </template>
 
