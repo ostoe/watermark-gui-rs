@@ -32,6 +32,8 @@ jobs:
           echo "ls ${{ github.workspace }}"
       - run: |
           ls ./src-tauri/winBin/
+      - run: |
+          ls ./src-tauri/darwinBin/
 
       - name: Build the app
         uses: tauri-apps/tauri-action@v0
