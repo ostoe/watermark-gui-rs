@@ -26,10 +26,12 @@ jobs:
         with:
           toolchain: stable
       - name: Install app dependencies and build web
-        run: npm ci
+        run: npm ci && node scripts/abuild.mjs
       - name: run npm mjs scripts
         run: |
-          ./scripts/abuild.mjs
+          echo "ls ${{ github.workspace }}"
+      - run: |
+          ls ./src-tauri/winBin/
 
       - name: Build the app
         uses: tauri-apps/tauri-action@v0
