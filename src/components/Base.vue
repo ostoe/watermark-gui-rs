@@ -296,7 +296,7 @@ import PreviewWidget from "./PreviewWidget.vue";
 // import { image_progress } from "../scripts/reactives";
 import { elmessage, UserSeniorSettings } from "../scripts/reactives";
 import { resolve, resourceDir } from "@tauri-apps/api/path";
-import { Arrayable } from "element-plus/es/utils";
+// import { Arrayable } from "element-plus/es/utils";
 import { StyleValue } from 'vue';
 import { convertFileSrc } from '@tauri-apps/api/tauri';
 // const pic = convertFileSrc("/Users/dongyifan/watermark-gui-rs/src/assets/20220807-_DSC0279-3.jpg")

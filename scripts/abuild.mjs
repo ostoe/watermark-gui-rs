@@ -13,9 +13,9 @@ const { platform, arch } = process;
 import tauriConfJson from "../src-tauri/tauri.conf.json" assert { type: 'json' };
 // import tauriConfJson   from "../src-tauri/tauri.conf.json";
 if (platform === "win32") {
-    tauriConfJson.tauri.bundle.resources = ["resources", "winBin/exiftool.exe"]
-    const zip = new AdmZip("./scripts/winBin.zip")
-    zip.extractAllTo("./src-tauri/winBin/", true, true)
+    // tauriConfJson.tauri.bundle.resources = ["resources", "winBin/exiftool.exe"]
+    // const zip = new AdmZip("./scripts/winBin.zip")
+    // zip.extractAllTo("./src-tauri/winBin/", true, true)
 } else if (platform === "darwin") {
     tauriConfJson.tauri.bundle.resources = ["resources", "darwinBin"]
     const zip = new AdmZip("./scripts/darwinBin.zip")

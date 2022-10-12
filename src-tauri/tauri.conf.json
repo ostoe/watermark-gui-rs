@@ -62,16 +62,6 @@
             ]
           },
           {
-            "name": "darwinBin/exiftool",
-            "sidecar": true,
-            "args": [
-              "-j",
-              {
-                "validator": ".*"
-              }
-            ]
-          },
-          {
             "name": "win-ps",
             "cmd": "powershell",
             "args": [

@@ -84,7 +84,7 @@ const toggleDarkMode = () => {
 //   //   router.push("/textImageProcess");
 // });
 //获取鼠标点击消除遮罩
-let t: NodeJS.Timeout | null = null;
+// let t: NodeJS.Timeout | null = null;
 // const isCollapse = ref(true);
 // const delay = ref(200);
 // const extendPadding = ref("");

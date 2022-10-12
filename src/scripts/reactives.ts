@@ -30,7 +30,7 @@ const sidebarReactives = reactive({
   curWindowHeight:0,
   //获取鼠标点击消除遮罩
   changeThisCollapse() {
-    let t: NodeJS.Timeout | null = null;
+    let t: number | null = null;
     let firstClick = !t;
     if (firstClick) {
       this.isCollapse = this.isCollapse ? false : true;
@@ -361,12 +361,13 @@ const image_progress = reactive({
   },
 
   //
-  dragFiles(arr: Array<string>) {
+  async dragFiles(arr: Array<string>) {
     this.image_paths = {
       count: arr.length,
       image_paths: arr,
     } as ImageProps;
     image_progress.update_progress(0, arr.length);
+    user_conf.latestSelectedDirPath = await dirname(arr[0]);
     elmessage("selected: " + this.image_paths);
   },
   // input files
@@ -575,18 +576,18 @@ async function drag_event_handle() {
   });
 };
 
-async function test_close_event() {
-  // .listen<null>('tauri://close-requested', (event) => {
-  const unlisten = await listen<null>("tauri://close-requested", (event) => {
-    console.log("close----");
-    const { appWindow } = require('@tauri-apps/api/window');
-				resolve();
-				appWindow.close();
-    invoke("send_event");
-  })
-};
+// async function test_close_event() {
+//   // .listen<null>('tauri://close-requested', (event) => {
+//   const unlisten = await listen<null>("tauri://close-requested", (event) => {
+//     console.log("close----");
+//     const { appWindow } = require('@tauri-apps/api/window');
+// 				resolve();
+// 				appWindow.close();
+//     invoke("send_event");
+//   })
+// };
 
-test_close_event();
+// test_close_event();
 
 // run init function
 user_conf.init_user_conf();

@@ -12,7 +12,7 @@ import { ref, onMounted } from "vue";
 import { sidebarReactives, image_progress } from "../scripts/reactives";
 import { convertFileSrc } from "@tauri-apps/api/tauri";
 //获取鼠标点击消除遮罩
-let t: NodeJS.Timeout | null = null;
+// let t: NodeJS.Timeout | null = null;
 // const isCollapse = ref(true);
 // const delay = ref(200);
 // const extendPadding = ref("");

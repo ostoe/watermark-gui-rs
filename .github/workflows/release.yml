@@ -25,6 +25,9 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
+      - name: add aarch64-apple-darwin
+        if: matrix.os == 'macos-latest'
+        run: rustup target add aarch64-apple-darwin
       - name: Install app dependencies and build web
         run: npm ci && node scripts/abuild.mjs
       # - name: run npm mjs scripts
@@ -46,4 +49,4 @@ jobs:
           releaseName: "Watermark-Gui v__VERSION__"
           releaseBody: 'See the assets to download this version and install.'
           releaseDraft: false 
-          prerelease: true
+          prerelease: true 
