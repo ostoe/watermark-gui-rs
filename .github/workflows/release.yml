@@ -42,7 +42,7 @@ jobs:
 
       - name: Build MacOS the app
         if: matrix.platform == 'macos-latest'
-        uses: tauri-apps/tauri-action@v0
+        uses: tauri-apps/tauri-action@v0.3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -54,7 +54,7 @@ jobs:
           prerelease: true 
       - name: Build Win-OS the app
         if: matrix.platform == 'windows-latest'
-        uses: tauri-apps/tauri-action@v0
+        uses: tauri-apps/tauri-action@v0.3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
