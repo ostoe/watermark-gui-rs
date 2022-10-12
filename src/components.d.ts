@@ -75,7 +75,7 @@ declare module '@vue/runtime-core' {
     PreviewWidget: typeof import('./components/PreviewWidget.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    SeniorSettings: typeof import('./components/seniorSettings.vue')['default']
+    SeniorSettings: typeof import('./components/SeniorSettings.vue')['default']
     SideBar: typeof import('./components/SideBar.vue')['default']
     TextImageProcess: typeof import('./components/TextImageProcess.vue')['default']
     TopBar: typeof import('./components/TopBar.vue')['default']

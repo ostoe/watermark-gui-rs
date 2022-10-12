@@ -16,13 +16,13 @@ fs.stat('./src-tauri/darwinBin/exiftool', function (err, stats) {
 });
 fs.stat('./src-tauri/winBin/exiftool.exe', function (err, stats) {
     // console.log(stats);
-    if (err) {
-        return console.log("[warning] no such file or directory");
-    }
-    fs.unlink("./src-tauri/winBin/exiftool.exe",
-        (err) => {
-            if (err) throw err;
-            console.log('winBin/* was deleted')
-        }
-    )
+    // if (err) {
+    //     return console.log("[warning] no such file or directory");
+    // }
+    // fs.unlink("./src-tauri/winBin/exiftool.exe",
+    //     (err) => {
+    //         if (err) throw err;
+    //         console.log('winBin/* was deleted')
+    //     }
+    // )
 });

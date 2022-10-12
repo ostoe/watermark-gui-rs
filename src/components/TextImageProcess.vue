@@ -296,13 +296,13 @@ async function handleOnChange() {
     directory: false,
   });
   if (typeof selected === "string") {
-    const perlScriptsPath = await resolveResource('darwinBin/exiftool'); // debug 下面的目录
     // elllmessage(perlScriptsPath);
     // const abcd = await new Command("cmdd").execute(); // dev => src-tauri // build => /目录 或者/Users/fly/目录
     // elllmessage(abcd.stdout)
     const osType = await os_type(); // Returns 'Linux' 'Darwin'  'Windows_NT'
     let exifTags = {};
     if (osType.includes('Darwin')) {
+      const perlScriptsPath = await resolveResource(''); // debug 下面的目录
       // const output = await Command.sidecar("resources/exiftool",  [ exiftool_path, "-j" , "/Users/fly/Pictures/100NCZ_7/DSC_0595.JPG"]).execute();
       const output = await new Command("perl-run", [perlScriptsPath, "-j", "-b", selected]).execute();
       // console.log(output);
