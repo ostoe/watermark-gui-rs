@@ -13,6 +13,7 @@ jobs:
         platform: [macos-latest, windows-latest]
     runs-on: ${{ matrix.platform }}
     steps:
+      - uses: AutoModality/action-clean@v1
       - name: Checkout repository
         uses: actions/checkout@v2
 
