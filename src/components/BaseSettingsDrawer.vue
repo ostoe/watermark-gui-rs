@@ -447,7 +447,7 @@ const extendCollapse = ref(["1", "2", "3"])
 </template>
   
 
-<style lang="scss" scoped>
+<style lang="css" scoped>
 .row {
     position: absolute;
     bottom: 8px;
@@ -469,7 +469,7 @@ const extendCollapse = ref(["1", "2", "3"])
 
 .grid-content {
     border-radius: 4px;
-    // min-height: 36px;
+    
 }
 
 #invalidInputCss .el-input {
@@ -508,38 +508,41 @@ const extendCollapse = ref(["1", "2", "3"])
     border-radius: 4px;
 }
 
-// :deep(.elinput, .preffix) {
-//     border: v-bind(inputBorder_preffix);
-// }
-
-// :deep(.elinput, .center) {
-//     border: v-bind(inputBorder_center);
-// }
-
-// :deep(.elinput, .suffix) {
-//     border: v-bind(inputBorder_suffix);
-// }
-
-// .el-input__inner {
-//     --el-input-focus-border: #b24444;
-//     --el-input-text-color: #b24444;
-//     --el-text-color-regular:#b24444;
-//     // --el-input-focus-border: #b24444;
-// }
-
-// .el-input__inner::placeholder {
-//   color:  #b24444;
-// }
-// /* google */
-// .el-input__inner::-webkit-input-placeholder {
-//   color:  #b24444;
-// }
-// /* firefox */
-// .el-input__inner:-moz-placeholder {
-//   color:  #b24444;
-// }
-// /*ie*/
-// .el-input__inner:-ms-input-placeholder {
-//   color:  #b24444;
-// }
 </style>
+
+
+<!-- 
+// :deep(.elinput, .preffix) {
+    //     border: v-bind(inputBorder_preffix);
+    // }
+    
+    // :deep(.elinput, .center) {
+    //     border: v-bind(inputBorder_center);
+    // }
+    
+    // :deep(.elinput, .suffix) {
+    //     border: v-bind(inputBorder_suffix);
+    // }
+    
+    // .el-input__inner {
+    //     --el-input-focus-border: #b24444;
+    //     --el-input-text-color: #b24444;
+    //     --el-text-color-regular:#b24444;
+    //     // --el-input-focus-border: #b24444;
+    // }
+    
+    // .el-input__inner::placeholder {
+    //   color:  #b24444;
+    // }
+    // /* google */
+    // .el-input__inner::-webkit-input-placeholder {
+    //   color:  #b24444;
+    // }
+    // /* firefox */
+    // .el-input__inner:-moz-placeholder {
+    //   color:  #b24444;
+    // }
+    // /*ie*/
+    // .el-input__inner:-ms-input-placeholder {
+    //   color:  #b24444;
+    // } -->

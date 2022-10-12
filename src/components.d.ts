@@ -56,7 +56,6 @@ declare module '@vue/runtime-core' {
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     ElTag: typeof import('element-plus/es')['ElTag']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
-    ElUpload: typeof import('element-plus/es')['ElUpload']
     IEpArrowLeft: typeof import('~icons/ep/arrow-left')['default']
     IEpArrowRight: typeof import('~icons/ep/arrow-right')['default']
     IEpCameraFilled: typeof import('~icons/ep/camera-filled')['default']

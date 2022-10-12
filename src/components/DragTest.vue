@@ -96,7 +96,7 @@ event.listen('tauri://file-drop-cancelled', (e) => {
   <!-- </div> -->
 </template>
 
-
+<!-- 
 <style lang="scss" scoped>
 .home {
   height: auto;
@@ -152,4 +152,4 @@ event.listen('tauri://file-drop-cancelled', (e) => {
     color: #41b883;
   }
 }
-</style>
+</style> -->

@@ -9,7 +9,7 @@ import { type as os_type } from '@tauri-apps/api/os';
 import { Command } from '@tauri-apps/api/shell';
 // import { ElMessage, ElNotification } from "element-plus";
 import { open } from "@tauri-apps/api/dialog";
-import { resolve, resourceDir } from "@tauri-apps/api/path";
+import { resolve, resolveResource, resourceDir } from "@tauri-apps/api/path";
 // import { watch } from "fs";
 // import ExifReader from "exifreader";
 import type {
@@ -25,14 +25,14 @@ const text = ref("./tests/img/jpg/gps/DSCN0010.jpg");
 const selectImage = ref("");
 const isPlain = ref(true);
 
-// const message=(msg: string)=> {
-//     ElNotification({
-//       message: msg,
-//       type: "success",
-//       title: "🐮----🍺",
-//       position: "bottom-left",
-//     });
-//   }
+const elllmessage=(msg: string)=> {
+    ElNotification({
+      message: msg,
+      type: "success",
+      title: "🐮----🍺",
+      position: "bottom-left",
+    });
+  }
 
 // {count: selected.length, image_paths: [selected]}
 
@@ -296,15 +296,21 @@ async function handleOnChange() {
     directory: false,
   });
   if (typeof selected === "string") {
+    const perlScriptsPath = await resolveResource('darwinBin/exiftool'); // debug 下面的目录
+    // elllmessage(perlScriptsPath);
+    // const abcd = await new Command("cmdd").execute(); // dev => src-tauri // build => /目录 或者/Users/fly/目录
+    // elllmessage(abcd.stdout)
     const osType = await os_type(); // Returns 'Linux' 'Darwin'  'Windows_NT'
     let exifTags = {};
     if (osType.includes('Darwin')) {
       // const output = await Command.sidecar("resources/exiftool",  [ exiftool_path, "-j" , "/Users/fly/Pictures/100NCZ_7/DSC_0595.JPG"]).execute();
-      const output = await new Command("perl-run", ["darwinBin/exiftool", "-j", "-b", selected]).execute();
+      const output = await new Command("perl-run", [perlScriptsPath, "-j", "-b", selected]).execute();
       // console.log(output);
+      // elllmessage(`${output.code}, ${output.signal},  ${output.stderr}, ${output.stdout}`)
       exifTags = JSON.parse(output.stdout)[0];
       console.log(exifTags);
     } else if (osType.includes('Windows_NT')) {
+      // const exifPS1ScriptsPath = await resolveResource('resources\\win-run.ps1'); 
       const output = await new Command("win-ps", [".\\resources\\win-run.ps1", "-j", "-b", selected]).execute();
       // console.log(output, output.stdout,);
       exifTags = JSON.parse(output.stdout)[0];
@@ -455,7 +461,7 @@ const skeletonTemplate = [{
           <i-ep-upload></i-ep-upload>
         </el-icon>
       </el-button>
-      <el-upload
+      <!-- <el-upload
         ref="upload"
         :limit="1"
         :auto-upload="false"
@@ -469,7 +475,7 @@ const skeletonTemplate = [{
             <i-ep-upload />
           </el-icon>
         </template>
-      </el-upload>
+      </el-upload> -->
       <!-- <el-skeleton style="width: 240px" :loading="loading" animated>
         <template #template>
           <el-skeleton-item variant="text" style="width: 1%" />

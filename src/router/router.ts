@@ -50,12 +50,12 @@ const routes = [
     //   }
     // ]
   },
-  {
-    path: "/DragTest",
-    name: "DragTest",
-    component: DragTest,
-    iconid: 4,
-  },
+  // {
+  //   path: "/DragTest",
+  //   name: "DragTest",
+  //   component: DragTest,
+  //   iconid: 4,
+  // },
   {
     path: "/animation",
     name: "时间",
