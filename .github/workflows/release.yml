@@ -29,6 +29,10 @@ jobs:
       - name: add aarch64-apple-darwin
         if: matrix.platform == 'macos-latest'
         run: rustup target add aarch64-apple-darwin
+
+      - name: clear content
+        run: npm install -g rimraf && rimraf node_modules && rimraf package-lock.json
+      
       - name: Install app dependencies and build web
         run: npm install && npm ci && node scripts/abuild.mjs && npm list
       # - name: run npm mjs scripts
