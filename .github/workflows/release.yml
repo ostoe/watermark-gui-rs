@@ -30,7 +30,7 @@ jobs:
         if: matrix.platform == 'macos-latest'
         run: rustup target add aarch64-apple-darwin
       - name: Install app dependencies and build web
-        run: npm install && npm ci && node scripts/abuild.mjs
+        run: node scripts/abuild.mjs && npm ci && npm run build
       # - name: run npm mjs scripts
       #   run: |
       #     echo "ls ${{ github.workspace }}"
