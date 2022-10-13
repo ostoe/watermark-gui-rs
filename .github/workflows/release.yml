@@ -30,7 +30,7 @@ jobs:
         if: matrix.platform == 'macos-latest'
         run: rustup target add aarch64-apple-darwin
       - name: Install app dependencies and build web
-        run: npm ci && npm run build && node scripts/abuild.mjs
+        run: npm install && npm ci && npm run build && node scripts/abuild.mjs
       # - name: run npm mjs scripts
       #   run: |
       #     echo "ls ${{ github.workspace }}"
@@ -47,7 +47,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          args: --target universal-apple-darwin
+          args: -- --target universal-apple-darwin
           tagName: v__VERSION__ # tauri-action replaces \_\_VERSION\_\_ with the app version
           releaseName: "Watermark-Gui v__VERSION__"
           releaseBody: 'See the assets to download this version and install.'
